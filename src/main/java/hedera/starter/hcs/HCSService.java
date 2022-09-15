@@ -1,79 +1,113 @@
 package hedera.starter.hcs;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.HederaStatusException;
-import com.hedera.hashgraph.sdk.consensus.*;
-import com.hedera.hashgraph.sdk.mirror.MirrorConsensusTopicQuery;
+import com.hedera.hashgraph.sdk.*;
 import hedera.starter.utilities.EnvUtils;
-import hedera.starter.utilities.HederaClient;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class HCSService {
 
-    public Client client = HederaClient.getHederaClientInstance();
+    /**
+     * Create Topic
+     * @return String
+     */
+    public String createTopic() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        Client client = Client.forTestnet();
+        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
 
-    //create HCS Topic
-    public String createTopic() throws HederaStatusException {
-        var tx = new ConsensusTopicCreateTransaction()
-                .setAdminKey(EnvUtils.getOperatorKey().publicKey)
+        var tx = new TopicCreateTransaction()
+                .setAdminKey(Objects.requireNonNull(EnvUtils.getOperatorKey().getPublicKey()))
                 .execute(client);
-        ConsensusTopicId topicId = tx.getReceipt(client).getConsensusTopicId();
-        System.out.println("New topic created: " + topicId);
+        TopicId topicId = tx.getReceipt(client).topicId;
 
-        return topicId.toString();
+        return topicId != null ? topicId.toString() : "Topic creation failed.";
     }
 
-    //Delete a HCS Topic
-    public boolean deleteTopic(String topicId) throws HederaStatusException {
-        var tx = new ConsensusTopicDeleteTransaction()
-                .setTopicId(ConsensusTopicId.fromString(topicId))
+    /**
+     * Create Topic with TopicMemo
+     * @return String
+     */
+    public String createTopicMemo(String topicMemo) throws TimeoutException, PrecheckStatusException,
+            ReceiptStatusException {
+        Client client = Client.forTestnet();
+        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+
+        var tx = new TopicCreateTransaction()
+                .setAdminKey(EnvUtils.getOperatorKey().getPublicKey())
+                .setTopicMemo(topicMemo)
+                .execute(client);
+        TopicId topicId = tx.getReceipt(client).topicId;
+
+        return topicId != null ? topicId.toString() : "Topic creation failed.";
+    }
+
+    /**
+     * Delete Topic
+     * @return boolean
+     */
+    public boolean deleteTopic(String topicId) throws TimeoutException, PrecheckStatusException,
+            ReceiptStatusException {
+        Client client = Client.forTestnet();
+        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+
+        var tx = new TopicDeleteTransaction()
+                .setTopicId(TopicId.fromString(topicId))
                 .execute(client)
-                .getReceipt(client); //get reciept to confirm the deletion.
-        System.out.println("Deleted topic " + topicId);
+                .getReceipt(client);
         return true;
     }
 
-    //get info on a hcs topic
-    public ConsensusTopicInfo getTopicInfo(String topicId) throws HederaStatusException {
 
-        long cost = new ConsensusTopicInfoQuery()
-                .setTopicId(ConsensusTopicId.fromString(topicId))
-                .getCost(client);
-        ConsensusTopicInfo info = new ConsensusTopicInfoQuery()
-                .setTopicId(ConsensusTopicId.fromString(topicId))
-                .setQueryPayment(cost + cost / 50) //add 2% to estimated cost
+    /**
+     * Get Topic information
+     * @return ConsensusTopicInfo
+     */
+    public TopicInfo getTopicInfo(String topicId) throws TimeoutException, PrecheckStatusException {
+        Client client = Client.forTestnet();
+        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+
+        TopicInfo info = new TopicInfoQuery()
+                .setTopicId(TopicId.fromString(topicId))
                 .execute(client);
         return info;
     }
 
     /**
      * Subscribe to messages on the topic, printing out the received message and metadata as it is published by the
-     * Hedera mirror node.
+     * @return boolean
      */
     public boolean subscribeToTopic(String topicId) {
-        new MirrorConsensusTopicQuery()
-                .setTopicId(ConsensusTopicId.fromString(topicId))
+        Client client = Client.forTestnet();
+        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+
+        new TopicMessageQuery()
+                .setTopicId(TopicId.fromString(topicId))
                 .setStartTime(Instant.ofEpochSecond(0))
-                .subscribe(HederaClient.getMirrorClient(), message -> {
-                            System.out.println("Received message from MirrorNode: " + new String(message.message, StandardCharsets.UTF_8)
-                                    + "\n\t consensus timestamp: " + message.consensusTimestamp
-                                    + "\n\t topic sequence number: " + message.sequenceNumber);
-                        },
-                        // On gRPC error, print the stack trace
-                        Throwable::printStackTrace);
-        System.out.println("New messages in this topics will be printed to the console.");
+                .subscribe(client, response -> {
+                            String messageAsString = new String(response.contents, StandardCharsets.UTF_8);
+                            System.out.println(response.consensusTimestamp + " received topic message: " +
+                                    messageAsString);
+                        });
         return true;
     }
 
-    // submit a message to a hcs topic
-    public boolean submitMessage(String topicId, String message) throws HederaStatusException {
+    /**
+     * Submit messages on the topic
+     * @return boolean
+     */
+    public boolean submitMessage(String topicId, String message) throws PrecheckStatusException, TimeoutException,
+            ReceiptStatusException {
+        Client client = Client.forTestnet();
+        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+
         System.out.println("Submitting message to " + topicId);
-        new ConsensusMessageSubmitTransaction()
-                .setTopicId(ConsensusTopicId.fromString(topicId))
+        new TopicMessageSubmitTransaction()
+                .setTopicId(TopicId.fromString(topicId))
                 .setMessage(message)
                 .execute(client)
                 .getReceipt(client);

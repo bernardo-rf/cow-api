@@ -1,7 +1,7 @@
 package hedera.starter.dto;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.contract.ContractInfo;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.ContractInfo;
 
 import javax.annotation.Nullable;
 import java.time.Duration;

@@ -25,9 +25,9 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfo(
-                "Hedera Starter Project",
-                "Hashgraph Interaction API",
-                null,
+                "COW Project",
+                "COW Hashgraph Rest API",
+                "v1.0",
                 null,
                 null,
                 null,

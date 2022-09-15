@@ -1,7 +1,7 @@
 package hedera.starter.utilities;
 
-import com.hedera.hashgraph.sdk.account.AccountId;
-import com.hedera.hashgraph.sdk.crypto.ed25519.Ed25519PrivateKey;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -25,8 +25,8 @@ public class EnvUtils {
         return AccountId.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_ID")));
     }
 
-    public static Ed25519PrivateKey getOperatorKey() {
-        return Ed25519PrivateKey.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_KEY")));
+    public static PrivateKey getOperatorKey() {
+        return PrivateKey.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_KEY")));
     }
 
     public enum Hedera_Environment {
