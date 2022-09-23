@@ -10,6 +10,7 @@ public class Field implements Serializable {
     /**
      * @param idField
      * @param idContract
+     * @param idOwner
      * @param fieldDescription
      * @param address
      * @param limit
@@ -28,6 +29,10 @@ public class Field implements Serializable {
     @Column(name = "IDContract")
     @ApiModelProperty(example = "0.0.48207803", name = "idContract")
     private String idContract;
+
+    @Column(name = "IDOwner")
+    @ApiModelProperty(example = "1", name = "idOwner")
+    private String idOwner;
 
     @Column(name = "Description")
     @ApiModelProperty(example = "West Farm", name = "fieldDescription", required = true)
@@ -61,9 +66,10 @@ public class Field implements Serializable {
         super();
     }
 
-    public Field(String idContract, String fieldDescription, String address, int limit, Double latitude,
+    public Field(String idContract, String idOwner, String fieldDescription, String address, int limit, Double latitude,
                  Double longitude, Boolean active, String observation) {
         this.idContract = idContract;
+        this.idOwner = idOwner;
         this.fieldDescription = fieldDescription;
         this.address = address;
         this.limit = limit;
@@ -83,7 +89,15 @@ public class Field implements Serializable {
 
     public String getIdContract() { return idContract; }
 
-    public void setIdContract(String idContract) { this.idContract = idContract;  }
+    public void setIdContract(String idContract) { this.idContract = idContract; }
+
+    public String getIdOwner() {
+        return idOwner;
+    }
+
+    public void setIdOwner(String idOwner) {
+        this.idOwner = idOwner;
+    }
 
     public String getFieldDescription() {
         return fieldDescription;

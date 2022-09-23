@@ -7,7 +7,7 @@ public class BovineDTO {
     private String idContract;
     private String idOwner;
     private long idField;
-    private Integer serialNumber;
+    private long serialNumber;
     private Date birthDate;
     private Double weight;
     private Double height;
@@ -22,7 +22,7 @@ public class BovineDTO {
 
     public BovineDTO() {}
 
-    public BovineDTO(long idBovine, String idContract, String idOwner, long idField, Integer serialNumber,
+    public BovineDTO(long idBovine, String idContract, String idOwner, long idField, long serialNumber,
                      Date birthDate, Double weight, Double height, String breed, String color, Boolean active,
                      String observation, long idBovineParent1, long idBovineParent2, boolean gender) {
         this.idBovine = idBovine;
@@ -74,11 +74,11 @@ public class BovineDTO {
         this.idField = idField;
     }
 
-    public Integer getSerialNumber() {
+    public long getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(Integer serialNumber) {
+    public void setSerialNumber(long serialNumber) {
         this.serialNumber = serialNumber;
     }
 

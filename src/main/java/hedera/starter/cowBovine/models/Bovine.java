@@ -35,8 +35,8 @@ public class Bovine implements Serializable {
     @ApiModelProperty(example = "1", name = "idContract")
     private String idContract;
 
-    @Column(name = "IDWallet")
-    @ApiModelProperty(example = "1", name = "idWallet")
+    @Column(name = "IDOwner")
+    @ApiModelProperty(example = "1", name = "idOwner")
     private String idOwner;
 
     @Column(name = "IDField")
@@ -45,7 +45,7 @@ public class Bovine implements Serializable {
 
     @Column(name = "SerialNumber")
     @ApiModelProperty(example = "12345", name = "serialNumber", required = true)
-    private Integer serialNumber;
+    private long serialNumber;
 
     @Column(name = "BirthDate")
     @ApiModelProperty(example = "2022-01-01", name = "birthDate", required = true)
@@ -91,12 +91,13 @@ public class Bovine implements Serializable {
 
     public Bovine() { super(); }
 
-    public Bovine(String idContract, String idOwner, long idField, Date birthDate, Double weight, Double height, String breed,
+    public Bovine(String idContract, String idOwner, long idField, long serialNumber,  Date birthDate, Double weight, Double height, String breed,
                   String color, Boolean active, String observation, long idBovineParent1, long idBovineParent2,
                   boolean gender ) {
         this.idContract = idContract;
         this.idOwner = idOwner;
         this.idField = idField;
+        this.serialNumber = serialNumber;
         this.birthDate = birthDate;
         this.weight = weight;
         this.height = height;
@@ -141,11 +142,11 @@ public class Bovine implements Serializable {
         this.idField = idField;
     }
 
-    public Integer getSerialNumber() {
+    public long getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(Integer serialNumber) {
+    public void setSerialNumber(long serialNumber) {
         this.serialNumber = serialNumber;
     }
 

@@ -2,11 +2,12 @@ package hedera.starter.cowUser.models;
 
 import java.util.Date;
 
-public class UserDTO {
+public class UserFullInfoDTO {
     private long idUser;
     private String idContract;
     private String idWallet;
     private int idUserType;
+    private String type;
     private String name;
     private Date birthDate;
     private String email;
@@ -14,13 +15,15 @@ public class UserDTO {
     private Boolean active;
     private Double balance;
 
-    public UserDTO() { }
+    public UserFullInfoDTO() { super(); }
 
-    public UserDTO(long idUser, String idContract, String idWallet, int idUserType, String name, Date birthDate, String email, String password, Boolean active, Double balance) {
+    public UserFullInfoDTO(long idUser, String idContract, String idWallet, int idUserType, String type, String name,
+                           Date birthDate, String email, String password, Boolean active, Double balance) {
         this.idUser = idUser;
         this.idContract = idContract;
         this.idWallet = idWallet;
         this.idUserType = idUserType;
+        this.type = type;
         this.name = name;
         this.birthDate = birthDate;
         this.email = email;
@@ -29,9 +32,7 @@ public class UserDTO {
         this.balance = balance;
     }
 
-    public long getIdUser() {
-        return idUser;
-    }
+    public long getIdUser() { return idUser; }
 
     public void setIdUser(long idUser) {
         this.idUser = idUser;
@@ -61,6 +62,10 @@ public class UserDTO {
         this.idUserType = idUserType;
     }
 
+    public String getUserType() { return type; }
+
+    public void setUserType(String type) { this.type = type; }
+
     public String getName() {
         return name;
     }
@@ -85,9 +90,7 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() { return password; }
 
     public void setPassword(String password) {
         this.password = password;
@@ -99,6 +102,14 @@ public class UserDTO {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Double getBalance() {

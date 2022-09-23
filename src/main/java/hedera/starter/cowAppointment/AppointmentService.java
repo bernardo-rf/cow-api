@@ -15,7 +15,7 @@ import java.util.concurrent.TimeoutException;
 public class AppointmentService {
 
     public Client client = Client.forTestnet();
-    private String PATH_APPOINTMENT_BIN = "D:\\Bernardo\\PolitecnicoLeiria\\MEI_CM\\2ano\\final_project\\COW.API\\src\\main\\java\\hedera\\starter\\cowAppointment\\AppointmentContract.bin";
+    private String PATH_APPOINTMENT_BIN = "D:\\Bernardo\\PolitecnicoLeiria\\MEI_CM\\2ano\\final_project\\COW.API\\src\\main\\java\\hedera\\starter\\cowAppointment\\Appointment.bin";
     private PrivateKey operatorKey = EnvUtils.getOperatorKey();
 
     public ContractId createAppointment(int idBovine, int idVeterinary, Date appointmentDate, String appointmentType,

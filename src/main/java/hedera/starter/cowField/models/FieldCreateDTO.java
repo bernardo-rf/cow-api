@@ -1,46 +1,32 @@
 package hedera.starter.cowField.models;
 
 import hedera.starter.cowBovine.models.BovineDTO;
-
 import java.util.List;
 
-public class FieldDTO {
-    private long idField;
+public class FieldCreateDTO {
     private String idOwner;
-    private String idContract;
     private String fieldDescription;
+    private String address;
     private Double latitude;
     private Double longitude;
-    private String address;
     private int limit;
     private Boolean active;
     private String observation;
     private List<BovineDTO> bovines;
 
-    public FieldDTO(){}
+    public FieldCreateDTO() { }
 
-    public FieldDTO(long idField, String idOwner, Boolean active, String fieldDescription, String idContract,
-                    Double latitude, Double longitude, String address, int limit, String observation,
-                    List<BovineDTO> bovines) {
-        this.idField = idField;
+    public FieldCreateDTO(String idOwner, String fieldDescription, String address, Double latitude, int limit,
+                          Double longitude, Boolean active,  String observation, List<BovineDTO> bovines) {
         this.idOwner = idOwner;
-        this.active = active;
         this.fieldDescription = fieldDescription;
-        this.idContract = idContract;
-        this.latitude = latitude;
-        this.longitude = longitude;
         this.address = address;
         this.limit = limit;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.active = active;
         this.observation = observation;
         this.bovines = bovines;
-    }
-
-    public long getIdField() {
-        return idField;
-    }
-
-    public void setIdField(long idField) {
-        this.idField = idField;
     }
 
     public String getIdOwner() {
@@ -51,14 +37,6 @@ public class FieldDTO {
         this.idOwner = idOwner;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
     public String getFieldDescription() {
         return fieldDescription;
     }
@@ -67,12 +45,12 @@ public class FieldDTO {
         this.fieldDescription = fieldDescription;
     }
 
-    public String getIdContract() {
-        return idContract;
+    public String getAddress() {
+        return address;
     }
 
-    public void setIdContract(String idContract) {
-        this.idContract = idContract;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Double getLatitude() {
@@ -91,12 +69,12 @@ public class FieldDTO {
         this.longitude = longitude;
     }
 
-    public String getAddress() {
-        return address;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public int getLimit() {

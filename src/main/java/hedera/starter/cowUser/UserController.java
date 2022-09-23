@@ -1,7 +1,5 @@
 package hedera.starter.cowUser;
 
-import hedera.starter.cowField.models.Field;
-import hedera.starter.cowField.models.FieldDTO;
 import hedera.starter.cowUser.models.*;
 import hedera.starter.cowUserType.models.UserType;
 import hedera.starter.cowUserType.models.UserTypeRepository;
@@ -16,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 @RestController
@@ -35,7 +32,7 @@ public class UserController {
     private UserTypeRepository userTypeRepository;
 
     @Autowired
-    private JwtToken jwtTokenUtil;
+    private JwtToken jwtToken;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -51,34 +48,36 @@ public class UserController {
 
     @GetMapping("/")
     @ApiOperation("Get all users")
-    public ResponseEntity<List<UserDTO>> getAllUsers() throws Exception {
+    public ResponseEntity<List<UserFullInfoDTO>> getAllUsers() throws Exception {
         try {
-            List<UserDTO> userDTOList =  new ArrayList<>();
+            List<UserFullInfoDTO> userFullInfoDTOList =  new ArrayList<>();
             List<User> users = userRepository.getAllUsers();
             if (users.isEmpty()){
-                return ResponseEntity.ok(userDTOList);
+                return ResponseEntity.ok(userFullInfoDTOList);
             }
             for (User user:users) {
                 Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(user.getIdUserType());
                 if(userType.isPresent()){
-                    UserDTO userDTO = userService.convertToDTO(user, userType.get().getDescription().toUpperCase());
-                    userDTOList.add(userDTO);
+                    UserFullInfoDTO userFullInfoDTO = userService.convertToDTO(user, userType.get().getDescription().toUpperCase());
+                    userFullInfoDTOList.add(userFullInfoDTO);
                 }
             }
-            return ResponseEntity.ok(userDTOList);
+            return ResponseEntity.ok(userFullInfoDTOList);
         }catch (Exception e){
             throw new Exception("INVALID_OPERATION", e);
         }
     }
 
-    @GetMapping("/{idUser}")
+    @GetMapping("/{userID}")
     @ApiOperation("Get user by id")
-    public ResponseEntity<UserDTO> getUser(@PathVariable long idUser) throws Exception {
+    public ResponseEntity<UserFullInfoDTO> getUser(@PathVariable long userID) throws Exception {
         try {
-            Optional<User> userAux = userRepository.findById(idUser);
+            Optional<User> userAux = userRepository.findById(userID);
             if (userAux.isPresent()){
                 Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(userAux.get().getIdUserType());
-                return ResponseEntity.ok(userService.getUserDTO(userAux, userType));
+                if(userType.isPresent()) {
+                    return ResponseEntity.ok(userService.getUserDTO(userAux.get(), userType.get()));
+                }
             }
         }catch (Exception e){
             throw new Exception("INVALID_OPERATION", e);
@@ -92,12 +91,14 @@ public class UserController {
             @ApiImplicitParam(name = "userEmail", required = true, type = "String", example = "bb@mail.pt",
                     value = "user email.")
     })
-    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam(defaultValue = "") String userEmail) throws Exception {
+    public ResponseEntity<UserFullInfoDTO> getUserByEmail(@RequestParam(defaultValue = "") String userEmail) throws Exception {
         try {
             Optional<User> userAux = userRepository.findUserByEmail(userEmail);
             if (userAux.isPresent()){
                 Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(userAux.get().getIdUserType());
-                return ResponseEntity.ok(userService.getUserDTO(userAux, userType));
+                if(userType.isPresent()) {
+                    return ResponseEntity.ok(userService.getUserDTO(userAux.get(), userType.get()));
+                }
             }
         }catch (Exception e){
             throw new Exception("INVALID_OPERATION", e);
@@ -111,53 +112,17 @@ public class UserController {
             @ApiImplicitParam(name = "idWallet", required = true, type = "long", example = "0.0.48229260",
                     value = "user wallet identifier.")
     })
-    public ResponseEntity<UserDTO> getUserByIDWallet(@RequestParam(defaultValue = "") String idWallet) throws Exception {
+    public ResponseEntity<UserFullInfoDTO> getUserByIDWallet(@RequestParam(defaultValue = "") String idWallet) throws Exception {
         try {
             Optional<User> userAux = userRepository.findUserByIDWallet(idWallet);
             if (userAux.isPresent()){
                 Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(userAux.get().getIdUserType());
-                return ResponseEntity.ok(userService.getUserDTO(userAux, userType));
+                if(userType.isPresent()) {
+                    return ResponseEntity.ok(userService.getUserDTO(userAux.get(), userType.get()));
+                }
             }
         }catch (Exception e){
             throw new Exception("INVALID_OPERATION", e);
-        }
-        return ResponseEntity.status(401).build();
-    }
-
-    @PostMapping("/")
-    @ApiOperation("Create a user")
-    public ResponseEntity<UserAuthResponseDTO> createUser( @RequestBody UserCreateDTO userCreateDTO )
-            throws Exception {
-        try {
-            if (userRepository.findUserByEmail(userCreateDTO.getEmail()).isPresent()){
-                return ResponseEntity.status(403).build();
-            }
-
-            List<String> userObject = userService.createUser(userCreateDTO.getIdUserType(), userCreateDTO.getName(),
-                    new Date(3810, Calendar.JANUARY, 1),  userCreateDTO.getEmail(),
-                    userCreateDTO.getPassword(), true);
-
-            if (!userObject.isEmpty()){
-                Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(userCreateDTO.getIdUserType());
-                if(userType.isPresent()){
-                    User user = new User(userObject.get(0), userObject.get(1), userCreateDTO.getIdUserType(),
-                            userCreateDTO.getName(), new Date(3810, Calendar.JANUARY, 1),
-                            userCreateDTO.getEmail(), bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
-                            true );
-                    userRepository.save(user);
-
-                    UserDTO userDTO = userService.convertToDTO(user, userType.get().getDescription().toUpperCase());
-                    if(userDTO != null){
-                        String token = jwtTokenUtil.generateToken(user);
-                        UserAuthResponseDTO userAuthResponseDTO = new UserAuthResponseDTO();
-                        userAuthResponseDTO.setToken(token);
-                        userAuthResponseDTO.setUser(userDTO);
-                        return ResponseEntity.ok(userAuthResponseDTO);
-                    }
-                }
-            }
-        }catch (Exception e) {
-            throw new Exception("INVALID_REGISTER", e);
         }
         return ResponseEntity.status(401).build();
     }
@@ -174,19 +139,70 @@ public class UserController {
 
                 Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(userLogin.get().getIdUserType());
                 if(userType.isPresent()){
-                    User user = userLogin.get();
-                    UserDTO userDTO = userService.convertToDTO(user, userType.get().getDescription().toUpperCase());
-                    if(userDTO != null){
-                        String token = jwtTokenUtil.generateToken(userLogin.get());
-                        UserAuthResponseDTO userAuthResponseDTO = new UserAuthResponseDTO();
-                        userAuthResponseDTO.setToken(token);
-                        userAuthResponseDTO.setUser(userDTO);
+                    UserAuthResponseDTO userAuthResponseDTO = userService.authenticate(userLogin.get(), userType.get(),
+                            jwtToken);
+                    if (!userAuthResponseDTO.getToken().isEmpty()){
                         return ResponseEntity.ok(userAuthResponseDTO);
                     }
                 }
             }
         }catch (BadCredentialsException e){
             throw new Exception("INVALID_CREDENTIALS", e);
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    @PostMapping(value="/", consumes = "application/json", produces = "application/json")
+    @ApiOperation("Create a user")
+    public ResponseEntity<UserAuthResponseDTO> createUser( @RequestBody UserCreateDTO userCreateDTO )
+            throws Exception {
+        try {
+            if (userRepository.findUserByEmail(userCreateDTO.getEmail()).isPresent()){
+                return ResponseEntity.status(403).build();
+            }
+
+            List<String> userObject = userService.createUser(userCreateDTO.getIdUserType(), userCreateDTO.getName(),
+                    new Date(3810, Calendar.JANUARY, 1),  userCreateDTO.getEmail(),
+                    userCreateDTO.getPassword(), true);
+
+            if (!userObject.isEmpty()){
+                Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(userCreateDTO.getIdUserType());
+                if(userType.isPresent()){
+                    String balance = userObject.get(2).substring(0, userObject.get(2).length()-3);
+                    User user = new User(userObject.get(0), userObject.get(1), userCreateDTO.getIdUserType(),
+                            userCreateDTO.getName(), new Date(3810, Calendar.JANUARY, 1),
+                            userCreateDTO.getEmail(), bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
+                            true, Double.valueOf(balance));
+                    userRepository.save(user);
+
+                    UserAuthResponseDTO userAuthResponseDTO = userService.authenticate(user, userType.get(),
+                            jwtToken);
+                    if (!userAuthResponseDTO.getToken().isEmpty()){
+                        return ResponseEntity.ok(userAuthResponseDTO);
+                    }
+                }
+            }
+        }catch (Exception e) {
+            throw new Exception("INVALID_REGISTER", e);
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    @PutMapping(value = "/{userWallet}", consumes = "application/json", produces = "application/json")
+    @ApiOperation("Update user")
+    public ResponseEntity<UserFullInfoDTO> updateUser(@PathVariable String userWallet,
+                                                      @RequestBody UserFullInfoDTO userFullInfoDTO) throws Exception {
+        try{
+            if(userWallet.equals(userFullInfoDTO.getIdWallet())){
+                User oldUser = userRepository.findUserByIDWallet(userWallet).get();
+                User newUser = userService.updateUser(oldUser, userFullInfoDTO);
+                userRepository.save(newUser);
+                Optional<UserType> userType = userTypeRepository.getUserTypeByIDUserType(newUser.getIdUserType());
+                return ResponseEntity.ok(userService.convertToDTO(newUser,
+                        userType.get().getDescription().toUpperCase()));
+            }
+        }catch  (Exception e){
+            throw new Exception("INVALID_OPERATION", e);
         }
         return ResponseEntity.status(401).build();
     }

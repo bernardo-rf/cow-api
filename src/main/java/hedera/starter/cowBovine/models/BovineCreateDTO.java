@@ -1,10 +1,9 @@
 package hedera.starter.cowBovine.models;
 
 import java.util.Date;
+import java.util.List;
 
-public class BovineFullInfoDTO {
-    private long idBovine;
-    private String idContract;
+public class BovineCreateDTO {
     private String idOwner;
     private long idField;
     private long serialNumber;
@@ -18,16 +17,10 @@ public class BovineFullInfoDTO {
     private long idBovineParent1;
     private long idBovineParent2;
     private boolean gender;
-    private String address;
 
-    public BovineFullInfoDTO(){};
+    public BovineCreateDTO() { }
 
-    public BovineFullInfoDTO(long idBovine, String idContract, String idOwner, long idField, long serialNumber,
-                             Date birthDate, Double weight, Double height, String breed, String color, Boolean active,
-                             String observation, long idBovineParent1, long idBovineParent2,
-                             boolean gender, String address ) {
-        this.idBovine = idBovine;
-        this.idContract = idContract;
+    public BovineCreateDTO(String idOwner, long idField, long serialNumber, Date birthDate, Double weight, Double height, String breed, String color, Boolean active, String observation, long idBovineParent1, long idBovineParent2, boolean gender) {
         this.idOwner = idOwner;
         this.idField = idField;
         this.serialNumber = serialNumber;
@@ -41,23 +34,6 @@ public class BovineFullInfoDTO {
         this.idBovineParent1 = idBovineParent1;
         this.idBovineParent2 = idBovineParent2;
         this.gender = gender;
-        this.address = address;
-    }
-
-    public long getIdBovine() {
-        return idBovine;
-    }
-
-    public void setIdBovine(long idBovine) {
-        this.idBovine = idBovine;
-    }
-
-    public String getIdContract() {
-        return idContract;
-    }
-
-    public void setIdContract(String idContract) {
-        this.idContract = idContract;
     }
 
     public String getIdOwner() {
@@ -120,7 +96,9 @@ public class BovineFullInfoDTO {
         return color;
     }
 
-    public void setColor(String color) { this.color = color; }
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public Boolean getActive() {
         return active;
@@ -136,14 +114,6 @@ public class BovineFullInfoDTO {
 
     public void setObservation(String observation) {
         this.observation = observation;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public long getIdBovineParent1() {
@@ -162,7 +132,11 @@ public class BovineFullInfoDTO {
         this.idBovineParent2 = idBovineParent2;
     }
 
-    public boolean isGender() { return gender; }
+    public boolean isGender() {
+        return gender;
+    }
 
-    public void setGender(boolean gender) { this.gender = gender; }
+    public void setGender(boolean gender) {
+        this.gender = gender;
+    }
 }

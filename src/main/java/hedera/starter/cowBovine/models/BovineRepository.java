@@ -17,5 +17,6 @@ public interface BovineRepository extends JpaRepository<Bovine, Long> {
     List<Bovine> getBovineByIdUser(String IDOwner);
 
     @Query("SELECT b FROM Bovine b WHERE b.serialNumber = ?1 and b.active = true")
-    Bovine checkBovineSerialNumber(String serialNumber);
+    Optional<Bovine> checkBovineSerialNumber(long serialNumber);
+
 }

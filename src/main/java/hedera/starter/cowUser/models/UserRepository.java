@@ -16,5 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> getAllUsers();
 
     @Query("SELECT u FROM User u WHERE u.idUser = 1 and u.active = true")
-    List<User> getUserByIDUser(long idUser);
+    User getUserByIDUser(long idUser);
 }

@@ -18,6 +18,7 @@ public class User implements Serializable {
      * @param email
      * @param password
      * @param active
+     * @param balance
      */
 
     @Id
@@ -39,7 +40,7 @@ public class User implements Serializable {
     private int idUserType;
 
     @Column(name = "Name")
-    @ApiModelProperty(example = "1", name = "name")
+    @ApiModelProperty(example = "1", name = "name", required = true)
     private String name;
 
     @Column(name = "birthdate")
@@ -47,21 +48,25 @@ public class User implements Serializable {
     private Date birthDate;
 
     @Column(name = "Email")
-    @ApiModelProperty(example = "Regular appointment", name = "email")
+    @ApiModelProperty(example = "Regular appointment", name = "email", required = true)
     private String email;
 
     @Column(name = "Password")
-    @ApiModelProperty(example = "Regular appointment", name = "password")
+    @ApiModelProperty(example = "Regular appointment", name = "password", required = true)
     private String password;
 
     @Column(name = "Active")
-    @ApiModelProperty(example = "1", name = "active")
+    @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
+
+    @Column(name = "Balance")
+    @ApiModelProperty(example = "1090.50", name="balance", required = true)
+    private double balance;
 
     public User() { super(); }
 
     public User(String idContract, String idWallet, int idUserType, String name, Date birthDate, String email,
-                String password, Boolean active) {
+                String password, Boolean active, Double balance) {
         this.idContract = idContract;
         this.idWallet = idWallet;
         this.idUserType = idUserType;
@@ -70,6 +75,7 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.active = active;
+        this.balance = balance;
     }
 
     public long getIdUser() { return idUser; }
@@ -140,4 +146,11 @@ public class User implements Serializable {
         this.active = active;
     }
 
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
 }

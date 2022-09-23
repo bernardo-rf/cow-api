@@ -1,11 +1,11 @@
 package hedera.starter.cowUser.models;
 public class UserAuthResponseDTO {
     private String token;
-    private UserDTO user;
+    private UserFullInfoDTO user;
 
     public UserAuthResponseDTO() { }
 
-    public UserAuthResponseDTO(String token, UserDTO user) {
+    public UserAuthResponseDTO(String token, UserFullInfoDTO user) {
         this.token = token;
         this.user = user;
     }
@@ -18,11 +18,11 @@ public class UserAuthResponseDTO {
         this.token = token;
     }
 
-    public UserDTO getUser() {
+    public UserFullInfoDTO getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(UserFullInfoDTO user) {
         this.user = user;
     }
 }

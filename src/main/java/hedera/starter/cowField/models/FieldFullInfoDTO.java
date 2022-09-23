@@ -2,21 +2,25 @@ package hedera.starter.cowField.models;
 
 public class FieldFullInfoDTO {
     private long idField;
-    private Boolean active;
-    private String fieldDescription;
+    private String idOwner;
     private String idContract;
+    private String fieldDescription;
     private Double latitude;
     private Double longitude;
     private String address;
     private int limit;
+    private Boolean active;
     private String observation;
-    private Integer currentOccupation;
+    private int currentOccupation;
+    private int currentOccupationPercentage;
 
     public FieldFullInfoDTO() { }
 
-    public FieldFullInfoDTO(long idField, String idContract, String fieldDescription, String address, int limit,
-                            Integer currentOccupation, Double latitude, Double longitude, Boolean active, String observation) {
+    public FieldFullInfoDTO(long idField, String idOwner, String idContract, String fieldDescription, String address,
+                            Double latitude, Double longitude, int limit, int currentOccupation, Boolean active,
+                            String observation, int currentOccupationPercentage) {
         this.idField = idField;
+        this.idOwner = idOwner;
         this.idContract = idContract;
         this.fieldDescription = fieldDescription;
         this.address = address;
@@ -26,6 +30,7 @@ public class FieldFullInfoDTO {
         this.longitude = longitude;
         this.active = active;
         this.observation = observation;
+        this.currentOccupationPercentage = currentOccupationPercentage;
     }
 
     public long getIdField() {
@@ -43,6 +48,10 @@ public class FieldFullInfoDTO {
     public void setIdContract(String idContract) {
         this.idContract = idContract;
     }
+
+    public String getIdOwner() { return idOwner; }
+
+    public void setIdOwner(String idOwner) { this.idOwner = idOwner; }
 
     public String getFieldDescription() {
         return fieldDescription;
@@ -68,11 +77,11 @@ public class FieldFullInfoDTO {
         this.limit = limit;
     }
 
-    public Integer getCurrentOccupation() {
+    public int getCurrentOccupation() {
         return currentOccupation;
     }
 
-    public void setCurrentOccupation(Integer currentOccupation) {
+    public void setCurrentOccupation(int currentOccupation) {
         this.currentOccupation = currentOccupation;
     }
 
@@ -106,5 +115,13 @@ public class FieldFullInfoDTO {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+    public int getCurrentOccupationPercentage() {
+        return currentOccupationPercentage;
+    }
+
+    public void setCurrentOccupationPercentage(int currentOccupationPercentage) {
+        this.currentOccupationPercentage = currentOccupationPercentage;
     }
 }

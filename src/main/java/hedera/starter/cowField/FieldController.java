@@ -1,13 +1,9 @@
 package hedera.starter.cowField;
 
-import com.hedera.hashgraph.sdk.ContractId;
 import hedera.starter.cowBovine.BovineService;
 import hedera.starter.cowBovine.models.Bovine;
 import hedera.starter.cowBovine.models.BovineDTO;
-import hedera.starter.cowField.models.Field;
-import hedera.starter.cowField.models.FieldDTO;
-import hedera.starter.cowField.models.FieldFullInfoDTO;
-import hedera.starter.cowField.models.FieldRepository;
+import hedera.starter.cowField.models.*;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,40 +32,16 @@ public class FieldController {
         bovineService = new BovineService();
     }
 
-    @GetMapping("/")
-    @ApiOperation("Get all fields")
-    public ResponseEntity<List<FieldDTO>> getAllFields() throws Exception {
-        try {
-            List<FieldDTO> fieldFullInfoDTOList =  new ArrayList<>();
-            List<Field> fields = fieldRepository.getAllFields();
-            if (fields.isEmpty()){
-                return ResponseEntity.ok(fieldFullInfoDTOList);
-            }
-            for (Field field:fields) {
-                FieldDTO fieldDTO = new FieldDTO(field.getIdField(), field.getActive(),
-                        field.getFieldDescription(), field.getIdContract(), field.getLatitude(), field.getLongitude(),
-                        field.getAddress(), field.getLimit(), field.getObservation());
-                fieldFullInfoDTOList.add(fieldDTO);
-            }
-            return ResponseEntity.ok(fieldFullInfoDTOList);
-        }catch (Exception e){
-            throw new Exception("INVALID_OPERATION", e);
-        }
-    }
-
     @GetMapping("/{fieldId}")
     @ApiOperation("Get field by id")
     public ResponseEntity<FieldFullInfoDTO> getField(@PathVariable long fieldId) throws Exception {
         try {
             Optional<Field> fieldAux = fieldRepository.getFieldByIDField(fieldId);
             if (fieldAux.isPresent()){
-                List<Integer> fieldsCurrentOccupation = fieldRepository.getAllFieldsCurrentOccupation();
-                if (!fieldsCurrentOccupation.isEmpty()){
-                    Field field = fieldAux.get();
-                    int currentOccupationPercentage = fieldsCurrentOccupation.get(0);
-                    FieldFullInfoDTO fieldFullInfoDTO = fieldService.convertToDto(field, currentOccupationPercentage);
-                    return ResponseEntity.ok(fieldFullInfoDTO);
-                }
+                int fieldsCurrentOccupation = fieldRepository.getFieldCurrentOccupation(fieldId);
+                int currentOccupationPercentage = (int)(((fieldsCurrentOccupation*1.0)/fieldAux.get().getLimit())*100);
+                FieldFullInfoDTO fullInfoDTO = fieldService.convertToDto(fieldAux.get(), fieldsCurrentOccupation, currentOccupationPercentage);
+                return ResponseEntity.ok(fullInfoDTO);
             }
         }catch(Exception e){
             throw new Exception("INVALID_OPERATION", e);
@@ -77,12 +49,12 @@ public class FieldController {
         return ResponseEntity.status(401).build();
     }
 
-    @GetMapping("/full_info")
+    @GetMapping("{idOwner}/full_info")
     @ApiOperation("Get all fields full info")
-    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsFullInfo() throws Exception {
+    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsFullInfo(@PathVariable String idOwner) throws Exception {
         try {
             List<FieldFullInfoDTO> fieldFullInfoDTOList =  new ArrayList<>();
-            List<Field> fields = fieldRepository.getAllFields();
+            List<Field> fields = fieldRepository.getAllFieldsByOwner(idOwner);
             if (fields.isEmpty()){
                 return ResponseEntity.ok(fieldFullInfoDTOList);
             }
@@ -91,7 +63,8 @@ public class FieldController {
                 for (int i=0; i <= fields.size() -1; i++){
                     Field field = fields.get(i);
                     int currentOccupationPercentage = (int)(((fieldsCurrentOccupation.get(i)*1.0)/field.getLimit())*100);
-                    FieldFullInfoDTO fieldFullInfoDTO = fieldService.convertToDto(field, currentOccupationPercentage);
+                    FieldFullInfoDTO fieldFullInfoDTO = fieldService.convertToDto(field, fieldsCurrentOccupation.get(i),
+                            currentOccupationPercentage);
                     fieldFullInfoDTOList.add(fieldFullInfoDTO);
                 }
                 return ResponseEntity.ok(fieldFullInfoDTOList);
@@ -113,101 +86,94 @@ public class FieldController {
                     BovineDTO bovineDTO = bovineService.convertToDto(bovine);
                     bovineDTOList.add(bovineDTO);
                 }
-                return ResponseEntity.ok(bovineDTOList);
             }
+            return ResponseEntity.ok(bovineDTOList);
         }catch(Exception e){
+            throw new Exception("INVALID_OPERATION", e);
+        }
+    }
+
+    @GetMapping("/cows/notIn/{fieldId}")
+    @ApiOperation("Get field cows by id")
+    public ResponseEntity<List<BovineDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception {
+        try {
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovineList = fieldRepository.getAllBovineNotIn(fieldId);
+            if (!bovineList.isEmpty()){
+                for (Bovine bovine: bovineList) {
+                    BovineDTO bovineDTO = bovineService.convertToDto(bovine);
+                    bovineDTOList.add(bovineDTO);
+                }
+            }
+            return ResponseEntity.ok(bovineDTOList);
+        }catch(Exception e){
+            throw new Exception("INVALID_OPERATION", e);
+        }
+    }
+
+    @PostMapping("/")
+    @ApiOperation("Create a field")
+    public ResponseEntity<FieldFullInfoDTO> createField(@RequestBody FieldCreateDTO fieldCreateDTO ) throws Exception {
+        try {
+            if (fieldRepository.findFieldByAddress(fieldCreateDTO.getAddress(), fieldCreateDTO.getIdOwner()) != null) {
+                return ResponseEntity.status(403).build();
+            }
+            Field newField = fieldService.createField(fieldCreateDTO);
+            if (newField != null){
+                fieldRepository.save(newField);
+                FieldFullInfoDTO fullInfoDTO = fieldService.convertToDto(newField, 0, 0);
+                if (fullInfoDTO.getIdField() != 0){
+                    bovineService.updateBovineLocation(fieldCreateDTO.getBovines(), newField.getIdField());
+                    return ResponseEntity.ok(fullInfoDTO);
+                }
+            }
+        }catch (Exception e) {
+        throw new Exception("INVALID_OPERATION", e);
+    }
+        return ResponseEntity.status(401).build();
+    }
+
+    @PutMapping("/{fieldID}")
+    @ApiOperation("Update a field")
+    public ResponseEntity<FieldDTO> updateField( @PathVariable long fieldID, @RequestBody FieldDTO fieldDTO )
+            throws Exception {
+        try {
+            if(fieldID == fieldDTO.getIdField()){
+                Optional<Field> oldField = fieldRepository.getFieldByIDField(fieldID);
+                if (oldField.isPresent()) {
+                    Field updatedField = fieldService.updateField(oldField.get(), fieldDTO);
+                    fieldRepository.save(updatedField);
+
+                    FieldFullInfoDTO fullInfoDTO = fieldService.convertToDto(updatedField, 0, 0);
+                    if (fullInfoDTO.getIdField() != 0){
+                        List<BovineDTO> bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(), updatedField.getIdField());
+                        FieldDTO updatedFieldDTO = new FieldDTO(updatedField.getIdField(), updatedField.getIdOwner(),
+                                updatedField.getActive(), updatedField.getFieldDescription(), updatedField.getIdContract(),
+                                updatedField.getLatitude(), updatedField.getLongitude(), updatedField.getAddress(),
+                                updatedField.getLimit(), updatedField.getObservation(), bovineDTOS);
+                        return ResponseEntity.ok(updatedFieldDTO);
+                    }
+                }
+            }
+        } catch  (Exception e){
             throw new Exception("INVALID_OPERATION", e);
         }
         return ResponseEntity.status(401).build();
     }
 
-
-
-    @PostMapping("/")
-    @ApiOperation("Create a field")
-    @ApiImplicitParams({
-            @ApiImplicitParam( name = "fieldDescription",type = "string", example = "West Field ",
-                    value = "define the description of the field."),
-            @ApiImplicitParam( name = "address",type = "string",
-                    example = "537-3270 1109 19th St. Gil, Nebraska(NE)",
-                    value = "define the description of the field."),
-            @ApiImplicitParam( name = "limit",type = "int", example = "100",
-                    value = "define the limit occupation of the field."),
-            @ApiImplicitParam( name = "latitude", type = "double", example = "37.89143",
-                    value = "define the latitude of the field."),
-            @ApiImplicitParam( name = "longitude", type = "double", example = "-55.86727",
-                    value = "define the longitude of the field."),
-            @ApiImplicitParam( name = "active", type = "boolean", example = "1",
-                    value = "define the active of the field."),
-            @ApiImplicitParam( name = "observation", type = "string", example = "Observation about the field",
-                    value = "define the observation of the field.")
-    })
-    public Field createField( @RequestParam(defaultValue = "Field 1") String fieldDescription,
-                              @RequestParam(defaultValue = "537-3270 1109 19th St. Gil, Nebraska(NE)")
-                                      String address,
-                              @RequestParam(defaultValue = "100") int limit,
-                              @RequestParam(defaultValue = "10.10101") Double latitude,
-                              @RequestParam(defaultValue = "-55.86727") Double longitude,
-                              @RequestParam(defaultValue = "1") Boolean active,
-                              @RequestParam(defaultValue = "") String observation) {
-                ContractId idContract = fieldService.createField(fieldDescription, latitude, longitude, active,
-                        observation);
-                Field newField = new Field(idContract.toString(), fieldDescription, address, limit, latitude, longitude,
-                        active, observation );
-        return fieldRepository.save(newField);
-    }
-
-    @PutMapping("/{idField}")
-    @ApiOperation("Update a field")
-    @ApiImplicitParams({
-            @ApiImplicitParam( name = "fieldDescription",type = "string", example = "West Field ",
-                    value = "define the description of the field."),
-            @ApiImplicitParam( name = "address",type = "string",
-                    example = "537-3270 1109 19th St. Gil, Nebraska(NE)",
-                    value = "define the description of the field."),
-            @ApiImplicitParam( name = "limit",type = "int", example = "100",
-                    value = "define the limit occupation of the field."),
-            @ApiImplicitParam( name = "latitude", type = "double", example = "37.89143",
-                    value = "define the latitude of the field."),
-            @ApiImplicitParam( name = "longitude", type = "double", example = "-55.86727",
-                    value = "define the longitude of the field."),
-            @ApiImplicitParam( name = "active", type = "boolean", example = "1",
-                    value = "define the active of the field."),
-            @ApiImplicitParam( name = "observation", type = "string", example = "Observation about the field",
-                    value = "define the observation of the field.")
-    })
-    public Field updateField( @PathVariable long idField,
-                              @RequestParam(defaultValue = "Field 1") String fieldDescription,
-                              @RequestParam(defaultValue = "537-3270 1109 19th St. Gil, Nebraska(NE)")
-                                          String address,
-                              @RequestParam(defaultValue = "100") int limit,
-                              @RequestParam(defaultValue = "37.89143") Double latitude,
-                              @RequestParam(defaultValue = "10.10101") Double longitude,
-                              @RequestParam(defaultValue = "1") Boolean active,
-                              @RequestParam(defaultValue = "") String observation) {
-
-        Field oldField = fieldRepository.findById(idField).get();
-
-        if (oldField != null){
-            fieldService.updateField(oldField.getIdContract(), fieldDescription, latitude, longitude, active, observation);
-            oldField.setFieldDescription(fieldDescription);
-            oldField.setAddress(address);
-            oldField.setLimit(limit);
-            oldField.setLatitude(latitude);
-            oldField.setLongitude(longitude);
-            oldField.setActive(active);
-            oldField.setObservation(observation);
-            return fieldRepository.save(oldField);
-        }else{
-            return new Field();
-        }
-    }
-
-    @DeleteMapping("/{idField}")
+    @DeleteMapping("/{fieldID}")
     @ApiOperation("Delete a field")
-    public void appointmentField( @PathVariable long idField) {
-        Field fieldToDelete = fieldRepository.findById(idField).get();
-        fieldService.deleteField(fieldToDelete.getIdContract());
-        fieldRepository.deleteById(idField);
+    public ResponseEntity<String> deleteField( @PathVariable long fieldID) throws Exception {
+        try {
+            Field fieldToDelete = fieldRepository.findById(fieldID).get();
+            if (!fieldToDelete.getIdContract().isBlank()){
+                fieldService.deleteField(fieldToDelete.getIdContract());
+                fieldRepository.deleteById(fieldID);
+                return ResponseEntity.ok().build();
+            }
+        }catch(Exception e){
+            throw new Exception("INVALID_OPERATION",e);
+        }
+        return ResponseEntity.status(401).build();
     }
 }
