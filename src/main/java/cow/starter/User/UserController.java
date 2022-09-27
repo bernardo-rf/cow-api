@@ -103,7 +103,7 @@ public class UserController {
             UserAuthResponseDTO userAuthResponseDTO = userService.authenticate(userAuthDTO);
             if (userAuthResponseDTO.getToken().equals("USER_DISABLE")) {
                 return ResponseEntity.status(403).build();
-            } else if(userAuthResponseDTO.getToken().equals("")){
+            } else if(!userAuthResponseDTO.getToken().equals("")){
                 return ResponseEntity.ok(userAuthResponseDTO);
             }
             return ResponseEntity.status(401).build();
