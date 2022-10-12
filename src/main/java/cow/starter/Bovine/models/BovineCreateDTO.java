@@ -16,12 +16,13 @@ public class BovineCreateDTO {
     private long idBovineParent1;
     private long idBovineParent2;
     private boolean gender;
+    private String imageCID;
 
     public BovineCreateDTO() { }
 
     public BovineCreateDTO(String idOwner, long idField, long serialNumber, Date birthDate, Double weight,
                            Double height, String breed, String color, Boolean active, String observation,
-                           long idBovineParent1, long idBovineParent2, boolean gender) {
+                           long idBovineParent1, long idBovineParent2, boolean gender, String imageCID) {
         this.idOwner = idOwner;
         this.idField = idField;
         this.serialNumber = serialNumber;
@@ -35,6 +36,7 @@ public class BovineCreateDTO {
         this.idBovineParent1 = idBovineParent1;
         this.idBovineParent2 = idBovineParent2;
         this.gender = gender;
+        this.imageCID = imageCID;
     }
 
     public String getIdOwner() {
@@ -139,5 +141,13 @@ public class BovineCreateDTO {
 
     public void setGender(boolean gender) {
         this.gender = gender;
+    }
+
+    public String getImageCID() {
+        return imageCID;
+    }
+
+    public void setImageCID(String imageCID) {
+        this.imageCID = imageCID;
     }
 }

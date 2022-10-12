@@ -1,7 +1,5 @@
 package cow.starter.Field;
 import com.hedera.hashgraph.sdk.*;
-import cow.starter.Appointment.models.Appointment;
-import cow.starter.Appointment.models.AppointmentDTO;
 import cow.starter.Bovine.BovineService;
 import cow.starter.Bovine.models.Bovine;
 import cow.starter.Bovine.models.BovineDTO;
@@ -10,11 +8,9 @@ import cow.starter.User.models.User;
 import cow.starter.User.models.UserRepository;
 import cow.starter.utilities.EnvUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.io.*;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +82,31 @@ public class FieldService {
         return fieldFullInfoDTOList;
     }
 
+    public List<FieldFullInfoDTO> getFieldsNotOccupied(String idOwner) {
+        List<Field> fields = fieldRepository.getAllFieldsByOwner(idOwner);
+        if (fields.isEmpty()){
+            return new ArrayList<>();
+        }
+
+        List<FieldFullInfoDTO> fieldFullInfoDTOList = new ArrayList<>();
+        List<Integer> fieldsCurrentOccupationList = fieldRepository.getAllFieldsCurrentOccupation();
+        if (!fieldsCurrentOccupationList.isEmpty()){
+            for (int i=0; i <= fields.size() -1; i++){
+
+                Field field = fieldRepository.getField(fields.get(i).getIdField());
+                if (field != null){
+                    int fieldCurrentOccupation = fieldRepository.getFieldCurrentOccupation(field.getIdField());
+                    int currentOccupationPercentage = (int)(((fieldCurrentOccupation*1.0)/field.getLimit())*100);
+                    if (currentOccupationPercentage != 100){
+                        FieldFullInfoDTO fieldFullInfoDTO = convertToDTO(field, fieldCurrentOccupation, currentOccupationPercentage);
+                        fieldFullInfoDTOList.add(fieldFullInfoDTO);
+                    }
+                }
+            }
+        }
+        return fieldFullInfoDTOList;
+    }
+
     public List<BovineDTO> getBovineDTOList(List<Bovine> bovines){
         List<BovineDTO> bovineDTOList = new ArrayList<>();
         for (Bovine bovine: bovines) {
@@ -103,7 +124,7 @@ public class FieldService {
                 fieldDTO.setIdField(999999);
                 return fieldDTO;
             }
-            File myObj = new File("D:\\Bernardo\\PolitecnicoLeiria\\MEI_CM\\2ano\\final_project\\COW.API\\src\\main\\java\\cow\\starter\\Field\\Field.bin");
+            File myObj = new File(EnvUtils.getContractPath() + "COW.API\\src\\main\\java\\cow\\starter\\Field\\Field.bin");
             Scanner myReader = new Scanner(myObj);
 
             if (checkFieldValues(fieldCreateDTO.getIdOwner())) {
@@ -138,8 +159,8 @@ public class FieldService {
                                 .setAdminKey(operatorKey)
                                 .setConstructorParameters(new ContractFunctionParameters()
                                         .addString(fieldCreateDTO.getFieldDescription())
-                                        .addUint256(BigDecimal.valueOf(fieldCreateDTO.getLatitude()).toBigInteger())
-                                        .addUint256(BigDecimal.valueOf(fieldCreateDTO.getLongitude()).toBigInteger())
+                                        .addString(fieldCreateDTO.getLatitude().toString())
+                                        .addString(fieldCreateDTO.getLongitude().toString())
                                         .addBool(fieldCreateDTO.getActive())
                                         .addString(fieldCreateDTO.getObservation())
                                         .addString(fieldCreateDTO.getIdOwner()))
@@ -172,26 +193,24 @@ public class FieldService {
         return fieldDTO;
     }
 
-        public FieldDTO updateField(FieldDTO fieldDTO) {
+    public FieldDTO updateField(FieldDTO fieldDTO) {
             FieldDTO emptyFieldDTO = new FieldDTO();
             try {
                 if (checkFieldValues(fieldDTO.getIdOwner())) {
-                    client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
-
-                    TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
-                            .setContractId(ContractId.fromString(fieldDTO.getIdContract()))
-                            .setGas(100000)
-                            .setFunction("setUpdate", new ContractFunctionParameters()
-                                    .addUint256(BigDecimal.valueOf(fieldDTO.getLatitude()).toBigInteger())
-                                    .addUint256(BigDecimal.valueOf(fieldDTO.getLongitude()).toBigInteger())
-                                    .addBool(fieldDTO.getActive()))
-                            .execute(client);
-
-                    TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
-                    System.out.println("Status " + fileReceipt.status);
-
                     Field field = fieldRepository.getField(fieldDTO.getIdField());
                     if (field != null) {
+                        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+
+                        TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
+                                .setContractId(ContractId.fromString(field.getIdContract()))
+                                .setGas(1000000)
+                                .setFunction("setUpdate", new ContractFunctionParameters()
+                                        .addBool(fieldDTO.getActive()))
+                                .execute(client);
+
+                        TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
+                        System.out.println("Status " + fileReceipt.status);
+
                         field.setFieldDescription(fieldDTO.getFieldDescription());
                         field.setAddress(fieldDTO.getAddress());
                         field.setLimit(fieldDTO.getLimit());
@@ -210,9 +229,12 @@ public class FieldService {
                         return convertToSimpleDTO(field, bovineDTOS);
                     }
                 }
-        } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
-            e.printStackTrace();
-        }
+//          } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
+//              e.printStackTrace();
+//          }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         return emptyFieldDTO;
     }
 

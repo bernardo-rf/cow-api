@@ -91,7 +91,7 @@ public class UserService {
                 return emptyUserAuthResponseDTO;
             }
 
-            File myObj = new File("D:\\Bernardo\\PolitecnicoLeiria\\MEI_CM\\2ano\\final_project\\COW.API\\src\\main\\java\\cow\\starter\\User\\User.bin");
+            File myObj = new File(EnvUtils.getContractPath() + "COW.API\\src\\main\\java\\cow\\starter\\User\\User.bin");
             Scanner myReader = new Scanner(myObj);
 
             while (myReader.hasNextLine()) {

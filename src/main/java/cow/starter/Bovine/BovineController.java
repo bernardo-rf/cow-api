@@ -1,7 +1,5 @@
 package cow.starter.Bovine;
 
-import com.hedera.hashgraph.sdk.ContractId;
-import cow.starter.Appointment.models.AppointmentDTO;
 import cow.starter.Bovine.models.*;
 import cow.starter.Field.models.Field;
 import cow.starter.Field.models.FieldRepository;
@@ -9,7 +7,6 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 @RestController
@@ -47,16 +44,84 @@ public class BovineController {
         }
     }
 
+    @GetMapping("/{ownerId}/male")
+    @ApiOperation("Get all bovines owned male")
+    public ResponseEntity<List<BovineDTO>> getAllBovinesByIDOwnerMale(@PathVariable String ownerId,
+                                                                      @RequestParam long idBovine) throws Exception {
+        try {
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovines = bovineRepository.getAllBovineMaleIdOwner(ownerId, idBovine);
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/{ownerId}/feminine")
+    @ApiOperation("Get all bovines owned male")
+    public ResponseEntity<List<BovineDTO>> getAllBovinesByIDOwnerFeminine(@PathVariable String ownerId,
+                                                                          @RequestParam long idBovine) throws Exception {
+        try {
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovines = bovineRepository.getAllBovineFeminineIdOwner(ownerId, idBovine);
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/genealogy/{bovineId}")
+    @ApiOperation("Get all genealogy by idBovine")
+    public ResponseEntity<List<BovineDTO>> getGenealogy(@PathVariable long bovineId) throws Exception {
+        try {
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+
+            List<Bovine> bovines = bovineRepository.getGenealogy(bovineId);
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
     @GetMapping("/{bovineId}")
     @ApiOperation("Get bovine by idBovine")
-    public ResponseEntity<BovineDTO> getBovine(@PathVariable long bovineId) throws Exception {
+    public ResponseEntity<BovineFullInfoDTO> getBovine(@PathVariable long bovineId) throws Exception {
+            BovineFullInfoDTO fullInfoDTO = new BovineFullInfoDTO();
         try {
             Bovine bovine = bovineRepository.getBovine(bovineId);
             if (bovine != null){
-                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
-                return ResponseEntity.ok(bovineDTO);
+                Field field = fieldRepository.getField(bovine.getIdField());
+                    if (bovine.getIdField() == field.getIdField()) {
+                         fullInfoDTO = new BovineFullInfoDTO(bovine.getIdBovine(),
+                                bovine.getIdContract(), bovine.getIdOwner(), bovine.getIdField(),
+                                bovine.getSerialNumber(), bovine.getBirthDate(), bovine.getWeight(),
+                                bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
+                                bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
+                                bovine.getGender(), field.getAddress(), bovine.getImageCID());
+                    }
             }
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.ok(fullInfoDTO);
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }
@@ -78,17 +143,16 @@ public class BovineController {
                                     bovine.getSerialNumber(), bovine.getBirthDate(), bovine.getWeight(),
                                     bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
                                     bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
-                                    bovine.getGender(), field.getAddress());
+                                    bovine.getGender(), field.getAddress(), bovine.getImageCID());
                             bovineDTOList.add(bovineDTO);
                         }
                     }
                 }
-                return ResponseEntity.ok(bovineDTOList);
             }
+            return ResponseEntity.ok(bovineDTOList);
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }
-        return ResponseEntity.status(401).build();
     }
 
     @PostMapping("/")

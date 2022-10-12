@@ -9,9 +9,12 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
 @Api("Handles management of COW Appointment")
 @RequestMapping(path = "api/appointment")
 public class AppointmentController {
@@ -43,15 +46,15 @@ public class AppointmentController {
 
     @GetMapping("/bovine/{bovineId}")
     @ApiOperation("Get all appointments request by id bovine")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentByIDBovine(@PathVariable long bovineId)
+    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByIDBovine(@PathVariable long bovineId)
             throws Exception {
         try {
+            List<AppointmentDTO> appointmentDTOList = new ArrayList<>();
             List<Appointment> appointmentList = appointmentRepository.getAllBovineAppointment(bovineId);
             if(!appointmentList.isEmpty()){
-                List<AppointmentDTO> appointmentDTOList = appointmentService.getAppointments(appointmentList);
-                return ResponseEntity.ok(appointmentDTOList);
+                appointmentDTOList = appointmentService.getAppointments(appointmentList);
             }
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.ok(appointmentDTOList);
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }

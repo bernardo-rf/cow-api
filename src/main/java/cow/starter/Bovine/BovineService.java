@@ -8,6 +8,10 @@ import cow.starter.Bovine.models.BovineDTO;
 import cow.starter.Bovine.models.BovineRepository;
 import cow.starter.Field.models.Field;
 import cow.starter.Field.models.FieldRepository;
+import cow.starter.FieldHistory.FieldHistoryService;
+import cow.starter.FieldHistory.models.FieldHistory;
+import cow.starter.FieldHistory.models.FieldHistoryCreatedDTO;
+import cow.starter.FieldHistory.models.FieldHistoryDTO;
 import cow.starter.User.models.User;
 import cow.starter.User.models.UserRepository;
 import cow.starter.utilities.EnvUtils;
@@ -20,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
@@ -36,6 +41,9 @@ public class BovineService {
     @Autowired
     FieldRepository fieldRepository;
 
+    @Autowired
+    FieldHistoryService fieldHistoryService;
+
     private Client client = Client.forTestnet();
 
     public BovineDTO convertToDTO(Bovine bovine){
@@ -43,28 +51,23 @@ public class BovineService {
                 bovine.getIdField(), bovine.getSerialNumber(), bovine.getBirthDate(), bovine.getWeight(),
                 bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
                 bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
-                bovine.getGender());
+                bovine.getGender(), bovine.getImageCID());
     }
 
     public Bovine convertToEntity(BovineCreateDTO bovineDTO, String idContract){
         return new Bovine(idContract, bovineDTO.getIdOwner(), bovineDTO.getIdField(), bovineDTO.getSerialNumber(),
                 bovineDTO.getBirthDate(), bovineDTO.getWeight(), bovineDTO.getHeight(), bovineDTO.getBreed(),
                 bovineDTO.getColor(), bovineDTO.getActive(), bovineDTO.getObservation(),
-                bovineDTO.getIdBovineParent1(), bovineDTO.getIdBovineParent2(), bovineDTO.isGender());
+                bovineDTO.getIdBovineParent1(), bovineDTO.getIdBovineParent2(), bovineDTO.isGender(),
+                bovineDTO.getImageCID());
     }
 
-    public boolean checkBovineValues(long idParentBovine1, long idParentBovine2, long idField, String idOwner){
-        Bovine bovine1 = bovineRepository.getBovine(idParentBovine1);
-        if (bovine1 != null) {
-            Bovine bovine2 = bovineRepository.getBovine(idParentBovine2);
-            if (bovine2 != null) {
-                Field field = fieldRepository.getField(idField);
-                if (field != null) {
-                    User user = userRepository.getUserByIDOwner(idOwner);
-                    if (user != null) {
-                        return user.getIdUser() != 0;
-                    }
-                }
+    public boolean checkBovineValues(long idField, String idOwner){
+        Field field = fieldRepository.getField(idField);
+        if (field != null) {
+            User user = userRepository.getUserByIDOwner(idOwner);
+            if (user != null) {
+                return user.getIdUser() != 0;
             }
         }
         return false;
@@ -79,11 +82,10 @@ public class BovineService {
                 return emptyBovineDTO;
             }
 
-            File myObj = new File("D:\\Bernardo\\PolitecnicoLeiria\\MEI_CM\\2ano\\final_project\\COW.API\\src\\main\\java\\cow\\starter\\Bovine\\Bovine.bin");
+            File myObj = new File(EnvUtils.getContractPath() + "COW.API\\src\\main\\java\\cow\\starter\\Bovine\\Bovine.bin");
             Scanner myReader = new Scanner(myObj);
 
-            if (checkBovineValues(bovineCreateDTO.getIdBovineParent1(), bovineCreateDTO.getIdBovineParent2(),
-                    bovineCreateDTO.getIdField(), bovineCreateDTO.getIdOwner())) {
+            if (checkBovineValues(bovineCreateDTO.getIdField(), bovineCreateDTO.getIdOwner())) {
                 while (myReader.hasNextLine()) {
                     PrivateKey operatorKey = EnvUtils.getOperatorKey();
                     client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
@@ -111,7 +113,7 @@ public class BovineService {
 
                         TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
                                 .setBytecodeFileId(bytecodeFileId)
-                                .setGas(300000)
+                                .setGas(500000)
                                 .setAdminKey(operatorKey)
                                 .setConstructorParameters(new ContractFunctionParameters()
                                         .addString(bovineCreateDTO.getIdOwner())
@@ -135,13 +137,18 @@ public class BovineService {
                             bovineRepository.save(bovine);
                             BovineDTO newBovineDTO = convertToDTO(bovine);
                             if (newBovineDTO.getIdBovine() != 0) {
-                                return newBovineDTO;
+                                FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(
+                                        bovineCreateDTO.getIdField(), newBovineDTO.getIdBovine(), new Date());
+                                FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
+                                if (fieldHistoryDTO.getIdFieldHistory() != 0){
+                                    return newBovineDTO;
+                                }
                             }
                         }
                     }
                 }
             }
-        } catch (FileNotFoundException | TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
+        } catch (FileNotFoundException | TimeoutException | PrecheckStatusException | ReceiptStatusException  e) {
             e.printStackTrace();
         }
 
@@ -151,8 +158,7 @@ public class BovineService {
     public BovineDTO updateBovine(BovineDTO bovineDTO){
         BovineDTO emptyBovineDTO = new BovineDTO();
         try {
-            if (checkBovineValues(bovineDTO.getIdBovineParent1(), bovineDTO.getIdBovineParent2(),
-                    bovineDTO.getIdField(), bovineDTO.getIdOwner())) {
+            if (checkBovineValues(bovineDTO.getIdField(), bovineDTO.getIdOwner())) {
                 client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
 
                 TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
@@ -173,6 +179,12 @@ public class BovineService {
 
                 Bovine bovine = bovineRepository.getBovine(bovineDTO.getIdBovine());
                 if (bovine != null) {
+                    if(bovine.getIdField() != bovineDTO.getIdField()){
+                        FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(bovineDTO.getIdField(),
+                                bovineDTO.getIdBovine(), new Date());
+                        FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
+                    }
+
                     bovine.setIdOwner(bovineDTO.getIdOwner());
                     bovine.setIdField(bovineDTO.getIdField());
                     bovine.setSerialNumber(bovineDTO.getSerialNumber());
@@ -186,11 +198,12 @@ public class BovineService {
                     bovine.setIdBovineParent1(bovineDTO.getIdBovineParent1());
                     bovine.setIdBovineParent2(bovineDTO.getIdBovineParent2());
                     bovine.setGender(bovineDTO.getGender());
+                    bovine.setImageCID(bovineDTO.getImageCID());
                     bovineRepository.save(bovine);
+
                     return convertToDTO(bovine);
                 }
             }
-
         } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
             e.printStackTrace();
         }
@@ -203,6 +216,10 @@ public class BovineService {
             if (bovine != null){
                 bovine.setIdField(idField);
                 bovineRepository.save(bovine);
+
+                FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(idField, bovineDTO.getIdBovine(),
+                        new Date());
+                FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
             }
         }
         return bovineDTOS;

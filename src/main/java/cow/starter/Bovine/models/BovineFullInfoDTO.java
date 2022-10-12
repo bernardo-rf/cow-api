@@ -1,5 +1,8 @@
 package cow.starter.Bovine.models;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class BovineFullInfoDTO {
@@ -19,13 +22,15 @@ public class BovineFullInfoDTO {
     private long idBovineParent2;
     private boolean gender;
     private String address;
+    private String age;
+    private String imageCID;
 
     public BovineFullInfoDTO(){};
 
     public BovineFullInfoDTO(long idBovine, String idContract, String idOwner, long idField, long serialNumber,
                              Date birthDate, Double weight, Double height, String breed, String color, Boolean active,
                              String observation, long idBovineParent1, long idBovineParent2,
-                             boolean gender, String address ) {
+                             boolean gender, String address, String imageCID) {
         this.idBovine = idBovine;
         this.idContract = idContract;
         this.idOwner = idOwner;
@@ -42,6 +47,22 @@ public class BovineFullInfoDTO {
         this.idBovineParent2 = idBovineParent2;
         this.gender = gender;
         this.address = address;
+        this.imageCID = imageCID;
+
+
+        int age = Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getYears();
+        this.age = age + " years";
+        if (age <= 0) {
+            age = Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getMonths();
+            this.age = age + " months";
+            if (age <= 0) {
+                age = Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getDays();
+                this.age = age + " days";
+            }
+        }
+        if(age == 1){
+            this.age = this.age.substring(0, this.age.length()-1);
+        }
     }
 
     public long getIdBovine() {
@@ -163,4 +184,20 @@ public class BovineFullInfoDTO {
     public boolean isGender() { return gender; }
 
     public void setGender(boolean gender) { this.gender = gender; }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getImageCID() {
+        return imageCID;
+    }
+
+    public void setImageCID(String imageCID) {
+        this.imageCID = imageCID;
+    }
 }

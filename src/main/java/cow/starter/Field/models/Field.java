@@ -26,11 +26,11 @@ public class Field implements Serializable {
     @ApiModelProperty(example = "1", name = "idField", required = true)
     private long idField;
 
-    @Column(name = "IDContract", columnDefinition = "IDContract", nullable = false)
+    @Column(name = "IDContract", nullable = false)
     @ApiModelProperty(example = "0.0.48207803", name = "idContract")
     private String idContract;
 
-    @Column(name = "IDOwner", columnDefinition = "IDOwner", nullable = false)
+    @Column(name = "IDOwner", nullable = false)
     @ApiModelProperty(example = "1", name = "idOwner")
     private String idOwner;
 

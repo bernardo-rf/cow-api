@@ -20,23 +20,23 @@ public class AppointmentRequest implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDAppointmentRequest", columnDefinition = "IDAppointmentRequest")
+    @Column(name = "IDAppointmentRequest")
     @ApiModelProperty(example = "1", name = "idAppointmentRequest", required = true)
     private long idAppointmentRequest;
 
-    @Column(name = "IDUser", columnDefinition = "IDUser", nullable = false)
+    @Column(name = "IDUser", nullable = false)
     @ApiModelProperty(example = "1", name = "idUser")
     private long idUser;
 
-    @Column(name = "IDUserRequest", columnDefinition = "IDUserRequest", nullable = false )
+    @Column(name = "IDUserRequest", nullable = false )
     @ApiModelProperty(example = "1", name = "idUserRequest")
     private long idUserRequest;
 
-    @Column(name = "IDBovine", columnDefinition = "IDBovine", nullable = false)
+    @Column(name = "IDBovine", nullable = false)
     @ApiModelProperty(example = "1", name = "idBovine")
     private long idBovine;
 
-    @Column(name = "AppointmentDate", columnDefinition = "AppointmentDate", nullable = false)
+    @Column(name = "AppointmentDate", nullable = false)
     @ApiModelProperty(example = "2022-01-01", name = "appointmentDate", required = true)
     private Date appointmentDate;
 

@@ -19,6 +19,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
@@ -69,7 +70,7 @@ public class AppointmentService {
     public AppointmentDTO createAppointment(AppointmentCreateDTO appointmentCreateDTO) {
         AppointmentDTO appointmentDTO = new AppointmentDTO();
         try {
-            File myObj = new File("D:\\Bernardo\\PolitecnicoLeiria\\MEI_CM\\2ano\\final_project\\COW.API\\src\\main\\java\\cow\\starter\\Appointment\\Appointment.bin");
+            File myObj = new File(EnvUtils.getContractPath() + "COW.API\\src\\main\\java\\cow\\starter\\Appointment\\Appointment.bin");
             Scanner myReader = new Scanner(myObj);
 
             if (checkAppointmentValues(appointmentCreateDTO.getIdUser(), appointmentCreateDTO.getIdBovine())) {

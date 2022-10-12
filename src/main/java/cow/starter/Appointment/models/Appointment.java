@@ -21,27 +21,27 @@ public class Appointment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDAppointment", columnDefinition = "IDAppointment")
+    @Column(name = "IDAppointment")
     @ApiModelProperty(example = "1", name = "idAppointment", required = true)
     private long idAppointment;
 
-    @Column(name = "IDContract", columnDefinition = "IDContract", nullable = false)
+    @Column(name = "IDContract", nullable = false)
     @ApiModelProperty(example = "0.0.48207803", name = "idContract")
     private String idContract;
 
-    @Column(name = "IDBovine", columnDefinition = "IDBovine", nullable = false)
+    @Column(name = "IDBovine", nullable = false)
     @ApiModelProperty(example = "1", name = "idBovine", required = true)
     private long idBovine;
 
-    @Column(name = "IDUser", columnDefinition = "IDUser", nullable = false)
+    @Column(name = "IDUser", nullable = false)
     @ApiModelProperty(example = "1", name = "idUser")
     private long idUser;
 
-    @Column(name = "appointmentdate", columnDefinition = "AppointmentDate", nullable = false)
+    @Column(name = "appointmentdate", nullable = false)
     @ApiModelProperty(example = "2022-01-01", name = "appointmentDate")
     private Date appointmentDate;
 
-    @Column(name = "appointmenttype", columnDefinition = "AppointmentType", nullable = false, length = 50)
+    @Column(name = "appointmenttype", nullable = false, length = 50)
     @ApiModelProperty(example = "Regular appointment", name = "type")
     private String appointmentType;
 

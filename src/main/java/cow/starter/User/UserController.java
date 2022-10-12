@@ -1,19 +1,14 @@
 package cow.starter.User;
 
-import cow.starter.Field.models.FieldDTO;
 import cow.starter.User.models.*;
-import cow.starter.UserType.models.UserType;
 import cow.starter.UserType.models.UserTypeRepository;
-import cow.starter.utilities.JwtToken;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
@@ -101,8 +96,10 @@ public class UserController {
     public ResponseEntity<UserAuthResponseDTO> authenticateUser(@RequestBody UserAuthDTO userAuthDTO) throws Exception {
         try {
             UserAuthResponseDTO userAuthResponseDTO = userService.authenticate(userAuthDTO);
-            if (userAuthResponseDTO.getToken().equals("USER_DISABLE")) {
-                return ResponseEntity.status(403).build();
+            if (userAuthResponseDTO.getToken() == null){
+                return ResponseEntity.status(401).build();
+            }else if (userAuthResponseDTO.getToken().equals("USER_DISABLE")) {
+                return ResponseEntity.status(401).build();
             } else if(!userAuthResponseDTO.getToken().equals("")){
                 return ResponseEntity.ok(userAuthResponseDTO);
             }

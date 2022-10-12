@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
 @Api("Handles management of COW UserTypes")
-@RequestMapping(path = "/userType")
+@RequestMapping(path = "api/userTypes")
 public class UserTypeController {
 
     @Autowired
@@ -25,7 +26,7 @@ public class UserTypeController {
     @GetMapping("/")
     @ApiOperation("Get all user types")
     public List<UserType> getUserTypes() {
-        return userTypeRepository.findAll();
+        return userTypeRepository.getAllUserTypes();
     }
 
     @GetMapping("/{idUserType}")
