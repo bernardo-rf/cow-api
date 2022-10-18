@@ -9,12 +9,12 @@ public class AppointmentRequestDTO {
     private long idBovine;
     private Date appointmentDate;
     private String motive;
-    private Boolean status;
+    private int status;
 
     public AppointmentRequestDTO( ) { }
 
-    public AppointmentRequestDTO(long idAppointmentRequest, long idUser, long idUserRequest, long idBovine, Date appointmentDate,
-                                 String motive, Boolean status) {
+    public AppointmentRequestDTO(long idAppointmentRequest, long idUser, long idUserRequest, long idBovine,
+                                 Date appointmentDate, String motive, int status) {
         this.idAppointmentRequest = idAppointmentRequest;
         this.idUser = idUser;
         this.idUserRequest = idUserRequest;
@@ -72,11 +72,11 @@ public class AppointmentRequestDTO {
         this.motive = motive;
     }
 
-    public Boolean getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 }

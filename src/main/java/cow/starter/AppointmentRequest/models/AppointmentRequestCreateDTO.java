@@ -1,21 +1,26 @@
 package cow.starter.AppointmentRequest.models;
 
+import cow.starter.Bovine.models.Bovine;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class AppointmentRequestCreateDTO {
     private long idUser;
     private long idUserRequest;
-    private long idBovine;
     private Date appointmentDate;
     private String motive;
-    private Boolean status;
+    private int status;
+    private List<Bovine> bovines;
 
     public AppointmentRequestCreateDTO( ) { }
 
-    public AppointmentRequestCreateDTO(long idUser, long idUserRequest, long idBovine, Date appointmentDate, String motive, Boolean status) {
+    public AppointmentRequestCreateDTO(long idUser, long idUserRequest, Date appointmentDate,
+                                       String motive, int status) {
         this.idUser = idUser;
         this.idUserRequest = idUserRequest;
-        this.idBovine = idBovine;
+        this.bovines = new ArrayList<>();
         this.appointmentDate = appointmentDate;
         this.motive = motive;
         this.status = status;
@@ -37,14 +42,6 @@ public class AppointmentRequestCreateDTO {
         this.idUserRequest = idUserRequest;
     }
 
-    public long getIdBovine() {
-        return idBovine;
-    }
-
-    public void setIdBovine(long idBovine) {
-        this.idBovine = idBovine;
-    }
-
     public Date getAppointmentDate() {
         return appointmentDate;
     }
@@ -61,11 +58,19 @@ public class AppointmentRequestCreateDTO {
         this.motive = motive;
     }
 
-    public Boolean getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(Boolean status) {
+    public void setStatus(int status) {
         this.status = status;
+    }
+
+    public List<Bovine> getBovines() {
+        return bovines;
+    }
+
+    public void setBovines(List<Bovine> bovines) {
+        this.bovines = bovines;
     }
 }

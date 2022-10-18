@@ -1,63 +1,34 @@
 package cow.starter.AppointmentRequest.models;
 
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
-@Entity
-@Table(name="COW_AppointmentRequest")
-public class AppointmentRequest implements Serializable {
-    /**
-     * @param idAppointmentRequest
-     * @param idUser
-     * @param idBovine
-     * @param appointmentDate
-     * @param motive
-     * @param status
-     */
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDAppointmentRequest")
-    @ApiModelProperty(example = "1", name = "idAppointmentRequest", required = true)
+public class AppointmentRequestFullInfoDTO {
     private long idAppointmentRequest;
-
-    @Column(name = "IDUser", nullable = false)
-    @ApiModelProperty(example = "1", name = "idUser")
     private long idUser;
-
-    @Column(name = "IDUserRequest", nullable = false )
-    @ApiModelProperty(example = "1", name = "idUserRequest")
     private long idUserRequest;
-
-    @Column(name = "IDBovine", nullable = false)
-    @ApiModelProperty(example = "1", name = "idBovine")
     private long idBovine;
-
-    @Column(name = "AppointmentDate", nullable = false)
-    @ApiModelProperty(example = "2022-01-01", name = "appointmentDate", required = true)
     private Date appointmentDate;
-
-    @Column(name = "Motive", nullable = false, length = 250)
-    @ApiModelProperty(example = "Motive", name = "motive", required = true)
     private String motive;
-
-    @Column(name = "Status", nullable = false)
-    @ApiModelProperty(example = "true", name = "status", required = true)
     private int status;
+    private String userName;
+    private String userRequestName;
+    private long bovineSerialNumber;
 
-    public AppointmentRequest() { super(); }
+    public AppointmentRequestFullInfoDTO(){}
 
-    public AppointmentRequest(long idUser, long idUserRequest, long idBovine, Date appointmentDate, String motive,
-                              int status ) {
+    public AppointmentRequestFullInfoDTO(long idAppointmentRequest, long idUser, long idUserRequest, long idBovine,
+                                         Date appointmentDate, String motive, int status, String userName,
+                                         String userRequestName, long bovineSerialNumber) {
+        this.idAppointmentRequest = idAppointmentRequest;
         this.idUser = idUser;
         this.idUserRequest = idUserRequest;
         this.idBovine = idBovine;
         this.appointmentDate = appointmentDate;
         this.motive = motive;
         this.status = status;
+        this.userName = userName;
+        this.userRequestName = userRequestName;
+        this.bovineSerialNumber = bovineSerialNumber;
     }
 
     public long getIdAppointmentRequest() {
@@ -108,11 +79,33 @@ public class AppointmentRequest implements Serializable {
         this.motive = motive;
     }
 
-    public int getStatus() {
-        return status;
-    }
+    public int getStatus() { return status; }
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserRequestName() {
+        return userRequestName;
+    }
+
+    public void setUserRequestName(String userRequestName) {
+        this.userRequestName = userRequestName;
+    }
+
+    public long getBovineSerialNumber() {
+        return bovineSerialNumber;
+    }
+
+    public void setBovineSerialNumber(long bovineSerialNumber) {
+        this.bovineSerialNumber = bovineSerialNumber;
     }
 }

@@ -9,6 +9,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.active = true")
     List<User> getAllUsers();
 
+    @Query("SELECT u FROM User u " +
+            "LEFT JOIN UserType ut ON ut.idUserType = u.idUserType " +
+            "WHERE u.active = true and ut.description='Veterinary'")
+    List<User> getAllUsersVeterinary();
+
     @Query("SELECT u FROM User u WHERE u.idUser = :idUser and u.active = true")
     User getUser(long idUser);
 

@@ -1,9 +1,6 @@
 package cow.starter.AppointmentRequest;
 
-import cow.starter.AppointmentRequest.models.AppointmentRequest;
-import cow.starter.AppointmentRequest.models.AppointmentRequestCreateDTO;
-import cow.starter.AppointmentRequest.models.AppointmentRequestDTO;
-import cow.starter.AppointmentRequest.models.AppointmentRequestRepository;
+import cow.starter.AppointmentRequest.models.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +22,7 @@ public class AppointmentRequestController {
     @Autowired
     private AppointmentRequestRepository appointmentRequestRepository;
 
-    private List<AppointmentRequestDTO> appointmentRequestDTOList = new ArrayList<>();
+    private List<AppointmentRequestFullInfoDTO> appointmentRequestDTOList = new ArrayList<>();
 
     public AppointmentRequestController() {
         appointmentRequestService = new AppointmentRequestService();
@@ -49,7 +46,7 @@ public class AppointmentRequestController {
 
     @GetMapping("/bovine/{bovineId}")
     @ApiOperation("Get all appointments request by id bovine")
-    public ResponseEntity<List<AppointmentRequestDTO>> getAppointmentRequestByIDBovine(@PathVariable long bovineId)
+    public ResponseEntity<List<AppointmentRequestFullInfoDTO>> getAppointmentRequestByIDBovine(@PathVariable long bovineId)
             throws Exception {
         try {
             List<AppointmentRequest> appointmentRequestList = appointmentRequestRepository.getAllBovineAppointmentRequest(bovineId);
@@ -63,8 +60,8 @@ public class AppointmentRequestController {
     }
 
     @GetMapping("/user/{userId}")
-    @ApiOperation("Get all appointments request by id bovine")
-    public ResponseEntity<List<AppointmentRequestDTO>> getAppointmentRequestByIDUser(@PathVariable long userId)
+    @ApiOperation("Get all appointments request by id user")
+    public ResponseEntity<List<AppointmentRequestFullInfoDTO>> getAppointmentRequestByIDUser(@PathVariable long userId)
             throws Exception {
         try {
             List<AppointmentRequest> appointmentRequestList = appointmentRequestRepository.getAllUserAppointmentRequest(userId);
@@ -78,8 +75,8 @@ public class AppointmentRequestController {
     }
 
     @GetMapping("/userRequest/{userRequestId}")
-    @ApiOperation("Get all appointments request by id bovine")
-    public ResponseEntity<List<AppointmentRequestDTO>> getAppointmentRequestByIDUserRequest(@PathVariable long userRequestId)
+    @ApiOperation("Get all appointments request by id user request")
+    public ResponseEntity<List<AppointmentRequestFullInfoDTO>> getAppointmentRequestByIDUserRequest(@PathVariable long userRequestId)
             throws Exception {
         try {
             List<AppointmentRequest> appointmentRequestList = appointmentRequestRepository.getAllUserRequestAppointmentRequest(userRequestId);
@@ -94,12 +91,13 @@ public class AppointmentRequestController {
 
     @PostMapping("/")
     @ApiOperation("Create a appointment request")
-    public ResponseEntity<AppointmentRequestDTO> createAppointmentRequest(@RequestBody AppointmentRequestCreateDTO appointmentRequestCreateDTO )
+    public ResponseEntity<List<AppointmentRequestDTO>> createAppointmentRequest(@RequestBody AppointmentRequestCreateDTO appointmentRequestCreateDTO )
             throws Exception {
         try {
-            AppointmentRequestDTO appointmentRequestDTO = appointmentRequestService.createAppointmentRequest(appointmentRequestCreateDTO);
-            if (appointmentRequestDTO.getIdAppointmentRequest() != 0){
-                return ResponseEntity.ok(appointmentRequestDTO);
+            List<AppointmentRequestDTO> appointmentRequestDTOList = appointmentRequestService.createAppointmentRequest(
+                    appointmentRequestCreateDTO);
+            if (!appointmentRequestDTOList.isEmpty()){
+                return ResponseEntity.ok(appointmentRequestDTOList);
             }
             return ResponseEntity.status(404).build();
         }catch (Exception e) {

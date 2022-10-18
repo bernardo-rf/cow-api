@@ -1,6 +1,7 @@
 package cow.starter.User;
 
 import cow.starter.User.models.*;
+import cow.starter.UserType.models.UserType;
 import cow.starter.UserType.models.UserTypeRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.reflect.Array;
 import java.util.*;
 
 @RestController
@@ -29,6 +32,46 @@ public class UserController {
 
     public UserController() {
         this.userService = new UserService();
+    }
+
+    @GetMapping("/")
+    @ApiOperation("Get all users")
+    public ResponseEntity<List<UserFullInfoDTO>> getAllUsers() throws Exception {
+        try {
+            List<User> users = userRepository.getAllUsers();
+            List<UserFullInfoDTO> userFullInfoDTOS = new ArrayList<>();
+            if (!users.isEmpty()) {
+                for (User user: users) {
+                    UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
+                    if (userInfoDTO.getIdUser() != 0) {
+                        userFullInfoDTOS.add(userInfoDTO);
+                    }
+                }
+            }
+            return ResponseEntity.ok(userFullInfoDTOS);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/veterinary")
+    @ApiOperation("Get all veterinaries")
+    public ResponseEntity<List<UserFullInfoDTO>> getAllUsersVeterinary() throws Exception {
+        try {
+            List<User> users = userRepository.getAllUsersVeterinary();
+            List<UserFullInfoDTO> userFullInfoDTOS = new ArrayList<>();
+            if (!users.isEmpty()) {
+                for (User user: users) {
+                    UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
+                    if (userInfoDTO.getIdUser() != 0) {
+                        userFullInfoDTOS.add(userInfoDTO);
+                    }
+                }
+            }
+            return ResponseEntity.ok(userFullInfoDTOS);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
     }
 
     @GetMapping("/{userId}")
