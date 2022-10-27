@@ -1,31 +1,37 @@
 package cow.starter.Appointment.models;
 
+import cow.starter.Bovine.models.Bovine;
 import java.util.Date;
+import java.util.List;
 
 public class AppointmentCreateDTO {
-    private long idBovine;
+    private long idAppointmentRequest;
     private long idUser;
     private Date appointmentDate;
     private String appointmentType;
     private Double cost;
     private String observation;
+    private int status;
+    private List<Bovine> bovines;
 
     public AppointmentCreateDTO() { }
 
-    public AppointmentCreateDTO(long idBovine, long idUser, Date appointmentDate, String appointmentType, Double cost,
-                                String observation) {
-        this.idBovine = idBovine;
+    public AppointmentCreateDTO(long idAppointmentRequest, long idUser, Date appointmentDate, String appointmentType,
+                                Double cost, String observation, int status, List<Bovine> bovines) {
+        this.idAppointmentRequest = idAppointmentRequest;
+        this.bovines = bovines;
         this.idUser = idUser;
         this.appointmentDate = appointmentDate;
         this.appointmentType = appointmentType;
         this.cost = cost;
         this.observation = observation;
+        this.status = status;
     }
 
-    public long getIdBovine() { return idBovine; }
+    public long getIdAppointmentRequest() { return idAppointmentRequest; }
 
-    public void setIdBovine(long idBovine) {
-        this.idBovine = idBovine;
+    public void setIdAppointmentRequest(long idAppointmentRequest) {
+        this.idAppointmentRequest = idAppointmentRequest;
     }
 
     public long getIdUser() {
@@ -44,9 +50,7 @@ public class AppointmentCreateDTO {
         this.appointmentDate = appointmentDate;
     }
 
-    public String getAppointmentType() {
-        return appointmentType;
-    }
+    public String getAppointmentType() { return appointmentType; }
 
     public void setAppointmentType(String appointmentType) {
         this.appointmentType = appointmentType;
@@ -67,4 +71,16 @@ public class AppointmentCreateDTO {
     public void setObservation(String observation) {
         this.observation = observation;
     }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public List<Bovine> getBovines() { return bovines; }
+
+    public void setBovines(List<Bovine> bovines) { this.bovines = bovines; }
 }

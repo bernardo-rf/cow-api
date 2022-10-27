@@ -21,51 +21,59 @@ public class Appointment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDAppointment")
     @ApiModelProperty(example = "1", name = "idAppointment", required = true)
     private long idAppointment;
 
-    @Column(name = "IDContract", nullable = false)
-    @ApiModelProperty(example = "0.0.48207803", name = "idContract")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "0.0.48207803", name = "idContract", required = true)
     private String idContract;
 
-    @Column(name = "IDBovine", nullable = false)
+    @ApiModelProperty(example = "1", name = "idAppointmentRequest", required = true)
+    private long idAppointmentRequest;
+
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "idBovine", required = true)
     private long idBovine;
 
-    @Column(name = "IDUser", nullable = false)
-    @ApiModelProperty(example = "1", name = "idUser")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idUser", required = true)
     private long idUser;
 
-    @Column(name = "appointmentdate", nullable = false)
-    @ApiModelProperty(example = "2022-01-01", name = "appointmentDate")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "2022-01-01", name = "appointmentDate", required = true)
     private Date appointmentDate;
 
-    @Column(name = "appointmenttype", nullable = false, length = 50)
-    @ApiModelProperty(example = "Regular appointment", name = "type")
+    @Column(nullable = false, length = 50)
+    @ApiModelProperty(example = "Regular appointment", name = "type", required = true)
     private String appointmentType;
 
-    @Column(name = "Cost", nullable = false)
-    @ApiModelProperty(example = "5.00 hbar", name = "cost")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "5.00", name = "cost", required = true)
     private Double cost;
 
-    @Column(name = "Observation")
     @ApiModelProperty(example = "Appointment observation", name = "observation")
     private String observation;
+
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "status", required = true)
+    private int appointmentStatus;
+
 
     public Appointment() {
         super();
     }
 
-    public Appointment(String idContract, long idBovine, long idUser, Date appointmentDate, String appointmentType, Double cost,
-                       String observation  ) {
+    public Appointment(String idContract, long idAppointmentRequest, long idBovine, long idUser, Date appointmentDate, String appointmentType, Double cost,
+                       String observation, int status ) {
         this.idContract = idContract;
+        this.idAppointmentRequest = idAppointmentRequest;
         this.idBovine = idBovine;
         this.idUser = idUser;
         this.appointmentDate = appointmentDate;
         this.appointmentType = appointmentType;
         this.cost = cost;
         this.observation = observation;
+        this.appointmentStatus = status;
     }
 
     public long getIdAppointment() {
@@ -74,6 +82,12 @@ public class Appointment implements Serializable {
 
     public void setIdAppointment(long idAppointment) {
         this.idAppointment = idAppointment;
+    }
+
+    public long getIdAppointmentRequest() { return idAppointmentRequest; }
+
+    public void setIdAppointmentRequest(long idAppointmentRequest) {
+        this.idAppointmentRequest = idAppointmentRequest;
     }
 
     public String getIdContract() {
@@ -127,4 +141,8 @@ public class Appointment implements Serializable {
     public void setObservation(String observation) {
         this.observation = observation;
     }
+
+    public int getStatus() { return appointmentStatus; }
+
+    public void setStatus(int status) { this.appointmentStatus = status; }
 }

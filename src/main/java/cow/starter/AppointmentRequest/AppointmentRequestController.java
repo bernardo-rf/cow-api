@@ -124,6 +124,23 @@ public class AppointmentRequestController {
         }
     }
 
+    @PutMapping("/{appointmentRequestId}/status")
+    @ApiOperation("Update a field")
+    public ResponseEntity<AppointmentRequestDTO> updateAppointmentRequest(@PathVariable long appointmentRequestId,
+                                                                          @RequestParam int status )
+            throws Exception {
+        try {
+            AppointmentRequestDTO updatedAppointmentRequestDTO = appointmentRequestService.
+                    updateAppointmentRequestStatus(appointmentRequestId, status);
+            if (updatedAppointmentRequestDTO.getIdAppointmentRequest() != 0){
+                return ResponseEntity.ok(updatedAppointmentRequestDTO);
+            }
+            return ResponseEntity.status(404).build();
+        } catch (Exception e) {
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
     @DeleteMapping("/{appointmentRequestId}")
     @ApiOperation("Delete a appointment request")
     public ResponseEntity<String> deleteAppointmentRequest( @PathVariable long appointmentRequestId) throws Exception {

@@ -1,28 +1,32 @@
 package cow.starter.Appointment.models;
 
-import java.util.Date;
-
 public class AppointmentDTO {
     private long idAppointment;
     private String idContract;
+    private long idAppointmentRequest;
     private long idBovine;
     private long idUser;
-    private Date appointmentDate;
+    private String appointmentDate;
     private String appointmentType;
     private Double cost;
     private String observation;
+    private int status;
 
     public AppointmentDTO() { }
 
-    public AppointmentDTO(long idAppointment, String idContract, long idBovine, long idUser, Date appointmentDate, String appointmentType, Double cost, String observation) {
+    public AppointmentDTO(long idAppointment, String idContract, long idAppointmentRequest, long idBovine, long idUser,
+                          String appointmentDate, String appointmentType, Double cost, String observation,
+                          int status) {
         this.idAppointment = idAppointment;
         this.idContract = idContract;
+        this.idAppointmentRequest = idAppointmentRequest;
         this.idBovine = idBovine;
         this.idUser = idUser;
         this.appointmentDate = appointmentDate;
         this.appointmentType = appointmentType;
         this.cost = cost;
         this.observation = observation;
+        this.status = status;
     }
 
     public long getIdAppointment() {
@@ -57,11 +61,11 @@ public class AppointmentDTO {
         this.idUser = idUser;
     }
 
-    public Date getAppointmentDate() {
+    public String getAppointmentDate() {
         return appointmentDate;
     }
 
-    public void setAppointmentDate(Date appointmentDate) {
+    public void setAppointmentDate(String appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 
@@ -87,5 +91,21 @@ public class AppointmentDTO {
 
     public void setObservation(String observation) {
         this.observation = observation;
+    }
+
+    public long getIdAppointmentRequest() {
+        return idAppointmentRequest;
+    }
+
+    public void setIdAppointmentRequest(long idAppointmentRequest) {
+        this.idAppointmentRequest = idAppointmentRequest;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

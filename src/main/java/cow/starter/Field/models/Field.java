@@ -22,43 +22,41 @@ public class Field implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDField")
     @ApiModelProperty(example = "1", name = "idField", required = true)
     private long idField;
 
-    @Column(name = "IDContract", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "0.0.48207803", name = "idContract")
     private String idContract;
 
-    @Column(name = "IDOwner", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "idOwner")
     private String idOwner;
 
-    @Column(name = "Description", nullable = false, length=50)
+    @Column(nullable = false, length=50)
     @ApiModelProperty(example = "West Farm", name = "fieldDescription", required = true)
     private String fieldDescription;
 
-    @Column(name = "Address", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "537-3270 1109 19th St. Gil, Nebraska(NE)", name = "address", required = true)
     private String address;
 
-    @Column(name = "Limit", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "100", name = "limit", required = true)
-    private int limit;
+    private int fieldLimit;
 
-    @Column(name = "Latitude",nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "37.89143", name = "latitude", required = true)
     private Double latitude;
 
-    @Column(name = "Longitude", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "66.31465", name = "longitude", required = true)
     private Double longitude;
 
-    @Column(name = "Active", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
-    @Column(name = "Observation")
     @ApiModelProperty(example = "Field with too much trees, short space.", name = "observation", required = false)
     private String observation;
 
@@ -72,7 +70,7 @@ public class Field implements Serializable {
         this.idOwner = idOwner;
         this.fieldDescription = fieldDescription;
         this.address = address;
-        this.limit = limit;
+        this.fieldLimit = limit;
         this.latitude = latitude;
         this.longitude = longitude;
         this.active = active;
@@ -116,11 +114,11 @@ public class Field implements Serializable {
     }
 
     public int getLimit() {
-        return limit;
+        return fieldLimit;
     }
 
     public void setLimit(int limit) {
-        this.limit = limit;
+        this.fieldLimit = limit;
     }
 
     public Double getLatitude() {

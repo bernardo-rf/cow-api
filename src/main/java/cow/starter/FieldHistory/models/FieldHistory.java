@@ -10,20 +10,19 @@ import java.util.Date;
 public class FieldHistory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDFieldHistory")
     @ApiModelProperty(example = "1", name = "idFieldHistory", required = true)
     private long idFieldHistory;
 
-    @Column(name = "IDField", nullable = false)
-    @ApiModelProperty(example = "1", name = "idField")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idField", required = true)
     private long idField;
 
-    @Column(name = "IDBovine", nullable = false)
-    @ApiModelProperty(example = "1", name = "idBovine")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idBovine", required = true)
     private long idBovine;
 
-    @Column(name = "SwitchDate", nullable = false)
-    @ApiModelProperty(example = "2022-01-01", name = "switchDate")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "2022-01-01", name = "switchDate", required = true)
     private Date switchDate;
 
 

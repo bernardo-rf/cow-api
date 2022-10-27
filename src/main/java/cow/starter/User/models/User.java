@@ -22,44 +22,42 @@ public class User implements Serializable {
      */
 
     @Id
-    @Column(name = "IDUser")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(example = "1", name = "idUser", required = true)
     private long idUser;
 
-    @Column(name = "IDContract")
-    @ApiModelProperty(example = "1", name = "idContract")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idContract", required = true)
     private String idContract;
 
-    @Column(name = "IDWallet")
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "idWallet", required = true)
     private String idWallet;
 
-    @Column(name = "IDUsertype")
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "idUserType", required = true)
     private int idUserType;
 
-    @Column(name = "Name")
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "name", required = true)
     private String name;
 
-    @Column(name = "birthdate")
     @ApiModelProperty(example = "2022-01-01", name = "birthDate")
     private Date birthDate;
 
-    @Column(name = "Email")
+    @Column(nullable = false)
     @ApiModelProperty(example = "Regular appointment", name = "email", required = true)
     private String email;
 
-    @Column(name = "Password")
+    @Column(nullable = false)
     @ApiModelProperty(example = "Regular appointment", name = "password", required = true)
     private String password;
 
-    @Column(name = "Active")
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
-    @Column(name = "Balance")
+    @Column(nullable = false)
     @ApiModelProperty(example = "1090.50", name="balance", required = true)
     private double balance;
 

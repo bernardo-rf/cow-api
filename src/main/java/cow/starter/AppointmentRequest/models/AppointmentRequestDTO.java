@@ -1,20 +1,18 @@
 package cow.starter.AppointmentRequest.models;
 
-import java.util.Date;
-
 public class AppointmentRequestDTO {
     private long idAppointmentRequest;
     private long idUser;
     private long idUserRequest;
     private long idBovine;
-    private Date appointmentDate;
+    private String appointmentDate;
     private String motive;
     private int status;
 
     public AppointmentRequestDTO( ) { }
 
     public AppointmentRequestDTO(long idAppointmentRequest, long idUser, long idUserRequest, long idBovine,
-                                 Date appointmentDate, String motive, int status) {
+                                 String appointmentDate, String motive, int status) {
         this.idAppointmentRequest = idAppointmentRequest;
         this.idUser = idUser;
         this.idUserRequest = idUserRequest;
@@ -56,11 +54,11 @@ public class AppointmentRequestDTO {
         this.idBovine = idBovine;
     }
 
-    public Date getAppointmentDate() {
+    public String getAppointmentDate() {
         return appointmentDate;
     }
 
-    public void setAppointmentDate(Date appointmentDate) {
+    public void setAppointmentDate(String appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 

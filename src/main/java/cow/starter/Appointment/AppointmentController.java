@@ -1,6 +1,8 @@
 package cow.starter.Appointment;
 
 import cow.starter.Appointment.models.*;
+import cow.starter.AppointmentRequest.models.AppointmentRequestDTO;
+import cow.starter.AppointmentRequest.models.AppointmentRequestFullInfoDTO;
 import cow.starter.Bovine.models.Bovine;
 import cow.starter.Bovine.models.BovineRepository;
 import io.swagger.annotations.Api;
@@ -8,7 +10,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,11 +49,27 @@ public class AppointmentController {
 
     @GetMapping("/bovine/{bovineId}")
     @ApiOperation("Get all appointments request by id bovine")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByIDBovine(@PathVariable long bovineId)
+    public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentsByIDBovine(@PathVariable long bovineId)
             throws Exception {
         try {
-            List<AppointmentDTO> appointmentDTOList = new ArrayList<>();
+            List<AppointmentFullInfoDTO> appointmentDTOList = new ArrayList<>();
             List<Appointment> appointmentList = appointmentRepository.getAllBovineAppointment(bovineId);
+            if(!appointmentList.isEmpty()){
+                appointmentDTOList = appointmentService.getAppointments(appointmentList);
+            }
+            return ResponseEntity.ok(appointmentDTOList);
+        }catch(Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/bovines/{ownerId}")
+    @ApiOperation("Get all appointments request of my cows")
+    public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentsOfOwnedCows(@PathVariable String ownerId)
+            throws Exception {
+        try {
+            List<Appointment> appointmentList = appointmentRepository.getAllOwnedBovineAppointment(ownerId);
+            List<AppointmentFullInfoDTO> appointmentDTOList = new ArrayList<>();
             if(!appointmentList.isEmpty()){
                 appointmentDTOList = appointmentService.getAppointments(appointmentList);
             }
@@ -78,9 +95,11 @@ public class AppointmentController {
                             if (bovine.getIdBovine() == appointment.getIdBovine()) {
                                 AppointmentFullInfoDTO appointmentFullInfoDTO = new AppointmentFullInfoDTO(
                                         appointment.getIdAppointment(), appointment.getIdContract(),
-                                        appointment.getIdBovine(), appointment.getIdUser(),
-                                        appointment.getAppointmentDate(), appointment.getAppointmentType(),
-                                        appointment.getCost(), appointment.getObservation(), bovine.getSerialNumber());
+                                        appointment.getIdAppointmentRequest(), appointment.getIdBovine(),
+                                        appointment.getIdUser(), appointment.getAppointmentDate().toString(),
+                                        appointment.getAppointmentType(), appointment.getCost(),
+                                        appointment.getObservation(), bovine.getSerialNumber(),
+                                        appointment.getStatus());
                                 appointmentDTOList.add(appointmentFullInfoDTO);
                             }
                         }
@@ -122,6 +141,22 @@ public class AppointmentController {
                 return ResponseEntity.status(404).build();
             }
             return ResponseEntity.status(409).build();
+        } catch (Exception e) {
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @PutMapping("/{appointmentId}/status")
+    @ApiOperation("Update a field")
+    public ResponseEntity<AppointmentDTO> updateAppointmentRequest(@PathVariable long appointmentId,
+                                                                          @RequestParam int status )
+            throws Exception {
+        try {
+            AppointmentDTO updatedAppointmentDTO = appointmentService.updateAppointmentStatus(appointmentId, status);
+            if (updatedAppointmentDTO.getIdAppointmentRequest() != 0){
+                return ResponseEntity.ok(updatedAppointmentDTO);
+            }
+            return ResponseEntity.status(404).build();
         } catch (Exception e) {
             throw new Exception("ERROR: ", e);
         }

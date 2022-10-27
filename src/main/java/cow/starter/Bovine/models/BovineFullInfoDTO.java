@@ -1,5 +1,7 @@
 package cow.starter.Bovine.models;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -11,7 +13,7 @@ public class BovineFullInfoDTO {
     private String idOwner;
     private long idField;
     private long serialNumber;
-    private Date birthDate;
+    private String birthDate;
     private Double weight;
     private Double height;
     private String breed;
@@ -28,7 +30,7 @@ public class BovineFullInfoDTO {
     public BovineFullInfoDTO(){};
 
     public BovineFullInfoDTO(long idBovine, String idContract, String idOwner, long idField, long serialNumber,
-                             Date birthDate, Double weight, Double height, String breed, String color, Boolean active,
+                             String birthDate, Double weight, Double height, String breed, String color, Boolean active,
                              String observation, long idBovineParent1, long idBovineParent2,
                              boolean gender, String address, String imageCID) {
         this.idBovine = idBovine;
@@ -49,14 +51,14 @@ public class BovineFullInfoDTO {
         this.address = address;
         this.imageCID = imageCID;
 
-
-        int age = Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getYears();
+        LocalDate birthDateTST = LocalDate.parse(birthDate.split(" ")[0]);
+        int age = Period.between(birthDateTST, LocalDate.now()).getYears();
         this.age = age + " years";
         if (age <= 0) {
-            age = Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getMonths();
+            age = Period.between(birthDateTST, LocalDate.now()).getMonths();
             this.age = age + " months";
             if (age <= 0) {
-                age = Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getDays();
+                age = Period.between(birthDateTST, LocalDate.now()).getDays();
                 this.age = age + " days";
             }
         }
@@ -105,11 +107,11 @@ public class BovineFullInfoDTO {
         this.serialNumber = serialNumber;
     }
 
-    public Date getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 

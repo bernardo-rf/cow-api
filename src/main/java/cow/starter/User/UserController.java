@@ -1,7 +1,6 @@
 package cow.starter.User;
 
 import cow.starter.User.models.*;
-import cow.starter.UserType.models.UserType;
 import cow.starter.UserType.models.UserTypeRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Array;
 import java.util.*;
 
 @RestController
@@ -159,7 +156,7 @@ public class UserController {
         try {
             UserAuthResponseDTO userAuthResponseDTO = userService.createUser(userCreateDTO);
             if (userAuthResponseDTO.getToken().equals("ERROR_EMAIL")){
-                return ResponseEntity.status(403).build();
+                return ResponseEntity.status(409).build();
             }else if (userAuthResponseDTO.getToken().equals("ERROR_USER_TYPE")){
                 return ResponseEntity.status(404).build();
             }

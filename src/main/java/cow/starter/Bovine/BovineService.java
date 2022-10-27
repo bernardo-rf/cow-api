@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -48,7 +51,7 @@ public class BovineService {
 
     public BovineDTO convertToDTO(Bovine bovine){
         return new BovineDTO(bovine.getIdBovine(), bovine.getIdContract(), bovine.getIdOwner(),
-                bovine.getIdField(), bovine.getSerialNumber(), bovine.getBirthDate(), bovine.getWeight(),
+                bovine.getIdField(), bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
                 bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
                 bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
                 bovine.getGender(), bovine.getImageCID());
@@ -82,7 +85,7 @@ public class BovineService {
                 return emptyBovineDTO;
             }
 
-            File myObj = new File(EnvUtils.getContractPath() + "COW.API\\src\\main\\java\\cow\\starter\\Bovine\\Bovine.bin");
+            File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Bovine\\Bovine.bin");
             Scanner myReader = new Scanner(myObj);
 
             if (checkBovineValues(bovineCreateDTO.getIdField(), bovineCreateDTO.getIdOwner())) {
@@ -161,13 +164,17 @@ public class BovineService {
             if (checkBovineValues(bovineDTO.getIdField(), bovineDTO.getIdOwner())) {
                 client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
 
+
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+                Date birthDate = formatter.parse(bovineDTO.getBirthDate());
+
                 TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
                         .setContractId(ContractId.fromString(bovineDTO.getIdContract()))
                         .setGas(1000000)
                         .setFunction("setUpdate", new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdField()))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getSerialNumber()))
-                                .addUint256(BigInteger.valueOf(bovineDTO.getBirthDate().getTime()))
+                                .addUint256(BigInteger.valueOf(birthDate.getTime()))
                                 .addBool(bovineDTO.getActive())
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent1()))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent2()))
@@ -188,7 +195,7 @@ public class BovineService {
                     bovine.setIdOwner(bovineDTO.getIdOwner());
                     bovine.setIdField(bovineDTO.getIdField());
                     bovine.setSerialNumber(bovineDTO.getSerialNumber());
-                    bovine.setBirthDate(bovineDTO.getBirthDate());
+                    bovine.setBirthDate(birthDate);
                     bovine.setWeight(bovineDTO.getWeight());
                     bovine.setHeight(bovineDTO.getHeight());
                     bovine.setBreed(bovineDTO.getBreed());
@@ -204,7 +211,7 @@ public class BovineService {
                     return convertToDTO(bovine);
                 }
             }
-        } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
+        } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException | ParseException e) {
             e.printStackTrace();
         }
         return emptyBovineDTO;

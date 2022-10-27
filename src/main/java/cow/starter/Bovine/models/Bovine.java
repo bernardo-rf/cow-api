@@ -28,67 +28,62 @@ public class Bovine implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDBovine")
     @ApiModelProperty(example = "1", name = "idBovine", required = true)
     private long idBovine;
 
-    @Column(name = "IDContract", nullable = false)
-    @ApiModelProperty(example = "1", name = "idContract")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idContract", required = true)
     private String idContract;
 
-    @Column(name = "IDOwner", nullable = false)
-    @ApiModelProperty(example = "1", name = "idOwner")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idOwner", required = true)
     private String idOwner;
 
-    @Column(name = "IDField", nullable = false)
-    @ApiModelProperty(example = "1", name = "idField")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idField", required = true)
     private long idField;
 
-    @Column(name = "SerialNumber", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "12345", name = "serialNumber", required = true)
     private long serialNumber;
 
-    @Column(name = "BirthDate", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "2022-01-01", name = "birthDate", required = true)
     private Date birthDate;
 
-    @Column(name = "Weight", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "102.20", name = "weight", required = true)
     private Double weight;
 
-    @Column(name = "Height", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "1.00", name = "height", required = true)
     private Double height;
 
-    @Column(name = "Breed", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "Angus", name = "breed", required = true)
     private String breed;
 
-    @Column(name = "Color", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "White", name = "color", required = true)
     private String color;
 
-    @Column(name = "Active", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
-    @Column(name = "Observation")
     @ApiModelProperty(example = "Bovine observation.", name = "observation")
     private String observation;
 
-    @Column(name = "IDBovineParent1", nullable = false)
     @ApiModelProperty(example = "Bovine identifier parent 1.", name = "idBovineParent1")
     private long idBovineParent1;
 
-    @Column(name = "IDBovineParent2", nullable = false)
     @ApiModelProperty(example = "Bovine identifier parent 2.", name = "idBovineParent2")
     private long idBovineParent2;
 
-    @Column(name = "Gender")
+    @Column(nullable = false)
     @ApiModelProperty(example = "Bovine identifier gender.", name = "gender")
     private boolean gender;
 
-    @Column(name = "ImageCID")
     @ApiModelProperty(example = "Bovine image identifier.", name = "imageCID")
     private String imageCID;
 
@@ -146,17 +141,13 @@ public class Bovine implements Serializable {
         this.idField = idField;
     }
 
-    public long getSerialNumber() {
-        return serialNumber;
-    }
+    public long getSerialNumber() { return serialNumber; }
 
     public void setSerialNumber(long serialNumber) {
         this.serialNumber = serialNumber;
     }
 
-    public Date getBirthDate() {
-        return birthDate;
-    }
+    public Date getBirthDate() { return birthDate; }
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;

@@ -8,7 +8,7 @@ public class BovineDTO {
     private String idOwner;
     private long idField;
     private long serialNumber;
-    private Date birthDate;
+    private String birthDate;
     private Double weight;
     private Double height;
     private String breed;
@@ -23,7 +23,7 @@ public class BovineDTO {
     public BovineDTO() {}
 
     public BovineDTO(long idBovine, String idContract, String idOwner, long idField, long serialNumber,
-                     Date birthDate, Double weight, Double height, String breed, String color, Boolean active,
+                     String birthDate, Double weight, Double height, String breed, String color, Boolean active,
                      String observation, long idBovineParent1, long idBovineParent2, boolean gender, String imageCID) {
         this.idBovine = idBovine;
         this.idContract = idContract;
@@ -83,11 +83,11 @@ public class BovineDTO {
         this.serialNumber = serialNumber;
     }
 
-    public Date getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Date birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 

@@ -30,7 +30,7 @@ public class FieldHistoryService {
     public FieldHistoryFullInfoDTO convertToDTO(FieldHistory fieldHistory, String fieldDescription, String fieldAddress,
                                                 long serialNumber) {
         return new FieldHistoryFullInfoDTO(fieldHistory.getIdFieldHistory(), fieldHistory.getIdField(), fieldDescription,
-                fieldAddress, fieldHistory.getIdBovine(), serialNumber, fieldHistory.getSwitchDate());
+                fieldAddress, fieldHistory.getIdBovine(), serialNumber, fieldHistory.getSwitchDate().toString());
     }
 
     public boolean checkFieldHistoryValues(long idField, long idBovine){

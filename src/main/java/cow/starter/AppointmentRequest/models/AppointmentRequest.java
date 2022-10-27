@@ -20,33 +20,32 @@ public class AppointmentRequest implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDAppointmentRequest")
     @ApiModelProperty(example = "1", name = "idAppointmentRequest", required = true)
     private long idAppointmentRequest;
 
-    @Column(name = "IDUser", nullable = false)
-    @ApiModelProperty(example = "1", name = "idUser")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idUser", required = true)
     private long idUser;
 
-    @Column(name = "IDUserRequest", nullable = false )
-    @ApiModelProperty(example = "1", name = "idUserRequest")
+    @Column(nullable = false )
+    @ApiModelProperty(example = "1", name = "idUserRequest", required = true)
     private long idUserRequest;
 
-    @Column(name = "IDBovine", nullable = false)
-    @ApiModelProperty(example = "1", name = "idBovine")
+    @Column(nullable = false)
+    @ApiModelProperty(example = "1", name = "idBovine", required = true)
     private long idBovine;
 
-    @Column(name = "AppointmentDate", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "2022-01-01", name = "appointmentDate", required = true)
     private Date appointmentDate;
 
-    @Column(name = "Motive", nullable = false, length = 250)
-    @ApiModelProperty(example = "Motive", name = "motive", required = true)
+    @Column(nullable = false, length = 50)
+    @ApiModelProperty(example = "Regular Appoitment", name = "motive", required = true)
     private String motive;
 
-    @Column(name = "Status", nullable = false)
+    @Column(nullable = false)
     @ApiModelProperty(example = "true", name = "status", required = true)
-    private int status;
+    private int appointmentRequestStatus;
 
     public AppointmentRequest() { super(); }
 
@@ -57,7 +56,7 @@ public class AppointmentRequest implements Serializable {
         this.idBovine = idBovine;
         this.appointmentDate = appointmentDate;
         this.motive = motive;
-        this.status = status;
+        this.appointmentRequestStatus = status;
     }
 
     public long getIdAppointmentRequest() {
@@ -109,10 +108,10 @@ public class AppointmentRequest implements Serializable {
     }
 
     public int getStatus() {
-        return status;
+        return appointmentRequestStatus;
     }
 
     public void setStatus(int status) {
-        this.status = status;
+        this.appointmentRequestStatus = status;
     }
 }

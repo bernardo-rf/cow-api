@@ -34,7 +34,7 @@ public class EnvUtils {
         MAINNET
     }
 
-    public static String getContractPath() {
-        return Objects.requireNonNull(getEnv().get("CONTRACT_PATH"));
+    public static String getProjectPath() {
+        return Objects.requireNonNull(getEnv().get("PROJECT_PATH"));
     }
 }

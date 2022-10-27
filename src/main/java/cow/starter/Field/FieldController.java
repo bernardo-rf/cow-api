@@ -79,7 +79,7 @@ public class FieldController {
                         if (bovine.getIdField() == field.getIdField()) {
                             BovineFullInfoDTO bovineDTO = new BovineFullInfoDTO(bovine.getIdBovine(),
                                     bovine.getIdContract(), bovine.getIdOwner(), bovine.getIdField(),
-                                    bovine.getSerialNumber(), bovine.getBirthDate(), bovine.getWeight(),
+                                    bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
                                     bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
                                     bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
                                     bovine.getGender(), field.getAddress(), bovine.getImageCID());

@@ -14,16 +14,15 @@ public class UserType implements Serializable {
      */
 
     @Id
-    @Column(name = "IDUserType")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(example = "1", name = "idUserType", required = true)
-    private Integer idUserType;
+    private long idUserType;
 
-    @Column(name = "Description")
+    @Column(nullable = false)
     @ApiModelProperty(example = "Veterinary", name = "description", required = true)
     private String description;
 
-    @Column(name = "Active")
+    @Column(nullable = false)
     @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
@@ -34,11 +33,11 @@ public class UserType implements Serializable {
         this.active = active;
     }
 
-    public Integer getIdUserType() {
+    public long getIdUserType() {
         return idUserType;
     }
 
-    public void setIdUserType(Integer idUserType) {
+    public void setIdUserType(long idUserType) {
         this.idUserType = idUserType;
     }
 

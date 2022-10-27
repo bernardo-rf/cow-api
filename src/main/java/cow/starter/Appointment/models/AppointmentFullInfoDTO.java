@@ -1,23 +1,24 @@
 package cow.starter.Appointment.models;
 
-import java.util.Date;
-
 public class AppointmentFullInfoDTO {
     private long idAppointment;
     private String idContract;
+    private long idAppointmentRequest;
     private long idBovine;
     private long idUser;
-    private Date appointmentDate;
+    private String appointmentDate;
     private String appointmentType;
     private Double cost;
     private String observation;
     private long bovineSerialNumber;
+    private int status;
 
-    public AppointmentFullInfoDTO(long idAppointment, String idContract, long idBovine, long idUser,
-                                  Date appointmentDate, String appointmentType, Double cost,
-                                  String observation, long bovineSerialNumber) {
+    public AppointmentFullInfoDTO(long idAppointment, String idContract, long idAppointmentRequest, long idBovine,
+                                  long idUser, String appointmentDate, String appointmentType, Double cost,
+                                  String observation, long bovineSerialNumber, int status) {
         this.idAppointment = idAppointment;
         this.idContract = idContract;
+        this.idAppointmentRequest = idAppointmentRequest;
         this.idBovine = idBovine;
         this.idUser = idUser;
         this.appointmentDate = appointmentDate;
@@ -25,6 +26,7 @@ public class AppointmentFullInfoDTO {
         this.cost = cost;
         this.observation = observation;
         this.bovineSerialNumber = bovineSerialNumber;
+        this.status = status;
     }
 
     public long getIdAppointment() {
@@ -59,11 +61,11 @@ public class AppointmentFullInfoDTO {
         this.idUser = idUser;
     }
 
-    public Date getAppointmentDate() {
+    public String getAppointmentDate() {
         return appointmentDate;
     }
 
-    public void setAppointmentDate(Date appointmentDate) {
+    public void setAppointmentDate(String appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 
@@ -97,5 +99,19 @@ public class AppointmentFullInfoDTO {
 
     public void setBovineSerialNumber(long bovineSerialNumber) {
         this.bovineSerialNumber = bovineSerialNumber;
+    }
+
+    public long getIdAppointmentRequest() { return idAppointmentRequest; }
+
+    public void setIdAppointmentRequest(long idAppointmentRequest) {
+        this.idAppointmentRequest = idAppointmentRequest;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

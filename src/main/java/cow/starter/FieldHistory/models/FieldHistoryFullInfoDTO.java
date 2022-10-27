@@ -9,12 +9,12 @@ public class FieldHistoryFullInfoDTO {
     private String fieldAddress;
     private long idBovine;
     private long bovineSerialNumber;
-    private Date switchDate;
+    private String switchDate;
 
     public FieldHistoryFullInfoDTO() { }
 
     public FieldHistoryFullInfoDTO(long idFieldHistory, long idField, String fieldDescription, String fieldAddress,
-                                   long idBovine, long bovineSerialNumber, Date switchDate) {
+                                   long idBovine, long bovineSerialNumber, String switchDate) {
         this.idFieldHistory = idFieldHistory;
         this.idField = idField;
         this.fieldDescription = fieldDescription;
@@ -72,11 +72,11 @@ public class FieldHistoryFullInfoDTO {
         this.bovineSerialNumber = bovineSerialNumber;
     }
 
-    public Date getSwitchDate() {
+    public String getSwitchDate() {
         return switchDate;
     }
 
-    public void setSwitchDate(Date switchDate) {
+    public void setSwitchDate(String switchDate) {
         this.switchDate = switchDate;
     }
 }
