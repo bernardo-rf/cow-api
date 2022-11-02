@@ -39,8 +39,11 @@ public class User implements Serializable {
     private int idUserType;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "name", required = true)
+    @ApiModelProperty(example = "John", name = "name", required = true)
     private String name;
+
+    @ApiModelProperty(example = "John Doe", name = "name")
+    private String fullName;
 
     @ApiModelProperty(example = "2022-01-01", name = "birthDate")
     private Date birthDate;
@@ -61,10 +64,14 @@ public class User implements Serializable {
     @ApiModelProperty(example = "1090.50", name="balance", required = true)
     private double balance;
 
+    @ApiModelProperty(example = "Bovine image identifier.", name = "imageCID")
+    private String imageCID;
+
+
     public User() { super(); }
 
     public User(String idContract, String idWallet, int idUserType, String name, Date birthDate, String email,
-                String password, Boolean active, Double balance) {
+                String password, Boolean active, Double balance, String fullName, String imageCID) {
         this.idContract = idContract;
         this.idWallet = idWallet;
         this.idUserType = idUserType;
@@ -74,6 +81,8 @@ public class User implements Serializable {
         this.password = password;
         this.active = active;
         this.balance = balance;
+        this.fullName = fullName;
+        this.imageCID = imageCID;
     }
 
     public long getIdUser() { return idUser; }
@@ -150,5 +159,21 @@ public class User implements Serializable {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getImageCID() {
+        return imageCID;
+    }
+
+    public void setImageCID(String imageCID) {
+        this.imageCID = imageCID;
     }
 }

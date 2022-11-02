@@ -13,10 +13,13 @@ public class UserDTO {
     private String password;
     private Boolean active;
     private Double balance;
+    private String fullName;
+    private String imageCID;
 
     public UserDTO() { }
 
-    public UserDTO(long idUser, String idContract, String idWallet, int idUserType, String name, Date birthDate, String email, String password, Boolean active, Double balance) {
+    public UserDTO(long idUser, String idContract, String idWallet, int idUserType, String name, Date birthDate,
+                   String email, String password, Boolean active, Double balance, String fullName, String imageCID) {
         this.idUser = idUser;
         this.idContract = idContract;
         this.idWallet = idWallet;
@@ -27,6 +30,8 @@ public class UserDTO {
         this.password = password;
         this.active = active;
         this.balance = balance;
+        this.fullName = fullName;
+        this.imageCID = imageCID;
     }
 
     public long getIdUser() {
@@ -107,5 +112,21 @@ public class UserDTO {
 
     public void setBalance(Double balance) {
         this.balance = balance;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getImageCID() {
+        return imageCID;
+    }
+
+    public void setImageCID(String imageCID) {
+        this.imageCID = imageCID;
     }
 }

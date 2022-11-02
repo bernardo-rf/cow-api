@@ -39,7 +39,7 @@ public class UserController {
             List<UserFullInfoDTO> userFullInfoDTOS = new ArrayList<>();
             if (!users.isEmpty()) {
                 for (User user: users) {
-                    UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
+                    UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user.getIdUser());
                     if (userInfoDTO.getIdUser() != 0) {
                         userFullInfoDTOS.add(userInfoDTO);
                     }
@@ -59,7 +59,7 @@ public class UserController {
             List<UserFullInfoDTO> userFullInfoDTOS = new ArrayList<>();
             if (!users.isEmpty()) {
                 for (User user: users) {
-                    UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
+                    UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user.getIdUser());
                     if (userInfoDTO.getIdUser() != 0) {
                         userFullInfoDTOS.add(userInfoDTO);
                     }
@@ -75,12 +75,9 @@ public class UserController {
     @ApiOperation("Get user by id")
     public ResponseEntity<UserFullInfoDTO> getUser(@PathVariable long userId) throws Exception {
         try {
-            User user = userRepository.getUser(userId);
-            if (user != null){
-                UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
-                if (userInfoDTO.getIdUser() != 0) {
-                    return ResponseEntity.ok(userInfoDTO);
-                }
+            UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(userId);
+            if (userInfoDTO.getIdUser() != 0) {
+                return ResponseEntity.ok(userInfoDTO);
             }
             return ResponseEntity.status(404).build();
         }catch (Exception e){
@@ -97,9 +94,9 @@ public class UserController {
     public ResponseEntity<UserFullInfoDTO> getUserByEmail(@RequestParam(defaultValue = "") String userEmail)
             throws Exception {
         try {
-            User user = userRepository.getUserByEmail(userEmail);
+            User user = userRepository.getUserByEmail(userEmail, 0);
             if (user != null){
-                UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
+                UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user.getIdUser());
                 if (userInfoDTO.getIdUser() != 0) {
                     return ResponseEntity.ok(userInfoDTO);
                 }
@@ -120,7 +117,7 @@ public class UserController {
         try {
             User user = userRepository.getUserByIDWallet(idWallet);
             if (user != null){
-                UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user);
+                UserFullInfoDTO userInfoDTO = userService.getUserFullInfo(user.getIdUser());
                 if (userInfoDTO.getIdUser() != 0) {
                     return ResponseEntity.ok(userInfoDTO);
                 }
@@ -171,14 +168,15 @@ public class UserController {
     public ResponseEntity<UserFullInfoDTO> updateUser(@PathVariable String userWallet,
                                                       @RequestBody UserDTO userDTO) throws Exception {
         try {
-            if (userWallet.equals(userDTO.getIdWallet())) {
-                UserFullInfoDTO updatedUserDTO = userService.updateUser(userDTO);
-                if (updatedUserDTO.getIdUser() != 0) {
-                    return ResponseEntity.ok(updatedUserDTO);
-                }
-                return ResponseEntity.status(404).build();
+            UserFullInfoDTO updatedUserDTO = userService.updateUser(userDTO);
+
+            if(updatedUserDTO.getName().equals("error_password_equals_to_previous")){
+                return ResponseEntity.status(406).build();
+            }else if(updatedUserDTO.getName().equals("error_email_already_taken")) {
+                return ResponseEntity.status(409).build();
             }
-            return ResponseEntity.status(409).build();
+
+             return ResponseEntity.ok(updatedUserDTO);
         } catch (Exception e) {
             throw new Exception("ERROR:", e);
         }

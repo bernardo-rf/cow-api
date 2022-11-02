@@ -1,8 +1,6 @@
 package cow.starter.Appointment;
 
 import cow.starter.Appointment.models.*;
-import cow.starter.AppointmentRequest.models.AppointmentRequestDTO;
-import cow.starter.AppointmentRequest.models.AppointmentRequestFullInfoDTO;
 import cow.starter.Bovine.models.Bovine;
 import cow.starter.Bovine.models.BovineRepository;
 import io.swagger.annotations.Api;
@@ -153,7 +151,7 @@ public class AppointmentController {
             throws Exception {
         try {
             AppointmentDTO updatedAppointmentDTO = appointmentService.updateAppointmentStatus(appointmentId, status);
-            if (updatedAppointmentDTO.getIdAppointmentRequest() != 0){
+            if (updatedAppointmentDTO.getIdAppointment() != 0){
                 return ResponseEntity.ok(updatedAppointmentDTO);
             }
             return ResponseEntity.status(404).build();
