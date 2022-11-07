@@ -28,63 +28,47 @@ public class Bovine implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(example = "1", name = "idBovine", required = true)
     private long idBovine;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "idContract", required = true)
     private String idContract;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "idOwner", required = true)
     private String idOwner;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "idField", required = true)
     private long idField;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "12345", name = "serialNumber", required = true)
     private long serialNumber;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "2022-01-01", name = "birthDate", required = true)
     private Date birthDate;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "102.20", name = "weight", required = true)
     private Double weight;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1.00", name = "height", required = true)
     private Double height;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "Angus", name = "breed", required = true)
     private String breed;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "White", name = "color", required = true)
     private String color;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
-    @ApiModelProperty(example = "Bovine observation.", name = "observation")
     private String observation;
 
-    @ApiModelProperty(example = "Bovine identifier parent 1.", name = "idBovineParent1")
     private long idBovineParent1;
 
-    @ApiModelProperty(example = "Bovine identifier parent 2.", name = "idBovineParent2")
     private long idBovineParent2;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "Bovine identifier gender.", name = "gender")
     private boolean gender;
 
-    @ApiModelProperty(example = "Bovine image identifier.", name = "imageCID")
     private String imageCID;
 
     public Bovine() { super(); }
