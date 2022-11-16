@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Appointment Request")
 @RequestMapping(path = "api/appointmentRequest")
 public class AppointmentRequestController {

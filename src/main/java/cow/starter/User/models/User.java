@@ -1,80 +1,88 @@
 package cow.starter.User.models;
 
-import io.swagger.annotations.ApiModelProperty;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import cow.starter.Appointment.models.Appointment;
+import cow.starter.Auction.models.Auction;
+import cow.starter.Bovine.models.Bovine;
+import cow.starter.Field.models.Field;
+import cow.starter.UserType.models.UserType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="COW_User")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
-    /**
-     * @param idUser
-     * @param idContract
-     * @param idWallet
-     * @param idUserType
-     * @param name
-     * @param birthDate
-     * @param email
-     * @param password
-     * @param active
-     * @param balance
-     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(example = "1", name = "idUser", required = true)
     private long idUser;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "idContract", required = true)
     private String idContract;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "idWallet", required = true)
     private String idWallet;
 
-    @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "idUserType", required = true)
-    private int idUserType;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_user_type")
+    @JsonBackReference
+    private UserType userType;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "John", name = "name", required = true)
     private String name;
 
-    @ApiModelProperty(example = "John Doe", name = "name")
     private String fullName;
 
-    @ApiModelProperty(example = "2022-01-01", name = "birthDate")
     private Date birthDate;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "Regular appointment", name = "email", required = true)
     private String email;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "Regular appointment", name = "password", required = true)
     private String password;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1090.50", name="balance", required = true)
     private double balance;
 
-    @ApiModelProperty(example = "Bovine image identifier.", name = "imageCID")
     private String imageCID;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @JsonManagedReference
+    private Set<Appointment> appointmentSet = new HashSet();
 
-    public User() { super(); }
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @JsonManagedReference
+    private Set<Auction> auctionSet = new HashSet();
 
-    public User(String idContract, String idWallet, int idUserType, String name, Date birthDate, String email,
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @JsonManagedReference
+    private Set<Bovine> bovineSet = new HashSet();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @JsonManagedReference
+    private Set<Field> fieldSet = new HashSet();
+
+    public User(String idContract, String idWallet, UserType userType, String name, Date birthDate, String email,
                 String password, Boolean active, Double balance, String fullName, String imageCID) {
         this.idContract = idContract;
         this.idWallet = idWallet;
-        this.idUserType = idUserType;
+        this.userType = userType;
         this.name = name;
         this.birthDate = birthDate;
         this.email = email;
@@ -82,98 +90,6 @@ public class User implements Serializable {
         this.active = active;
         this.balance = balance;
         this.fullName = fullName;
-        this.imageCID = imageCID;
-    }
-
-    public long getIdUser() { return idUser; }
-
-    public void setIdUser(long idUser) {
-        this.idUser = idUser;
-    }
-
-    public String getIdContract() {
-        return idContract;
-    }
-
-    public void setIdContract(String idContract) {
-        this.idContract = idContract;
-    }
-
-    public String getIdWallet() {
-        return idWallet;
-    }
-
-    public void setIdWallet(String idWallet) {
-        this.idWallet = idWallet;
-    }
-
-    public int getIdUserType() {
-        return idUserType;
-    }
-
-    public void setIdUserType(int idUserType) {
-        this.idUserType = idUserType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(Date birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() { return password; }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getImageCID() {
-        return imageCID;
-    }
-
-    public void setImageCID(String imageCID) {
         this.imageCID = imageCID;
     }
 }

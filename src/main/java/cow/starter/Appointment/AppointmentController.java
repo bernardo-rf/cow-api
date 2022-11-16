@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Appointment")
 @RequestMapping(path = "api/appointment")
 public class AppointmentController {
@@ -90,14 +90,14 @@ public class AppointmentController {
                 if (!bovines.isEmpty()) {
                     for (Appointment appointment : appointments) {
                         for (Bovine bovine : bovines) {
-                            if (bovine.getIdBovine() == appointment.getIdBovine()) {
+                            if (bovine.getIdBovine() == appointment.getBovine().getIdBovine()) {
                                 AppointmentFullInfoDTO appointmentFullInfoDTO = new AppointmentFullInfoDTO(
                                         appointment.getIdAppointment(), appointment.getIdContract(),
-                                        appointment.getIdAppointmentRequest(), appointment.getIdBovine(),
-                                        appointment.getIdUser(), appointment.getAppointmentDate().toString(),
+                                        appointment.getIdAppointmentRequest(), appointment.getBovine().getIdBovine(),
+                                        appointment.getUser().getIdUser(), appointment.getAppointmentDate().toString(),
                                         appointment.getAppointmentType(), appointment.getCost(),
                                         appointment.getObservation(), bovine.getSerialNumber(),
-                                        appointment.getStatus());
+                                        appointment.getAppointmentStatus());
                                 appointmentDTOList.add(appointmentFullInfoDTO);
                             }
                         }

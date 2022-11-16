@@ -8,15 +8,14 @@ import cow.starter.utilities.EnvUtils;
 import cow.starter.utilities.JwtToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 
 @Service
@@ -41,16 +40,16 @@ public class UserService {
 
     public Client client = Client.forTestnet();
 
-    public UserFullInfoDTO convertToDTO(User user, String userType){
-        return new UserFullInfoDTO(user.getIdUser(), user.getIdContract(), user.getIdWallet(), user.getIdUserType(),
+    public UserFullInfoDTO convertToDTO(User user, String userType) {
+        return new UserFullInfoDTO(user.getIdUser(), user.getIdContract(), user.getIdWallet(), user.getUserType().getIdUserType(),
                 userType, user.getName(), user.getBirthDate(), user.getEmail(), user.getPassword(), user.getActive(),
                 user.getBalance(), user.getFullName(), user.getImageCID());
     }
 
     public UserFullInfoDTO getUserFullInfo(long idUser) {
         User user = userRepository.getUser(idUser);
-        if(user != null){
-            UserType userType = userTypeRepository.getUserType(user.getIdUserType());
+        if (user != null) {
+            UserType userType = userTypeRepository.getUserType(user.getUserType().getIdUserType());
             if (userType != null) {
                 return convertToDTO(user, userType.getDescription().toUpperCase());
             }
@@ -62,7 +61,7 @@ public class UserService {
     public UserAuthResponseDTO authenticate(UserAuthDTO userDTO) {
         UserAuthResponseDTO emptyUserAuthResponseDTO = new UserAuthResponseDTO();
         User user = userRepository.getUserByEmail(userDTO.getEmail(), 0);
-        if (user != null && bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())){
+        if (user != null && bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
             if (!user.getActive()) {
                 emptyUserAuthResponseDTO.setToken("USER_DISABLE");
                 return emptyUserAuthResponseDTO;
@@ -83,13 +82,13 @@ public class UserService {
         try {
 
             User userAux = userRepository.getUserByEmail(userCreateDTO.getEmail(), 0);
-            if (userAux != null){
+            if (userAux != null) {
                 emptyUserAuthResponseDTO.setToken("ERROR_EMAIL");
                 return emptyUserAuthResponseDTO;
             }
 
             UserType userType = userTypeRepository.getUserType(userCreateDTO.getIdUserType());
-            if (userType == null){
+            if (userType == null) {
                 emptyUserAuthResponseDTO.setToken("ERROR_USER_TYPE");
                 return emptyUserAuthResponseDTO;
             }
@@ -108,19 +107,19 @@ public class UserService {
 
                 TransactionResponse newAccount = new AccountCreateTransaction()
                         .setKey(newAccountPublicKey)
-                        .setInitialBalance( Hbar.fromTinybars(1000))
+                        .setInitialBalance(Hbar.fromTinybars(1000))
                         .execute(client);
 
                 newAccountId = newAccount.getReceipt(client).accountId;
 
                 AccountBalance tokenBalance = null;
-                if (newAccountId != null){
+                if (newAccountId != null) {
                     AccountBalanceQuery query = new AccountBalanceQuery()
                             .setAccountId(newAccountId);
                     tokenBalance = query.execute(client);
                 }
 
-                if (tokenBalance != null){
+                if (tokenBalance != null) {
                     String objectByteCode = myReader.nextLine();
                     byte[] bytecode = objectByteCode.getBytes(StandardCharsets.UTF_8);
 
@@ -142,8 +141,8 @@ public class UserService {
                         TransactionReceipt fileReceipt2 = fileAppendTransaction.getReceipt(client);
                         System.out.println("Contract Created =" + fileReceipt2);
 
-                        String balanceAux  = tokenBalance.hbars.toString();
-                        String balance = balanceAux.substring(0, balanceAux.length()-3);
+                        String balanceAux = tokenBalance.hbars.toString();
+                        String balance = balanceAux.substring(0, balanceAux.length() - 3);
 
                         TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
                                 .setBytecodeFileId(bytecodeFileId)
@@ -165,15 +164,14 @@ public class UserService {
                             String idContract = fileReceipt3.contractId.toString();
                             String idAccount = newAccountId.toString();
 
-                            User user = new User(idContract, idAccount, userCreateDTO.getIdUserType(),
-                                    userCreateDTO.getName(),null,
-                                    userCreateDTO.getEmail(), bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
-                                    true, Double.valueOf(balance), "", "");
+                            User user = new User(idContract, idAccount, userType, userCreateDTO.getName(),
+                                    null, userCreateDTO.getEmail(),
+                                    bCryptPasswordEncoder.encode(userCreateDTO.getPassword()), true,
+                                    Double.valueOf(balance), "", "");
                             userRepository.save(user);
 
-                            return new UserAuthResponseDTO(
-                                    jwtToken.generateToken(user),
-                                    convertToDTO(user, userType.getDescription().toUpperCase()) );
+                            return new UserAuthResponseDTO( jwtToken.generateToken(user),
+                                    convertToDTO(user, userType.getDescription().toUpperCase()));
                         }
                     }
                 }
@@ -184,17 +182,17 @@ public class UserService {
         return emptyUserAuthResponseDTO;
     }
 
-    public UserFullInfoDTO updateUser(UserDTO userDTO){
+    public UserFullInfoDTO updateUser(UserDTO userDTO) {
         UserFullInfoDTO emptyUser = new UserFullInfoDTO();
         try {
             User user = userRepository.getUserByIDWallet(userDTO.getIdWallet());
-            if(bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
+            if (bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
                 emptyUser.setName("error_password_equals_to_previous");
                 return emptyUser;
             }
 
             User userAux = userRepository.getUserByEmail(userDTO.getEmail(), userDTO.getIdUser());
-            if (userAux != null){
+            if (userAux != null) {
                 emptyUser.setName("error_email_already_taken");
                 return emptyUser;
             }
@@ -213,19 +211,18 @@ public class UserService {
             TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
             System.out.println("Status " + fileReceipt.status);
 
-                user.setIdUserType(userDTO.getIdUserType());
-                user.setName(userDTO.getName());
-                user.setEmail(userDTO.getEmail());
-                user.setBirthDate(userDTO.getBirthDate());
-                user.setFullName(userDTO.getFullName());
-                user.setImageCID(userDTO.getImageCID());
+            user.setName(userDTO.getName());
+            user.setEmail(userDTO.getEmail());
+            user.setBirthDate(userDTO.getBirthDate());
+            user.setFullName(userDTO.getFullName());
+            user.setImageCID(userDTO.getImageCID());
 
-                if (!userDTO.getPassword().isEmpty()){
-                    user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword().toUpperCase()));
-                }
-                userRepository.save(user);
+            if (!userDTO.getPassword().isEmpty()) {
+                user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword().toUpperCase()));
+            }
+            userRepository.save(user);
 
-                return getUserFullInfo(user.getIdUser());
+            return getUserFullInfo(user.getIdUser());
 
         } catch (Exception e) {
             e.printStackTrace();

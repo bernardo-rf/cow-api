@@ -2,6 +2,8 @@ package cow.starter.User;
 
 import cow.starter.User.models.*;
 import cow.starter.UserType.models.UserTypeRepository;
+import cow.starter.utilities.EnvUtils;
+import io.github.cdimascio.dotenv.Dotenv;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Users")
 @RequestMapping(path = "api/users")
 public class UserController {

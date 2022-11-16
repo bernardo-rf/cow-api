@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Fields")
 @RequestMapping(path = "api/fields")
 public class FieldController {
@@ -32,25 +32,11 @@ public class FieldController {
         bovineService = new BovineService();
     }
 
-    @GetMapping("/{fieldId}")
-    @ApiOperation("Get field by id")
-    public ResponseEntity<FieldFullInfoDTO> getField(@PathVariable long fieldId) throws Exception {
-        try {
-            FieldFullInfoDTO fullInfoDTO = fieldService.getFieldFullInfo(fieldId);
-            if (fullInfoDTO.getIdField() != 0) {
-                return ResponseEntity.ok(fullInfoDTO);
-            }
-            return ResponseEntity.status(404).build();
-        }catch(Exception e){
-            throw new Exception("ERROR: ", e);
-        }
-    }
-
     @GetMapping("{ownerId}/full_info")
     @ApiOperation("Get all fields full info")
-    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsFullInfo(@PathVariable String ownerId) throws Exception {
+    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsByIDOwner(@PathVariable String ownerId) throws Exception {
         try {
-            return ResponseEntity.ok(fieldService.getFieldsFullInfo(ownerId));
+            return ResponseEntity.ok(fieldService.getFieldsByIDOwner(ownerId));
         }catch (Exception e){
             throw new Exception("ERROR: ", e);
         }
@@ -66,44 +52,35 @@ public class FieldController {
         }
     }
 
-    @GetMapping("/bovines/{fieldId}")
-    @ApiOperation("Get field cows by id")
-    public ResponseEntity<List<BovineFullInfoDTO>> getFieldBovine(@PathVariable long fieldId) throws Exception {
+    @GetMapping("/{fieldId}")
+    @ApiOperation("Get field by id")
+    public ResponseEntity<FieldFullInfoDTO> getField(@PathVariable long fieldId) throws Exception {
         try {
-            List<BovineFullInfoDTO> bovineDTOList =  new ArrayList<>();
-            List<Bovine> bovines = fieldRepository.getFieldBovines(fieldId);
-            if (!bovines.isEmpty()){
-                List<Field> fields = fieldRepository.getAllFields();
-                for (Bovine bovine:bovines) {
-                    for (Field field: fields) {
-                        if (bovine.getIdField() == field.getIdField()) {
-                            BovineFullInfoDTO bovineDTO = new BovineFullInfoDTO(bovine.getIdBovine(),
-                                    bovine.getIdContract(), bovine.getIdOwner(), bovine.getIdField(),
-                                    bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
-                                    bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
-                                    bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
-                                    bovine.getGender(), field.getAddress(), bovine.getImageCID());
-                            bovineDTOList.add(bovineDTO);
-                        }
-                    }
-                }
+            FieldFullInfoDTO fullInfoDTO = fieldService.getField(fieldId);
+            if (fullInfoDTO.getIdField() != 0) {
+                return ResponseEntity.ok(fullInfoDTO);
             }
-            return ResponseEntity.ok(bovineDTOList);
+            return ResponseEntity.status(404).build();
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }
     }
 
-    @GetMapping("/cows/notIn/{fieldId}")
+    @GetMapping("/bovines/{fieldId}")
     @ApiOperation("Get field cows by id")
-    public ResponseEntity<List<BovineDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception {
+    public ResponseEntity<FieldDTO> getFieldBovine(@PathVariable long fieldId) throws Exception {
         try {
-            List<BovineDTO> bovineDTOList =  new ArrayList<>();
-            List<Bovine> bovineList = fieldRepository.getAllBovinesNotIn(fieldId);
-            if (!bovineList.isEmpty()){
-                bovineDTOList = fieldService.getBovineDTOList(bovineList);
-            }
-            return ResponseEntity.ok(bovineDTOList);
+            return ResponseEntity.ok(fieldService.getFieldBovines(fieldId));
+        }catch(Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/bovines/{fieldId}/notIn")
+    @ApiOperation("Get field cows by id")
+    public ResponseEntity<List<BovineFullInfoDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception {
+        try {
+            return ResponseEntity.ok(fieldService.getFieldBovinesNotIn(fieldId));
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }

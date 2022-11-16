@@ -1,10 +1,9 @@
 package cow.starter.Bid.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import cow.starter.Auction.models.Auction;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import cow.starter.User.models.User;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,15 +17,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class Bid implements Serializable {
 
-    /**
-     * @param idBid
-     * @param idContract
-     * @param idAuction
-     * @param idBidder
-     * @param value
-     * @param bidDate
-     */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idBid;
@@ -34,12 +24,15 @@ public class Bid implements Serializable {
     @Column(nullable = false)
     private String idContract;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_auction")
+    @JsonBackReference
     private Auction auction;
 
-    @Column(nullable = false)
-    private String idBidder;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
+    @JsonBackReference
+    private User user;
 
     @Column(nullable = false, scale = 2)
     private Double value;
@@ -47,10 +40,10 @@ public class Bid implements Serializable {
     @Column(nullable = false)
     private Date bidDate;
 
-    public Bid(String idContract, Auction auction, String idBidder, Double value, Date bidDate) {
+    public Bid(String idContract, Auction auction, User user, Double value, Date bidDate) {
         this.idContract = idContract;
         this.auction = auction;
-        this.idBidder = idBidder;
+        this.user = user;
         this.value = value;
         this.bidDate = bidDate;
     }

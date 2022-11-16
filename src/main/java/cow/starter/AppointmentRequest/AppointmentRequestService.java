@@ -34,27 +34,27 @@ public class AppointmentRequestService {
     AppointmentService appointmentService;
 
     public AppointmentRequestDTO convertToDTO(AppointmentRequest appointmentRequest) {
-        return new AppointmentRequestDTO(appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getIdUser(),
-                appointmentRequest.getIdUserRequest(), appointmentRequest.getIdBovine(),
+        return new AppointmentRequestDTO(appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getUser().getIdUser(),
+                appointmentRequest.getUserRequest().getIdUser(), appointmentRequest.getBovine().getIdBovine(),
                 appointmentRequest.getAppointmentDate().toString(), appointmentRequest.getMotive(),
-                appointmentRequest.getStatus());
+                appointmentRequest.getAppointmentRequestStatus());
     }
 
     public AppointmentRequestFullInfoDTO convertFullInfoToDTO(AppointmentRequest appointmentRequest, String userName,
                                               String userRequestName, long serialNumber) {
         return new AppointmentRequestFullInfoDTO(appointmentRequest.getIdAppointmentRequest(),
-                appointmentRequest.getIdUser(), appointmentRequest.getIdUserRequest(), appointmentRequest.getIdBovine(),
-                appointmentRequest.getAppointmentDate().toString(), appointmentRequest.getMotive(),
-                appointmentRequest.getStatus(), userName, userRequestName, serialNumber);
+                appointmentRequest.getUser().getIdUser(), appointmentRequest.getUserRequest().getIdUser(),
+                appointmentRequest.getBovine().getIdBovine(), appointmentRequest.getAppointmentDate().toString(),
+                appointmentRequest.getMotive(), appointmentRequest.getAppointmentRequestStatus(), userName, userRequestName, serialNumber);
     }
 
     public List<AppointmentRequestFullInfoDTO> getAppointmentsRequest(List<AppointmentRequest> appointmentRequestList){
         List<AppointmentRequestFullInfoDTO> appointmentRequestDTOList = new ArrayList<>();
         if (!appointmentRequestList.isEmpty()) {
             for (AppointmentRequest appointmentRequest : appointmentRequestList) {
-                User userVeterinary = userRepository.getUser(appointmentRequest.getIdUser());
-                User user = userRepository.getUser(appointmentRequest.getIdUserRequest());
-                Bovine bovine = bovineRepository.getBovine(appointmentRequest.getIdBovine());
+                User userVeterinary = userRepository.getUser(appointmentRequest.getUser().getIdUser());
+                User user = userRepository.getUser(appointmentRequest.getUser().getIdUser());
+                Bovine bovine = bovineRepository.getBovine(appointmentRequest.getBovine().getIdBovine());
                 appointmentRequestDTOList.add(convertFullInfoToDTO(appointmentRequest, userVeterinary.getName(),
                         user.getName(), bovine.getSerialNumber()));
             }
@@ -85,10 +85,11 @@ public class AppointmentRequestService {
                         bovine.getIdBovine(), appointmentRequestCreateDTO.getAppointmentDate());
                 if (appointmentRequest == null && checkAppointmentRequestValues(appointmentRequestCreateDTO.getIdUser(),
                         appointmentRequestCreateDTO.getIdUserRequest(), bovine.getIdBovine())) {
+
                     AppointmentRequest newAppointmentRequest = new AppointmentRequest(
-                            appointmentRequestCreateDTO.getIdUser(),
-                            appointmentRequestCreateDTO.getIdUserRequest(),
-                            bovine.getIdBovine(),
+                            userRepository.getUser(appointmentRequestCreateDTO.getIdUser()),
+                            userRepository.getUser(appointmentRequestCreateDTO.getIdUserRequest()),
+                            bovine,
                             appointmentRequestCreateDTO.getAppointmentDate(),
                             appointmentRequestCreateDTO.getMotive(),
                             appointmentRequestCreateDTO.getStatus());
@@ -116,11 +117,11 @@ public class AppointmentRequestService {
 
                 AppointmentRequest appointmentRequest = appointmentRequestRepository.getAppointmentRequest(appointmentRequestDTO.getIdAppointmentRequest());
                 if (appointmentRequest != null) {
-                    appointmentRequest.setIdBovine(appointmentRequestDTO.getIdBovine());
-                    appointmentRequest.setIdUser(appointmentRequestDTO.getIdUser());
+                    appointmentRequest.setBovine(bovineRepository.getBovine(appointmentRequestDTO.getIdBovine()));
+                    appointmentRequest.setUser(userRepository.getUser(appointmentRequestDTO.getIdUser()));
                     appointmentRequest.setAppointmentDate( appointmentDate );
                     appointmentRequest.setMotive(appointmentRequestDTO.getMotive());
-                    appointmentRequest.setStatus(appointmentRequestDTO.getStatus());
+                    appointmentRequest.setAppointmentRequestStatus(appointmentRequestDTO.getStatus());
                     appointmentRequestRepository.save(appointmentRequest);
                     return convertToDTO(appointmentRequest);
                 }
@@ -135,15 +136,14 @@ public class AppointmentRequestService {
         try {
             AppointmentRequest appointmentRequest = appointmentRequestRepository.getAppointmentRequest(idAppointmentRequest);
             if (appointmentRequest != null) {
-                appointmentRequest.setStatus(status);
+                appointmentRequest.setAppointmentRequestStatus(status);
                 appointmentRequestRepository.save(appointmentRequest);
 
                     if (status == 1) {
-                        Bovine bovine = bovineRepository.getBovine(appointmentRequest.getIdBovine());
                         List<Bovine> bovines = new ArrayList<>();
-                        bovines.add(bovine);
+                        bovines.add(appointmentRequest.getBovine());
                         AppointmentCreateDTO appointmentCreateDTO = new AppointmentCreateDTO(
-                                appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getIdUser(),
+                                appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getUser().getIdUser(),
                                 appointmentRequest.getAppointmentDate(), appointmentRequest.getMotive(), 0.0,
                                 "", 0, bovines);
                         AppointmentDTO appointmentDTO = appointmentService.createAppointment(appointmentCreateDTO);

@@ -1,6 +1,10 @@
 package cow.starter.Auction.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import cow.starter.Bid.models.Bid;
+import cow.starter.Bovine.models.Bovine;
+import cow.starter.User.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,17 +24,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class Auction implements Serializable {
 
-    /**
-     * @param idAuction
-     * @param idContract
-     * @param idOwner
-     * @param auctionDescription
-     * @param startDate
-     * @param endDate
-     * @param status
-     * @param breed
-     */
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idAuction;
@@ -38,11 +31,15 @@ public class Auction implements Serializable {
     @Column(nullable = false)
     private String idContract;
 
-    @Column(nullable = false)
-    private long idBovine;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_bovine")
+    @JsonBackReference
+    private Bovine bovine;
 
-    @Column(nullable = false)
-    private String idOwner;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
+    @JsonBackReference
+    private User user;
 
     @Column(nullable = false, length = 50)
     private String auctionDescription;
@@ -60,13 +57,14 @@ public class Auction implements Serializable {
     private double startingPrice;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "auction")
+    @JsonManagedReference
     private Set<Bid> bidSet = new HashSet();
 
-    public Auction(String idContract, long idBovine, String idOwner, String auctionDescription, Date startDate,
+    public Auction(String idContract, Bovine bovine, User user, String auctionDescription, Date startDate,
                    Date endDate, int status, double startingPrice) {
         this.idContract = idContract;
-        this.idBovine = idBovine;
-        this.idOwner = idOwner;
+        this.bovine = bovine;
+        this.user = user;
         this.auctionDescription = auctionDescription;
         this.startDate = startDate;
         this.endDate = endDate;

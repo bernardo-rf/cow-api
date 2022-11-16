@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
-    @Query("SELECT a FROM Auction a")
+    @Query("SELECT a FROM Auction a ORDER BY a.status")
     List<Auction> getAllAuction();
 
     @Query("SELECT a FROM Auction a WHERE a.status = :status")
     List<Auction> getAuctionsByStatus(int status);
 
-    @Query("SELECT a FROM Auction a WHERE a.idOwner = :idOwner")
+    @Query("SELECT a FROM Auction a WHERE a.user.idWallet = :idOwner")
     List<Auction> getAuctionsByIDOwner(String idOwner);
 
     @Query("SELECT a FROM Auction a WHERE a.idAuction = :idAuction")

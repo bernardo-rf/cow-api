@@ -23,14 +23,14 @@ public class FieldHistoryService {
     BovineRepository bovineRepository;
 
     public FieldHistoryDTO convertToSimpleDTO(FieldHistory fieldHistory) {
-        return new FieldHistoryDTO(fieldHistory.getIdFieldHistory(), fieldHistory.getIdField(),
-                fieldHistory.getIdBovine(), fieldHistory.getSwitchDate());
+        return new FieldHistoryDTO(fieldHistory.getIdFieldHistory(), fieldHistory.getField().getIdField(),
+                fieldHistory.getBovine().getIdBovine(), fieldHistory.getSwitchDate());
     }
 
     public FieldHistoryFullInfoDTO convertToDTO(FieldHistory fieldHistory, String fieldDescription, String fieldAddress,
                                                 long serialNumber) {
-        return new FieldHistoryFullInfoDTO(fieldHistory.getIdFieldHistory(), fieldHistory.getIdField(), fieldDescription,
-                fieldAddress, fieldHistory.getIdBovine(), serialNumber, fieldHistory.getSwitchDate().toString());
+        return new FieldHistoryFullInfoDTO(fieldHistory.getIdFieldHistory(), fieldHistory.getField().getIdField(), fieldDescription,
+                fieldAddress, fieldHistory.getBovine().getIdBovine(), serialNumber, fieldHistory.getSwitchDate().toString());
     }
 
     public boolean checkFieldHistoryValues(long idField, long idBovine){
@@ -49,7 +49,7 @@ public class FieldHistoryService {
             Bovine bovine = bovineRepository.getBovine(idBovine);
             if (bovine != null) {
                 for (FieldHistory fieldHistory:fieldHistories) {
-                    Field field = fieldRepository.getField(fieldHistory.getIdField());
+                    Field field = fieldRepository.getField(fieldHistory.getField().getIdField());
                     if (field != null){
                         fieldHistoryFullInfoDTOList.add(convertToDTO(fieldHistory, field.getFieldDescription(),
                                 field.getAddress(), bovine.getSerialNumber()));
@@ -65,8 +65,8 @@ public class FieldHistoryService {
         FieldHistoryDTO fieldHistoryDTO = new FieldHistoryDTO();
         try {
             if(checkFieldHistoryValues(fieldHistoryCreatedDTO.getIdField(), fieldHistoryCreatedDTO.getIdBovine())) {
-                FieldHistory fieldHistory = new FieldHistory(fieldHistoryCreatedDTO.getIdField(),
-                        fieldHistoryCreatedDTO.getIdBovine(), fieldHistoryCreatedDTO.getSwitchDate());
+                FieldHistory fieldHistory = new FieldHistory(fieldRepository.getField(fieldHistoryCreatedDTO.getIdField()),
+                        bovineRepository.getBovine(fieldHistoryCreatedDTO.getIdBovine()), fieldHistoryCreatedDTO.getSwitchDate());
                 fieldHistoryRepository.save(fieldHistory);
                 fieldHistoryDTO = convertToSimpleDTO(fieldHistory);
                 if (fieldHistoryDTO.getIdFieldHistory() != 0) {
@@ -85,8 +85,8 @@ public class FieldHistoryService {
 
                 FieldHistory fieldHistory = fieldHistoryRepository.getFieldHistory(fieldHistoryDTO.getIdFieldHistory());
                 if (fieldHistory != null) {
-                    fieldHistory.setIdField(fieldHistoryDTO.getIdField());
-                    fieldHistory.setIdBovine(fieldHistoryDTO.getIdBovine());
+                    fieldHistory.setField(fieldRepository.getField(fieldHistoryDTO.getIdField()));
+                    fieldHistory.setBovine(bovineRepository.getBovine(fieldHistoryDTO.getIdBovine()));
                     fieldHistory.setSwitchDate(fieldHistoryDTO.getSwitchDate());
                     fieldHistoryRepository.save(fieldHistory);
 

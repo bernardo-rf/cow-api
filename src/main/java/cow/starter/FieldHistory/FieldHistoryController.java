@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Fields History")
 @RequestMapping(path = "api/historyFields")
 public class FieldHistoryController {

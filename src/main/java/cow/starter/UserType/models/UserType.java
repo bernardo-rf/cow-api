@@ -1,59 +1,41 @@
 package cow.starter.UserType.models;
 
-import io.swagger.annotations.ApiModelProperty;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import cow.starter.User.models.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name="COW_UserType")
+@Table(name = "COW_UserType")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserType implements Serializable {
-    /**
-     * @param idUserType
-     * @param description
-     * @param active
-     */
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ApiModelProperty(example = "1", name = "idUserType", required = true)
     private long idUserType;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "Veterinary", name = "description", required = true)
     private String description;
 
     @Column(nullable = false)
-    @ApiModelProperty(example = "1", name = "active", required = true)
     private Boolean active;
 
-    public UserType() { super(); }
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userType")
+    @JsonManagedReference
+    private Set<User> users = new HashSet();
 
-    public UserType(String description,  Boolean active) {
+    public UserType(String description, Boolean active) {
         this.description = description;
-        this.active = active;
-    }
-
-    public long getIdUserType() {
-        return idUserType;
-    }
-
-    public void setIdUserType(long idUserType) {
-        this.idUserType = idUserType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
         this.active = active;
     }
 }

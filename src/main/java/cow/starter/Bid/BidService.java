@@ -47,7 +47,7 @@ public class BidService {
     }
 
     public BidDTO convertToDTO(Bid bid) {
-        return new BidDTO(bid.getIdBid(), bid.getIdContract(), bid.getAuction().getIdAuction(), bid.getIdBidder(),
+        return new BidDTO(bid.getIdBid(), bid.getIdContract(), bid.getAuction().getIdAuction(), bid.getUser().getIdWallet(),
                 bid.getValue(), bid.getBidDate());
     }
 
@@ -129,8 +129,8 @@ public class BidService {
                         Auction auction = auctionRepository.getAuctionByIDAuction(bidCreateDTO.getIdAuction());
                         if (auction != null) {
                             Bid bid = new Bid(contractId.toString(), auction,
-                                    bidCreateDTO.getIdBidder(), bidCreateDTO.getValue(),
-                                    bidCreateDTO.getBidDate());
+                                    userRepository.getUserByIDOwner(bidCreateDTO.getIdBidder()),
+                                    bidCreateDTO.getValue(), bidCreateDTO.getBidDate());
                             bidRepository.save(bid);
 
                             BidDTO bidDTO = convertToDTO(bid);

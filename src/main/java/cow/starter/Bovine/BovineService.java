@@ -2,10 +2,9 @@ package cow.starter.Bovine;
 
 import com.hedera.hashgraph.sdk.*;
 import cow.starter.Appointment.models.Appointment;
-import cow.starter.Bovine.models.Bovine;
-import cow.starter.Bovine.models.BovineCreateDTO;
-import cow.starter.Bovine.models.BovineDTO;
-import cow.starter.Bovine.models.BovineRepository;
+import cow.starter.Auction.models.Auction;
+import cow.starter.Auction.models.AuctionFullInfoDTO;
+import cow.starter.Bovine.models.*;
 import cow.starter.Field.models.Field;
 import cow.starter.Field.models.FieldRepository;
 import cow.starter.FieldHistory.FieldHistoryService;
@@ -22,14 +21,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 @Service
@@ -50,19 +48,27 @@ public class BovineService {
     private Client client = Client.forTestnet();
 
     public BovineDTO convertToDTO(Bovine bovine){
-        return new BovineDTO(bovine.getIdBovine(), bovine.getIdContract(), bovine.getIdOwner(),
-                bovine.getIdField(), bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
+        return new BovineDTO(bovine.getIdBovine(), bovine.getIdContract(), bovine.getUser().getIdWallet(),
+                bovine.getField().getIdField(), bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
                 bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
                 bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
-                bovine.getGender(), bovine.getImageCID());
+                bovine.isGender(), bovine.getImageCID());
+    }
+
+    public BovineFullInfoDTO convertToFullDTO(Bovine bovine) {
+        return new BovineFullInfoDTO(bovine.getIdBovine(), bovine.getIdContract(), bovine.getUser(),
+                bovine.getField(), bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
+                bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
+                bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
+                bovine.isGender(), bovine.getImageCID());
     }
 
     public Bovine convertToEntity(BovineCreateDTO bovineDTO, String idContract){
-        return new Bovine(idContract, bovineDTO.getIdOwner(), bovineDTO.getIdField(), bovineDTO.getSerialNumber(),
-                bovineDTO.getBirthDate(), bovineDTO.getWeight(), bovineDTO.getHeight(), bovineDTO.getBreed(),
-                bovineDTO.getColor(), bovineDTO.getActive(), bovineDTO.getObservation(),
-                bovineDTO.getIdBovineParent1(), bovineDTO.getIdBovineParent2(), bovineDTO.isGender(),
-                bovineDTO.getImageCID());
+        return new Bovine(idContract, userRepository.getUserByIDOwner(bovineDTO.getIdOwner()),
+                fieldRepository.getField(bovineDTO.getIdField()), bovineDTO.getSerialNumber(), bovineDTO.getBirthDate(),
+                bovineDTO.getWeight(), bovineDTO.getHeight(), bovineDTO.getBreed(), bovineDTO.getColor(),
+                bovineDTO.getActive(), bovineDTO.getObservation(), bovineDTO.getIdBovineParent1(),
+                bovineDTO.getIdBovineParent2(), bovineDTO.isGender(), bovineDTO.getImageCID());
     }
 
     public boolean checkBovineValues(long idField, String idOwner){
@@ -76,10 +82,85 @@ public class BovineService {
         return false;
     }
 
+    public BovineFullInfoDTO getBovine(long idBovine){
+        BovineFullInfoDTO bovineFullInfoDTO = new BovineFullInfoDTO();
+        Bovine bovine = bovineRepository.getBovine(idBovine);
+        if(bovine == null){
+            return bovineFullInfoDTO;
+        }
+        return convertToFullDTO(bovine);
+    }
+
+    public List<BovineDTO> getAllBovine(){
+        List<BovineDTO> bovineDTOList  = new ArrayList<>();
+        List<Bovine> bovines = bovineRepository.getAllBovine();
+        if (bovines.isEmpty()){
+            return bovineDTOList;
+        }
+
+        for (Bovine bovine: bovines) {
+            bovineDTOList.add(convertToDTO(bovine));
+        }
+        return bovineDTOList;
+    }
+
+    public List<BovineFullInfoDTO> getAllBovineOwned(String ownerId){
+        List<BovineFullInfoDTO> bovineDTOList  = new ArrayList<>();
+        List<Bovine> bovines = bovineRepository.getAllBovineIdOwner(ownerId);
+        if (bovines.isEmpty()){
+            return bovineDTOList;
+        }
+
+        for (Bovine bovine: bovines) {
+            bovineDTOList.add(convertToFullDTO(bovine));
+        }
+        return bovineDTOList;
+    }
+
+    public List<BovineFullInfoDTO> getAllBovineOwnedToAuction(String ownerId){
+        List<BovineFullInfoDTO> bovineDTOList  = new ArrayList<>();
+        List<Bovine> bovines = bovineRepository.getAllBovineIdOwnerToAuction(ownerId);
+        if (bovines.isEmpty()){
+            return bovineDTOList;
+        }
+
+        for (Bovine bovine: bovines) {
+            bovineDTOList.add(convertToFullDTO(bovine));
+        }
+        return bovineDTOList;
+    }
+
+    public List<BovineFullInfoDTO> getAllBovineNotInField(long idField, String idWallet){
+        List<BovineFullInfoDTO> bovineDTOList  = new ArrayList<>();
+        List<Bovine> bovines = bovineRepository.getAllBovinesNotIn(idField, idWallet);
+        if (bovines.isEmpty()){
+            return bovineDTOList;
+        }
+
+        for (Bovine bovine: bovines) {
+            bovineDTOList.add(convertToFullDTO(bovine));
+        }
+        return bovineDTOList;
+    }
+
+    public List<BovineDTO> getGenealogy(long idBovine){
+        List<BovineDTO> bovineDTOList =  new ArrayList<>();
+        List<Bovine> bovines = bovineRepository.getGenealogy(idBovine);
+        if (bovines.isEmpty()){
+            return bovineDTOList;
+        }
+        for (Bovine bovine:bovines) {
+            BovineDTO bovineDTO = convertToDTO(bovine);
+            bovineDTOList.add(bovineDTO);
+        }
+        return bovineDTOList;
+    }
+
     public BovineDTO createBovine(BovineCreateDTO bovineCreateDTO) {
         BovineDTO emptyBovineDTO = new BovineDTO();
         try {
-            Bovine bovineAux = bovineRepository.checkBovineSerialNumber(bovineCreateDTO.getSerialNumber());
+            Bovine bovineAux = bovineRepository.checkBovineSerialNumber(bovineCreateDTO.getSerialNumber(),
+                    bovineCreateDTO.getIdOwner());
             if (bovineAux != null){
                 emptyBovineDTO.setIdBovine(999999);
                 return emptyBovineDTO;
@@ -164,7 +245,6 @@ public class BovineService {
             if (checkBovineValues(bovineDTO.getIdField(), bovineDTO.getIdOwner())) {
                 client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
 
-
                 DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
                 Date birthDate = formatter.parse(bovineDTO.getBirthDate());
 
@@ -178,7 +258,7 @@ public class BovineService {
                                 .addBool(bovineDTO.getActive())
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent1()))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent2()))
-                                .addBool(bovineDTO.getGender()))
+                                .addBool(bovineDTO.isGender()))
                         .execute(client);
 
                 TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
@@ -186,14 +266,14 @@ public class BovineService {
 
                 Bovine bovine = bovineRepository.getBovine(bovineDTO.getIdBovine());
                 if (bovine != null) {
-                    if(bovine.getIdField() != bovineDTO.getIdField()){
+                    if(bovine.getField().getIdField() != bovineDTO.getIdField()){
                         FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(bovineDTO.getIdField(),
                                 bovineDTO.getIdBovine(), new Date());
                         FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
                     }
 
-                    bovine.setIdOwner(bovineDTO.getIdOwner());
-                    bovine.setIdField(bovineDTO.getIdField());
+                    bovine.setUser(userRepository.getUserByIDOwner(bovineDTO.getIdOwner()));
+                    bovine.setField(fieldRepository.getField(bovineDTO.getIdField()));
                     bovine.setSerialNumber(bovineDTO.getSerialNumber());
                     bovine.setBirthDate(birthDate);
                     bovine.setWeight(bovineDTO.getWeight());
@@ -204,7 +284,7 @@ public class BovineService {
                     bovine.setObservation(bovineDTO.getObservation());
                     bovine.setIdBovineParent1(bovineDTO.getIdBovineParent1());
                     bovine.setIdBovineParent2(bovineDTO.getIdBovineParent2());
-                    bovine.setGender(bovineDTO.getGender());
+                    bovine.setGender(bovineDTO.isGender());
                     bovine.setImageCID(bovineDTO.getImageCID());
                     bovineRepository.save(bovine);
 
@@ -217,11 +297,11 @@ public class BovineService {
         return emptyBovineDTO;
     }
 
-    public List<BovineDTO> updateBovineLocation(List<BovineDTO> bovineDTOS, long idField){
+    public Set<BovineDTO> updateBovineLocation(Set<BovineDTO> bovineDTOS, long idField){
         for (BovineDTO bovineDTO: bovineDTOS) {
             Bovine bovine = bovineRepository.getBovine(bovineDTO.getIdBovine());
             if (bovine != null){
-                bovine.setIdField(idField);
+                bovine.setField(fieldRepository.getField(idField));
                 bovineRepository.save(bovine);
 
                 FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(idField, bovineDTO.getIdBovine(),

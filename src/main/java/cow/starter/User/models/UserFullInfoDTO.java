@@ -6,7 +6,7 @@ public class UserFullInfoDTO {
     private long idUser;
     private String idContract;
     private String idWallet;
-    private int idUserType;
+    private long idUserType;
     private String type;
     private String name;
     private Date birthDate;
@@ -19,7 +19,7 @@ public class UserFullInfoDTO {
 
     public UserFullInfoDTO() { super(); }
 
-    public UserFullInfoDTO(long idUser, String idContract, String idWallet, int idUserType, String type, String name,
+    public UserFullInfoDTO(long idUser, String idContract, String idWallet, long idUserType, String type, String name,
                            Date birthDate, String email, String password, Boolean active, Double balance,
                            String fullName, String imageCID ) {
         this.idUser = idUser;
@@ -59,11 +59,11 @@ public class UserFullInfoDTO {
         this.idWallet = idWallet;
     }
 
-    public int getIdUserType() {
+    public long getIdUserType() {
         return idUserType;
     }
 
-    public void setIdUserType(int idUserType) {
+    public void setIdUserType(long idUserType) {
         this.idUserType = idUserType;
     }
 

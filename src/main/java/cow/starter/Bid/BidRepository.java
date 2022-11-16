@@ -14,7 +14,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     @Query("SELECT b FROM Bid b WHERE b.auction.idAuction = :idAuction")
     List<Bid> getBidsByIDAuction(long idAuction);
 
-    @Query("SELECT b FROM Bid b WHERE b.idBidder = :idOwner")
+    @Query("SELECT b FROM Bid b WHERE b.user.idWallet = :idOwner")
     List<Bid> getBidsByIDBidder(String idOwner);
 
     @Query("SELECT b FROM Bid b WHERE b.idBid = :idBid")

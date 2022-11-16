@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
+@CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Bid")
 @RequestMapping(path = "api/bids")
 public class BidController {
@@ -38,7 +38,7 @@ public class BidController {
 
     @GetMapping("/{bidID}")
     @ApiOperation("Get bid by bid id")
-    public ResponseEntity<BidDTO> getAllBovinesByIDOwnerMale(@PathVariable long bidID) throws Exception {
+    public ResponseEntity<BidDTO> getBidByIDBid(@PathVariable long bidID) throws Exception {
         try {
             BidDTO bidDTO =  bidService.getBid(bidID);
             if (bidDTO.getIdBid() == 0){

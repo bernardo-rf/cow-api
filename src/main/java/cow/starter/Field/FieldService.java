@@ -3,6 +3,7 @@ import com.hedera.hashgraph.sdk.*;
 import cow.starter.Bovine.BovineService;
 import cow.starter.Bovine.models.Bovine;
 import cow.starter.Bovine.models.BovineDTO;
+import cow.starter.Bovine.models.BovineFullInfoDTO;
 import cow.starter.Field.models.*;
 import cow.starter.User.models.User;
 import cow.starter.User.models.UserRepository;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
 
 @Service
@@ -29,20 +28,21 @@ public class FieldService {
     @Autowired
     BovineService bovineService;
 
-
     public Client client = Client.forTestnet();
 
-    public FieldDTO convertToSimpleDTO(Field field, List<BovineDTO> bovineDTOS) {
-        return new FieldDTO(field.getIdField(), field.getIdOwner(), field.getActive(),
-                field.getFieldDescription(), field.getIdContract(), field.getLatitude(),
-                field.getLongitude(), field.getAddress(), field.getLimit(),
-                field.getObservation(), bovineDTOS);
+    public FieldDTO convertToDTO(Field field, Set<BovineDTO> bovines) {
+        return new FieldDTO(field.getIdField(), field.getUser().getIdWallet(), field.getIdContract(),
+                field.getFieldDescription(), field.getLatitude(), field.getLongitude(), field.getAddress(),
+                field.getFieldLimit(), field.getActive(), field.getObservation(), bovines);
     }
 
-    public FieldFullInfoDTO convertToDTO(Field field, int currentOccupation, int currentOccupationPercentage) {
-        return new FieldFullInfoDTO(field.getIdField(), field.getIdOwner(), field.getIdContract(),
-                field.getFieldDescription(), field.getAddress(), field.getLatitude(), field.getLongitude(),
-                field.getLimit(), currentOccupation, field.getActive(), field.getObservation(),
+    public FieldFullInfoDTO convertFullInfoToDTO(Field field) {
+        int fieldCurrentOccupation = field.getBovineSet().size();
+        int currentOccupationPercentage = (int)(((fieldCurrentOccupation*1.0)/field.getFieldLimit())*100);
+
+        return new FieldFullInfoDTO(field.getIdField(), field.getUser(), field.getIdContract(),
+                field.getFieldDescription(), field.getLatitude(), field.getLongitude(), field.getAddress(),
+                field.getFieldLimit(), field.getActive(), field.getObservation(), fieldCurrentOccupation,
                 currentOccupationPercentage);
     }
 
@@ -54,66 +54,63 @@ public class FieldService {
         return false;
     }
 
-    public FieldFullInfoDTO getFieldFullInfo(long fieldId){
+    public FieldFullInfoDTO getField(long fieldId){
         Field field = fieldRepository.getField(fieldId);
-        if (field != null){
-            int fieldsCurrentOccupation = fieldRepository.getFieldCurrentOccupation(field.getIdField());
-            int currentOccupationPercentage = (int)(((fieldsCurrentOccupation*1.0)/field.getLimit())*100);
-            return convertToDTO(field, fieldsCurrentOccupation, currentOccupationPercentage);
+        if (field == null){
+            return new FieldFullInfoDTO();
         }
-        return new FieldFullInfoDTO();
+        return convertFullInfoToDTO(field);
     }
 
-    public List<FieldFullInfoDTO> getFieldsFullInfo(String idOwner) {
-        List<Field> fields = fieldRepository.getAllFieldsByOwner(idOwner);
+    public List<FieldFullInfoDTO> getFieldsByIDOwner(String idOwner) {
+        List<FieldFullInfoDTO> fieldsList = new ArrayList<>();
+        List<Field> fields = fieldRepository.getFieldsByIDOwner(idOwner);
         if (fields.isEmpty()){
-            return new ArrayList<>();
+            return fieldsList;
         }
 
-        List<FieldFullInfoDTO> fieldFullInfoDTOList = new ArrayList<>();
-        List<Integer> fieldsCurrentOccupation = fieldRepository.getAllFieldsCurrentOccupation();
-        if (!fieldsCurrentOccupation.isEmpty()){
-            for (int i=0; i <= fields.size() -1; i++){
-                Field field = fields.get(i);
-                FieldFullInfoDTO fieldFullInfoDTO = getFieldFullInfo(field.getIdField());
-                fieldFullInfoDTOList.add(fieldFullInfoDTO);
-            }
+        for (Field field: fields) {
+            fieldsList.add(convertFullInfoToDTO(field));
         }
-        return fieldFullInfoDTOList;
+        return fieldsList;
     }
 
     public List<FieldFullInfoDTO> getFieldsNotOccupied(String idOwner) {
-        List<Field> fields = fieldRepository.getAllFieldsByOwner(idOwner);
+        List<FieldFullInfoDTO> fieldsList = new ArrayList<>();
+        List<Field> fields = fieldRepository.getFieldsByIDOwner(idOwner);
         if (fields.isEmpty()){
-            return new ArrayList<>();
+            return fieldsList;
         }
 
-        List<FieldFullInfoDTO> fieldFullInfoDTOList = new ArrayList<>();
-        List<Integer> fieldsCurrentOccupationList = fieldRepository.getAllFieldsCurrentOccupation();
-        if (!fieldsCurrentOccupationList.isEmpty()){
-            for (int i=0; i <= fields.size() -1; i++){
-
-                Field field = fieldRepository.getField(fields.get(i).getIdField());
-                if (field != null){
-                    int fieldCurrentOccupation = fieldRepository.getFieldCurrentOccupation(field.getIdField());
-                    int currentOccupationPercentage = (int)(((fieldCurrentOccupation*1.0)/field.getLimit())*100);
-                    if (currentOccupationPercentage != 100){
-                        FieldFullInfoDTO fieldFullInfoDTO = convertToDTO(field, fieldCurrentOccupation, currentOccupationPercentage);
-                        fieldFullInfoDTOList.add(fieldFullInfoDTO);
-                    }
-                }
+        for (Field field: fields) {
+            if(field.getBovineSet().size() != field.getFieldLimit()){
+                fieldsList.add(convertFullInfoToDTO(field));
             }
         }
-        return fieldFullInfoDTOList;
+        return fieldsList;
     }
 
-    public List<BovineDTO> getBovineDTOList(List<Bovine> bovines){
-        List<BovineDTO> bovineDTOList = new ArrayList<>();
-        for (Bovine bovine: bovines) {
-            BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
-            bovineDTOList.add(bovineDTO);
+    public FieldDTO getFieldBovines(long idField) {
+        FieldDTO fieldDTO = new FieldDTO();
+        Field field = fieldRepository.getField(idField);
+        if (field == null){
+            return fieldDTO;
         }
-        return bovineDTOList;
+
+        Set<BovineDTO> bovineDTOS = new HashSet<>();
+        for (Bovine bovine: field.getBovineSet()) {
+            bovineDTOS.add(bovineService.convertToDTO(bovine));
+        }
+
+        return convertToDTO(field, bovineDTOS);
+    }
+
+    public List<BovineFullInfoDTO>  getFieldBovinesNotIn(long idField){
+        Field field = fieldRepository.getField(idField);
+        if(field == null) {
+            return new ArrayList<>();
+        }
+        return bovineService.getAllBovineNotInField(idField, field.getUser().getIdWallet());
     }
 
     public FieldDTO createField(FieldCreateDTO fieldCreateDTO) {
@@ -171,13 +168,15 @@ public class FieldService {
 
                         ContractId contractId = fileReceipt3.contractId;
                         if (contractId != null) {
-                            Field newField = new Field(fileReceipt3.contractId.toString(), fieldCreateDTO.getIdOwner(),
-                                    fieldCreateDTO.getFieldDescription(), fieldCreateDTO.getAddress(), fieldCreateDTO.getLimit(),
-                                    fieldCreateDTO.getLatitude(), fieldCreateDTO.getLongitude(), fieldCreateDTO.getActive(),
+                            Field newField = new Field(fileReceipt3.contractId.toString(),
+                                    userRepository.getUserByIDOwner(fieldCreateDTO.getIdOwner()),
+                                    fieldCreateDTO.getFieldDescription(), fieldCreateDTO.getAddress(),
+                                    fieldCreateDTO.getLimit(), fieldCreateDTO.getLatitude(),
+                                    fieldCreateDTO.getLongitude(), fieldCreateDTO.getActive(),
                                     fieldCreateDTO.getObservation());
                             fieldRepository.save(newField);
 
-                            fieldDTO = convertToSimpleDTO(newField, new ArrayList<>());
+                            fieldDTO = convertToDTO(newField, new HashSet<>());
                             if (fieldDTO.getIdField() != 0) {
                                 bovineService.updateBovineLocation(fieldCreateDTO.getBovines(), newField.getIdField());
                                 return fieldDTO;
@@ -213,25 +212,21 @@ public class FieldService {
 
                         field.setFieldDescription(fieldDTO.getFieldDescription());
                         field.setAddress(fieldDTO.getAddress());
-                        field.setLimit(fieldDTO.getLimit());
+                        field.setFieldLimit(fieldDTO.getLimit());
                         field.setLatitude(fieldDTO.getLatitude());
                         field.setLongitude(fieldDTO.getLongitude());
                         field.setActive(fieldDTO.getActive());
                         field.setObservation(fieldDTO.getObservation());
                         fieldRepository.save(field);
 
-                        List<BovineDTO> bovineDTOS = new ArrayList<>();
+                        Set<BovineDTO> bovineDTOS = new HashSet<>();
                         if (!fieldDTO.getBovines().isEmpty()){
-                            bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(),
-                                    fieldDTO.getIdField());
-                            return convertToSimpleDTO(field, bovineDTOS);
+                            bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(), fieldDTO.getIdField());
+                            return convertToDTO(field, bovineDTOS);
                         }
-                        return convertToSimpleDTO(field, bovineDTOS);
+                        return convertToDTO(field, bovineDTOS);
                     }
                 }
-//          } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
-//              e.printStackTrace();
-//          }
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -8,20 +8,28 @@ public interface BovineRepository extends JpaRepository<Bovine, Long> {
     @Query("SELECT b FROM Bovine b WHERE b.active = true")
     List<Bovine> getAllBovine();
 
-    @Query("SELECT b FROM Bovine b WHERE b.idOwner = :idOwner and b.active = true ORDER BY b.serialNumber ASC")
+    @Query("SELECT b FROM Bovine b WHERE b.user.idWallet = :idOwner and b.active = true ORDER BY b.serialNumber ASC")
     List<Bovine> getAllBovineIdOwner(String idOwner);
 
-    @Query("SELECT b FROM Bovine b WHERE b.idOwner = :idOwner and b.gender = true and b.idBovine <> :idBovine")
+    @Query(value ="SELECT B.* FROM cow_bovine as B WHERE B.id_owner = :idOwner and B.id_bovine NOT IN (SELECT A.id_bovine FROM cow_auction as A WHERE A.status != 2) and B.active = 1 ORDER BY B.serial_number ASC", nativeQuery = true)
+    List<Bovine> getAllBovineIdOwnerToAuction(String idOwner);
+
+    @Query("SELECT b FROM Bovine b WHERE b.user.idWallet = :idOwner and b.gender = true and b.idBovine <> :idBovine")
     List<Bovine> getAllBovineMaleIdOwner(String idOwner, long idBovine);
 
-    @Query("SELECT b FROM Bovine b WHERE b.idOwner = :idOwner and b.gender = false and b.idBovine <> :idBovine")
+    @Query("SELECT b FROM Bovine b WHERE b.user.idWallet = :idOwner and b.gender = false and b.idBovine <> :idBovine")
     List<Bovine> getAllBovineFeminineIdOwner(String idOwner, long idBovine);
 
-    @Query("SELECT b FROM Bovine b WHERE b.serialNumber = :serialNumber and b.active = true")
-    Bovine checkBovineSerialNumber(long serialNumber);
+    @Query(" SELECT b FROM Bovine b LEFT JOIN Field f ON b.field.idField = f.idField " +
+            "WHERE b.field.idField <> :idField and b.user.idWallet = :idWallet and b.active = true")
+    List<Bovine> getAllBovinesNotIn(long idField, String idWallet);
+
+    @Query("SELECT b FROM Bovine b WHERE b.serialNumber = :serialNumber and b.user.idWallet = :idWallet and b.active = true")
+    Bovine checkBovineSerialNumber(long serialNumber, String idWallet);
 
     @Query("SELECT b FROM Bovine b WHERE b.idBovine = :idBovine and b.active = true ORDER BY b.idBovine ASC")
     Bovine getBovine(long idBovine);
+
 
     @Query( value ="WITH temp(id_bovine,id_bovine_parent1, id_bovine_parent2, active, birth_date, breed, color, height, " +
             "id_contract, id_field, observation, serial_number, weight, gender, id_owner, imagecid) as " +
