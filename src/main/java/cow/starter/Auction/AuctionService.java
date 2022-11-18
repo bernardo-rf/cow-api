@@ -209,8 +209,6 @@ public class AuctionService {
         if (auctionToUpdate == null) {
             emptyDTO.setIdAuction(999999);
             return emptyDTO;
-        } else if (auctionToUpdate.getStatus() != 0) {
-            return emptyDTO;
         }
 
         auctionToUpdate.setStatus(status);
