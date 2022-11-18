@@ -1,11 +1,11 @@
 package cow.starter.Appointment.models;
 
-import cow.starter.Bovine.models.Bovine;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,5 +21,5 @@ public class AppointmentCreateDTO {
     private Double cost;
     private String observation;
     private int status;
-    private List<Bovine> bovines;
+    private ArrayList<Integer> bovineIds;
 }

@@ -82,7 +82,14 @@ public class AppointmentService {
         AppointmentDTO appointmentDTO = new AppointmentDTO();
         try {
             Appointment newAppointment = new Appointment();
-            for (Bovine bovine: appointmentCreateDTO.getBovines()) {
+            List<Bovine> bovines =  new ArrayList<>();
+
+            for ( int i : appointmentCreateDTO.getBovineIds() ){
+                Bovine bovine = bovineRepository.getBovine((long) i);
+                bovines.add(bovine);
+            }
+
+            for (Bovine bovine: bovines) {
                 File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Appointment\\Appointment.bin");
                 Scanner myReader = new Scanner(myObj);
 

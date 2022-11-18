@@ -20,5 +20,5 @@ public class AppointmentRequestCreateDTO {
     private Date appointmentDate;
     private String motive;
     private int status;
-    private List<Bovine> bovines;
+    private ArrayList<Integer> bovineIds;
 }

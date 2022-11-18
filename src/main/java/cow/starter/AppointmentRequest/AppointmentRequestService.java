@@ -80,7 +80,13 @@ public class AppointmentRequestService {
     public List<AppointmentRequestDTO> createAppointmentRequest(AppointmentRequestCreateDTO appointmentRequestCreateDTO) {
         List<AppointmentRequestDTO> appointmentRequestDTOList = new ArrayList<>();
         try {
-            for (Bovine bovine: appointmentRequestCreateDTO.getBovines()) {
+            List<Bovine> bovines =  new ArrayList<>();
+            for ( long i : appointmentRequestCreateDTO.getBovineIds() ){
+                Bovine bovine = bovineRepository.getBovine(i);
+                bovines.add(bovine);
+            }
+
+            for (Bovine bovine: bovines) {
                 AppointmentRequest appointmentRequest = appointmentRequestRepository.checkAppointmentRequest(
                         bovine.getIdBovine(), appointmentRequestCreateDTO.getAppointmentDate());
                 if (appointmentRequest == null && checkAppointmentRequestValues(appointmentRequestCreateDTO.getIdUser(),
@@ -140,12 +146,12 @@ public class AppointmentRequestService {
                 appointmentRequestRepository.save(appointmentRequest);
 
                     if (status == 1) {
-                        List<Bovine> bovines = new ArrayList<>();
-                        bovines.add(appointmentRequest.getBovine());
+                        ArrayList<Integer> bovineIds = new ArrayList<>();
+                        bovineIds.add((int) appointmentRequest.getBovine().getIdBovine());
                         AppointmentCreateDTO appointmentCreateDTO = new AppointmentCreateDTO(
                                 appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getUser().getIdUser(),
                                 appointmentRequest.getAppointmentDate(), appointmentRequest.getMotive(), 0.0,
-                                "", 0, bovines);
+                                "", 0, bovineIds);
                         AppointmentDTO appointmentDTO = appointmentService.createAppointment(appointmentCreateDTO);
                         if (appointmentDTO.getIdAppointment() != 0) {
                             return convertToDTO(appointmentRequest);
