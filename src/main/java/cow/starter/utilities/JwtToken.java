@@ -1,6 +1,6 @@
 package cow.starter.utilities;
 
-import cow.starter.User.models.User;
+import cow.starter.user.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

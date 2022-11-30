@@ -1,10 +1,7 @@
 package cow.starter;
 
-import cow.starter.Field.models.FieldRepository;
-import cow.starter.User.models.User;
-import cow.starter.User.models.UserRepository;
-import cow.starter.UserType.models.UserType;
-import cow.starter.UserType.models.UserTypeRepository;
+import cow.starter.user_type.models.UserType;
+import cow.starter.user_type.models.UserTypeRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +18,7 @@ public class SpringHederaStarterProjectApplication {
     }
 
     @Bean
-    public CommandLineRunner demoData(UserRepository userRepository, UserTypeRepository userTypeRepository) {
+    public CommandLineRunner demoData(UserTypeRepository userTypeRepository) {
         return args -> {
             List<UserType> userTypes = userTypeRepository.getAllUserTypes();
             if (userTypes.isEmpty()) {
