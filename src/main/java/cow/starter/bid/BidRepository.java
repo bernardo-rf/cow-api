@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.bid;
 
 import cow.starter.bid.models.Bid;
@@ -10,12 +16,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @Query("SELECT b FROM Bid b")
     List<Bid> getAllBids();
-
-    @Query("SELECT b FROM Bid b WHERE b.auction.idAuction = :idAuction")
-    List<Bid> getBidsByIDAuction(long idAuction);
-
-    @Query("SELECT b FROM Bid b WHERE b.user.idWallet = :idOwner")
-    List<Bid> getBidsByIDBidder(String idOwner);
 
     @Query("SELECT b FROM Bid b WHERE b.idBid = :idBid")
     Bid getBidByIDBid(long idBid);

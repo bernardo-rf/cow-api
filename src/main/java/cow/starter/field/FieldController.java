@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.field;
 
 import cow.starter.bovine.BovineService;
@@ -20,15 +26,9 @@ public class FieldController {
     private FieldService fieldService;
 
     @Autowired
-    private BovineService bovineService;
-
-    @Autowired
     private FieldRepository fieldRepository;
 
-    public FieldController() {
-        fieldService = new FieldService();
-        bovineService = new BovineService();
-    }
+    public FieldController() { fieldService = new FieldService(); }
 
     @GetMapping("{ownerId}/full_info")
     @ApiOperation("Get all fields full info")

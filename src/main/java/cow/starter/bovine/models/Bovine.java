@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.bovine.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -87,11 +93,11 @@ public class Bovine implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bovine")
     @JsonManagedReference
-    private Set<Appointment> appointmentSet = new HashSet();
+    private Set<Appointment> appointmentSet = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bovine")
     @JsonManagedReference
-    private Set<Auction> auctionSet = new HashSet();
+    private Set<Auction> auctionSet = new HashSet<>();
 
     public Bovine(String idContract, User user, Field field, long serialNumber, Date birthDate, Double weight,
                   Double height, String breed, String color, Boolean active, String observation, Bovine bovineParent1,

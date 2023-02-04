@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.field_history.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;

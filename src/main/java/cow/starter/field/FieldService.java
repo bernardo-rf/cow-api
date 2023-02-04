@@ -1,4 +1,11 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.field;
+
 import com.hedera.hashgraph.sdk.*;
 import cow.starter.bovine.BovineService;
 import cow.starter.bovine.models.Bovine;

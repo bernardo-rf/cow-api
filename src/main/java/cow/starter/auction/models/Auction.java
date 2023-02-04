@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.auction.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -61,7 +67,7 @@ public class Auction implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "auction")
     @JsonManagedReference
-    private Set<Bid> bidSet = new HashSet();
+    private Set<Bid> bidSet = new HashSet<>();
 
     public Auction(String idContract, Bovine bovine, User user, String auctionDescription, Date startDate,
                    Date endDate, int auctionStatus, double startingPrice) {

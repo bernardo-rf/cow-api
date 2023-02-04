@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.bovine;
 
 import cow.starter.bovine.models.*;
@@ -18,9 +24,6 @@ public class BovineController {
 
     @Autowired
     BovineRepository bovineRepository;
-
-    @Autowired
-    FieldRepository fieldRepository;
 
     public BovineController() { bovineService = new BovineService(); }
 
