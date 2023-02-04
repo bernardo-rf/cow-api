@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.user;
 
 import cow.starter.user.models.*;
@@ -23,9 +29,6 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private UserTypeRepository userTypeRepository;
 
     public UserController() {
         this.userService = new UserService();

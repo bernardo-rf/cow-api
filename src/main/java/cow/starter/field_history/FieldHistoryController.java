@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.field_history;
 
 import cow.starter.field.models.*;
@@ -20,9 +26,6 @@ public class FieldHistoryController {
 
     @Autowired
     private FieldHistoryService fieldHistoryService;
-
-    @Autowired
-    private FieldRepository fieldRepository;
 
     public FieldHistoryController() {
         fieldHistoryService = new FieldHistoryService();

@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.user.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -73,19 +79,19 @@ public class User implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @JsonManagedReference
-    private Set<Appointment> appointmentSet = new HashSet();
+    private Set<Appointment> appointmentSet = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @JsonManagedReference
-    private Set<Auction> auctionSet = new HashSet();
+    private Set<Auction> auctionSet = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @JsonManagedReference
-    private Set<Bovine> bovineSet = new HashSet();
+    private Set<Bovine> bovineSet = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @JsonManagedReference
-    private Set<Field> fieldSet = new HashSet();
+    private Set<Field> fieldSet = new HashSet<>();
 
     public User(String idContract, String idWallet, UserType userType, String name, Date birthDate, String email,
                 String password, Boolean active, Double balance, String fullName, String imageCID) {

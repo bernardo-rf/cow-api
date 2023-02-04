@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.user_type.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -34,7 +40,7 @@ public class UserType implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "userType")
     @JsonManagedReference
-    private Set<User> users = new HashSet();
+    private Set<User> users = new HashSet<>();
 
     public UserType(String description, Boolean active) {
         this.typeDescription = description;

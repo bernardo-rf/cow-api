@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.auction.models;
 
 import cow.starter.bid.models.Bid;
@@ -26,5 +32,5 @@ public class AuctionFullInfoDTO {
     private Date endDate;
     private int status;
     private double startingPrice;
-    private Set<Bid> bidSet = new HashSet();
+    private Set<Bid> bidSet = new HashSet<>();
 }

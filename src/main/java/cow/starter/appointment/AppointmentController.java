@@ -1,7 +1,12 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.appointment;
 
 import cow.starter.appointment.models.*;
-import cow.starter.bovine.models.Bovine;
 import cow.starter.bovine.models.BovineRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,9 +26,6 @@ public class AppointmentController {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private BovineRepository bovineRepository;
 
     public AppointmentController() {
         appointmentService = new AppointmentService();

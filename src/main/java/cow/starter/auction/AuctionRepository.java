@@ -1,3 +1,9 @@
+/*
+ *
+ * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
+ *
+ */
+
 package cow.starter.auction;
 
 import cow.starter.auction.models.Auction;
@@ -10,12 +16,6 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a FROM Auction a ORDER BY a.auctionStatus")
     List<Auction> getAllAuction();
-
-    @Query("SELECT a FROM Auction a WHERE a.auctionStatus = :status")
-    List<Auction> getAuctionsByStatus(int status);
-
-    @Query("SELECT a FROM Auction a WHERE a.user.idWallet = :idOwner")
-    List<Auction> getAuctionsByIDOwner(String idOwner);
 
     @Query("SELECT a FROM Auction a WHERE a.idAuction = :idAuction")
     Auction getAuctionByIDAuction(long idAuction);
