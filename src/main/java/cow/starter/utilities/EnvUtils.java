@@ -1,9 +1,3 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
 package cow.starter.utilities;
 
 import com.hedera.hashgraph.sdk.AccountId;
@@ -43,5 +37,4 @@ public class EnvUtils {
     public static String getProjectPath() {
         return Objects.requireNonNull(getEnv().get("PROJECT_PATH"));
     }
-
 }

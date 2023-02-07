@@ -1,10 +1,4 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
-package cow.starter.auction.models;
+package cow.starter.Auction.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

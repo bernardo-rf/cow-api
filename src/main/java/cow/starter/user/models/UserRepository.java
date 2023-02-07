@@ -1,10 +1,4 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
-package cow.starter.user.models;
+package cow.starter.User.models;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,8 +10,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> getAllUsers();
 
     @Query("SELECT u FROM User u " +
-            "LEFT JOIN UserType ut ON ut.idUserType = u.userType.idUserType " +
-            "WHERE u.active = true and ut.typeDescription='Veterinary'")
+            "LEFT JOIN UserType ut ON ut.idUserType = u.idUserType " +
+            "WHERE u.active = true and ut.description='Veterinary'")
     List<User> getAllUsersVeterinary();
 
     @Query("SELECT u FROM User u WHERE u.idUser = :idUser and u.active = true")

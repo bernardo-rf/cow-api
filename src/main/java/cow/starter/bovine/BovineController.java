@@ -1,13 +1,8 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
+package cow.starter.Bovine;
 
-package cow.starter.bovine;
-
-import cow.starter.bovine.models.*;
-import cow.starter.field.models.FieldRepository;
+import cow.starter.Bovine.models.*;
+import cow.starter.Field.models.Field;
+import cow.starter.Field.models.FieldRepository;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
 @Api("Handles management of COW Bovine")
 @RequestMapping(path = "api/bovines")
 public class BovineController {
@@ -25,13 +20,65 @@ public class BovineController {
     @Autowired
     BovineRepository bovineRepository;
 
+    @Autowired
+    FieldRepository fieldRepository;
+
     public BovineController() { bovineService = new BovineService(); }
 
     @GetMapping("/")
     @ApiOperation("Get all bovines")
     public ResponseEntity<List<BovineDTO>> getAllBovines() throws Exception {
         try {
-            return ResponseEntity.ok(bovineService.getAllBovine());
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovines = bovineRepository.getAllBovine();
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/{ownerId}/male")
+    @ApiOperation("Get all bovines owned male")
+    public ResponseEntity<List<BovineDTO>> getAllBovinesByIDOwnerMale(@PathVariable String ownerId,
+                                                                      @RequestParam long idBovine) throws Exception {
+        try {
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovines = bovineRepository.getAllBovineMaleIdOwner(ownerId, idBovine);
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
+        }catch (Exception e){
+            throw new Exception("ERROR: ", e);
+        }
+    }
+
+    @GetMapping("/{ownerId}/feminine")
+    @ApiOperation("Get all bovines owned male")
+    public ResponseEntity<List<BovineDTO>> getAllBovinesByIDOwnerFeminine(@PathVariable String ownerId,
+                                                                          @RequestParam long idBovine) throws Exception {
+        try {
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovines = bovineRepository.getAllBovineFeminineIdOwner(ownerId, idBovine);
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
         }catch (Exception e){
             throw new Exception("ERROR: ", e);
         }
@@ -41,7 +88,17 @@ public class BovineController {
     @ApiOperation("Get all genealogy by idBovine")
     public ResponseEntity<List<BovineDTO>> getGenealogy(@PathVariable long bovineId) throws Exception {
         try {
-            return ResponseEntity.ok(bovineService.getGenealogy(bovineId));
+            List<BovineDTO> bovineDTOList =  new ArrayList<>();
+
+            List<Bovine> bovines = bovineRepository.getGenealogy(bovineId);
+            if (bovines.isEmpty()){
+                return ResponseEntity.ok(bovineDTOList);
+            }
+            for (Bovine bovine:bovines) {
+                BovineDTO bovineDTO = bovineService.convertToDTO(bovine);
+                bovineDTOList.add(bovineDTO);
+            }
+            return ResponseEntity.ok(bovineDTOList);
         }catch (Exception e){
             throw new Exception("ERROR: ", e);
         }
@@ -50,12 +107,21 @@ public class BovineController {
     @GetMapping("/{bovineId}")
     @ApiOperation("Get bovine by idBovine")
     public ResponseEntity<BovineFullInfoDTO> getBovine(@PathVariable long bovineId) throws Exception {
+            BovineFullInfoDTO fullInfoDTO = new BovineFullInfoDTO();
         try {
-            BovineFullInfoDTO bovineFullInfoDTO = bovineService.getBovine(bovineId);
-            if (bovineFullInfoDTO.getIdBovine() == 0){
-                return ResponseEntity.status(404).build();
+            Bovine bovine = bovineRepository.getBovine(bovineId);
+            if (bovine != null){
+                Field field = fieldRepository.getField(bovine.getIdField());
+                    if (bovine.getIdField() == field.getIdField()) {
+                         fullInfoDTO = new BovineFullInfoDTO(bovine.getIdBovine(),
+                                bovine.getIdContract(), bovine.getIdOwner(), bovine.getIdField(),
+                                bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
+                                bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
+                                bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
+                                bovine.getGender(), field.getAddress(), bovine.getImageCID());
+                    }
             }
-            return ResponseEntity.ok(bovineFullInfoDTO);
+            return ResponseEntity.ok(fullInfoDTO);
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }
@@ -65,17 +131,25 @@ public class BovineController {
     @ApiOperation("Get bovines by idOwner")
     public ResponseEntity<List<BovineFullInfoDTO>> getOwnedBovines(@PathVariable String ownerId) throws Exception {
         try {
-            return ResponseEntity.ok( bovineService.getAllBovineOwned(ownerId));
-        }catch(Exception e){
-            throw new Exception("ERROR: ", e);
-        }
-    }
-
-    @GetMapping("/{ownerId}/own/auction")
-    @ApiOperation("Get bovines by idOwner")
-    public ResponseEntity<List<BovineFullInfoDTO>> getBovinesToAuction(@PathVariable String ownerId) throws Exception {
-        try {
-            return ResponseEntity.ok( bovineService.getAllBovineOwnedToAuction(ownerId));
+            List<BovineFullInfoDTO> bovineDTOList =  new ArrayList<>();
+            List<Bovine> bovines = bovineRepository.getAllBovineIdOwner(ownerId);
+            if (!bovines.isEmpty()){
+                List<Field> fields = fieldRepository.getAllFields();
+                for (Bovine bovine:bovines) {
+                    for (Field field: fields) {
+                        if (bovine.getIdField() == field.getIdField()) {
+                            BovineFullInfoDTO bovineDTO = new BovineFullInfoDTO(bovine.getIdBovine(),
+                                    bovine.getIdContract(), bovine.getIdOwner(), bovine.getIdField(),
+                                    bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
+                                    bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
+                                    bovine.getObservation(), bovine.getIdBovineParent1(), bovine.getIdBovineParent2(),
+                                    bovine.getGender(), field.getAddress(), bovine.getImageCID());
+                            bovineDTOList.add(bovineDTO);
+                        }
+                    }
+                }
+            }
+            return ResponseEntity.ok(bovineDTOList);
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }

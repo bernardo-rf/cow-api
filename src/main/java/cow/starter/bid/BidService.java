@@ -1,19 +1,13 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
-package cow.starter.bid;
+package cow.starter.Bid;
 
 import com.hedera.hashgraph.sdk.*;
-import cow.starter.auction.AuctionRepository;
-import cow.starter.auction.models.Auction;
-import cow.starter.bid.models.Bid;
-import cow.starter.bid.models.BidCreateDTO;
-import cow.starter.bid.models.BidDTO;
-import cow.starter.user.models.User;
-import cow.starter.user.models.UserRepository;
+import cow.starter.Auction.AuctionRepository;
+import cow.starter.Auction.models.Auction;
+import cow.starter.Bid.models.Bid;
+import cow.starter.Bid.models.BidCreateDTO;
+import cow.starter.Bid.models.BidDTO;
+import cow.starter.User.models.User;
+import cow.starter.User.models.UserRepository;
 import cow.starter.utilities.EnvUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 
 @Service
 public class BidService {
@@ -54,8 +47,8 @@ public class BidService {
     }
 
     public BidDTO convertToDTO(Bid bid) {
-        return new BidDTO(bid.getIdBid(), bid.getIdContract(), bid.getAuction().getIdAuction(),
-                bid.getUser().getIdWallet(), bid.getBidValue(), bid.getBidDate());
+        return new BidDTO(bid.getIdBid(), bid.getIdContract(), bid.getAuction().getIdAuction(), bid.getIdBidder(),
+                bid.getValue(), bid.getBidDate());
     }
 
     public List<BidDTO> getAllBids() {
@@ -115,7 +108,7 @@ public class BidService {
                             .setMaxTransactionFee(new Hbar(2))
                             .execute(client);
                     TransactionReceipt fileReceipt2 = fileAppendTransaction.getReceipt(client);
-                    Logger.getLogger("Contract Created =" + fileReceipt2);
+                    System.out.println("Contract Created =" + fileReceipt2);
 
                     TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
                             .setBytecodeFileId(bytecodeFileId)
@@ -128,7 +121,7 @@ public class BidService {
                             .execute(client);
 
                     TransactionReceipt fileReceipt3 = contractCreateTransaction.getReceipt(client);
-                    Logger.getLogger("Contract Filled " + fileReceipt3.contractId);
+                    System.out.println("Contract Filled " + fileReceipt3.contractId);
 
                     ContractId contractId = fileReceipt3.contractId;
 
@@ -136,8 +129,8 @@ public class BidService {
                         Auction auction = auctionRepository.getAuctionByIDAuction(bidCreateDTO.getIdAuction());
                         if (auction != null) {
                             Bid bid = new Bid(contractId.toString(), auction,
-                                    userRepository.getUserByIDOwner(bidCreateDTO.getIdBidder()),
-                                    bidCreateDTO.getValue(), bidCreateDTO.getBidDate());
+                                    bidCreateDTO.getIdBidder(), bidCreateDTO.getValue(),
+                                    bidCreateDTO.getBidDate());
                             bidRepository.save(bid);
 
                             BidDTO bidDTO = convertToDTO(bid);

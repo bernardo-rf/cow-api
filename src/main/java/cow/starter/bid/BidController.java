@@ -1,13 +1,10 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
+package cow.starter.Bid;
 
-package cow.starter.bid;
-
-import cow.starter.bid.models.BidCreateDTO;
-import cow.starter.bid.models.BidDTO;
+import cow.starter.Auction.AuctionService;
+import cow.starter.Auction.models.AuctionCreateDTO;
+import cow.starter.Auction.models.AuctionDTO;
+import cow.starter.Bid.models.BidCreateDTO;
+import cow.starter.Bid.models.BidDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
 @Api("Handles management of COW Bid")
 @RequestMapping(path = "api/bids")
 public class BidController {
@@ -41,7 +38,7 @@ public class BidController {
 
     @GetMapping("/{bidID}")
     @ApiOperation("Get bid by bid id")
-    public ResponseEntity<BidDTO> getBidByIDBid(@PathVariable long bidID) throws Exception {
+    public ResponseEntity<BidDTO> getAllBovinesByIDOwnerMale(@PathVariable long bidID) throws Exception {
         try {
             BidDTO bidDTO =  bidService.getBid(bidID);
             if (bidDTO.getIdBid() == 0){

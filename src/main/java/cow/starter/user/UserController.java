@@ -1,13 +1,7 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
+package cow.starter.User;
 
-package cow.starter.user;
-
-import cow.starter.user.models.*;
-import cow.starter.user_type.models.UserTypeRepository;
+import cow.starter.User.models.*;
+import cow.starter.UserType.models.UserTypeRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -19,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
 @Api("Handles management of COW Users")
 @RequestMapping(path = "api/users")
 public class UserController {
@@ -29,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserTypeRepository userTypeRepository;
 
     public UserController() {
         this.userService = new UserService();

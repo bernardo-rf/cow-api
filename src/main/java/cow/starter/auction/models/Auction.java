@@ -1,21 +1,10 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
+package cow.starter.Auction.models;
 
-package cow.starter.auction.models;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import cow.starter.bid.models.Bid;
-import cow.starter.bovine.models.Bovine;
-import cow.starter.user.models.User;
+import cow.starter.Bid.models.Bid;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -31,26 +20,31 @@ import java.util.Set;
 @NoArgsConstructor
 public class Auction implements Serializable {
 
+    /**
+     * @param idAuction
+     * @param idContract
+     * @param idOwner
+     * @param auctionDescription
+     * @param startDate
+     * @param endDate
+     * @param status
+     * @param breed
+     */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idAuction;
 
-    @Column(nullable = false, unique = true)
-    @Nationalized
+    @Column(nullable = false)
     private String idContract;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_bovine")
-    @JsonBackReference
-    private Bovine bovine;
+    @Column(nullable = false)
+    private long idBovine;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
-    @JsonBackReference
-    private User user;
+    @Column(nullable = false)
+    private String idOwner;
 
     @Column(nullable = false, length = 50)
-    @Nationalized
     private String auctionDescription;
 
     @Column(nullable = false)
@@ -60,24 +54,23 @@ public class Auction implements Serializable {
     private Date endDate;
 
     @Column(nullable = false)
-    private int auctionStatus;
+    private int status;
 
     @Column(scale = 2)
     private double startingPrice;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "auction")
-    @JsonManagedReference
-    private Set<Bid> bidSet = new HashSet<>();
+    private Set<Bid> bidSet = new HashSet();
 
-    public Auction(String idContract, Bovine bovine, User user, String auctionDescription, Date startDate,
-                   Date endDate, int auctionStatus, double startingPrice) {
+    public Auction(String idContract, long idBovine, String idOwner, String auctionDescription, Date startDate,
+                   Date endDate, int status, double startingPrice) {
         this.idContract = idContract;
-        this.bovine = bovine;
-        this.user = user;
+        this.idBovine = idBovine;
+        this.idOwner = idOwner;
         this.auctionDescription = auctionDescription;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.auctionStatus = auctionStatus;
+        this.status = status;
         this.startingPrice = startingPrice;
     }
 }

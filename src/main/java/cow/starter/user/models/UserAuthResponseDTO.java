@@ -1,21 +1,28 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
-package cow.starter.user.models;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+package cow.starter.User.models;
 public class UserAuthResponseDTO {
     private String token;
     private UserFullInfoDTO user;
+
+    public UserAuthResponseDTO() { }
+
+    public UserAuthResponseDTO(String token, UserFullInfoDTO user) {
+        this.token = token;
+        this.user = user;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public UserFullInfoDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserFullInfoDTO user) {
+        this.user = user;
+    }
 }

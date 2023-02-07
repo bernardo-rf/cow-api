@@ -1,20 +1,13 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
-package cow.starter.auction;
+package cow.starter.Auction;
 
 import com.hedera.hashgraph.sdk.*;
-import cow.starter.auction.models.Auction;
-import cow.starter.auction.models.AuctionCreateDTO;
-import cow.starter.auction.models.AuctionDTO;
-import cow.starter.auction.models.AuctionFullInfoDTO;
-import cow.starter.bovine.models.Bovine;
-import cow.starter.bovine.models.BovineRepository;
-import cow.starter.user.models.User;
-import cow.starter.user.models.UserRepository;
+import cow.starter.Auction.models.Auction;
+import cow.starter.Auction.models.AuctionCreateDTO;
+import cow.starter.Auction.models.AuctionDTO;
+import cow.starter.Bovine.models.Bovine;
+import cow.starter.Bovine.models.BovineRepository;
+import cow.starter.User.models.User;
+import cow.starter.User.models.UserRepository;
 import cow.starter.utilities.EnvUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 
 @Service
 public class AuctionService {
@@ -55,37 +47,31 @@ public class AuctionService {
     }
 
     public AuctionDTO convertToDTO(Auction auction) {
-        return new AuctionDTO(auction.getIdAuction(), auction.getBovine().getIdBovine(), auction.getIdContract(),
-                auction.getUser().getIdWallet(), auction.getAuctionDescription(), auction.getStartDate(),
-                auction.getEndDate(), auction.getAuctionStatus(), auction.getStartingPrice());
+        return new AuctionDTO(auction.getIdAuction(), auction.getIdBovine(), auction.getIdContract(),
+                auction.getIdOwner(), auction.getAuctionDescription(), auction.getStartDate(), auction.getEndDate(),
+                auction.getStatus(), auction.getStartingPrice());
     }
 
-    public AuctionFullInfoDTO convertToFullDTO(Auction auction) {
-        return new AuctionFullInfoDTO(auction.getIdAuction(), auction.getIdContract(), auction.getBovine(),
-                auction.getUser(), auction.getAuctionDescription(), auction.getStartDate(),
-                auction.getEndDate(), auction.getAuctionStatus(), auction.getStartingPrice(), auction.getBidSet());
-    }
-
-    public List<AuctionFullInfoDTO> getAllAuctions() {
-        List<AuctionFullInfoDTO> auctionDTOList = new ArrayList<>();
+    public List<AuctionDTO> getAllAuctions() {
+        List<AuctionDTO> auctionDTOList = new ArrayList<>();
         List<Auction> auctions = auctionRepository.getAllAuction();
         if (auctions == null) {
             return auctionDTOList;
         }
 
         for (Auction auction : auctions) {
-            AuctionFullInfoDTO auctionDTO = convertToFullDTO(auction);
+            AuctionDTO auctionDTO = convertToDTO(auction);
             auctionDTOList.add(auctionDTO);
         }
         return auctionDTOList;
     }
 
-    public AuctionFullInfoDTO getAuction(long idAuction) {
+    public AuctionDTO getAuction(long idAuction){
         Auction auction = auctionRepository.getAuctionByIDAuction(idAuction);
-        if (auction == null) {
-            return new AuctionFullInfoDTO();
+        if (auction == null ) {
+            return new AuctionDTO();
         }
-        return convertToFullDTO(auction);
+        return convertToDTO(auction);
     }
 
     public AuctionDTO createAuction(AuctionCreateDTO auctionCreateDTO) {
@@ -123,7 +109,7 @@ public class AuctionService {
                             .setMaxTransactionFee(new Hbar(2))
                             .execute(client);
                     TransactionReceipt fileReceipt2 = fileAppendTransaction.getReceipt(client);
-                    Logger.getLogger("Contract Created =" + fileReceipt2);
+                    System.out.println("Contract Created =" + fileReceipt2);
 
                     TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
                             .setBytecodeFileId(bytecodeFileId)
@@ -139,15 +125,13 @@ public class AuctionService {
                             .execute(client);
 
                     TransactionReceipt fileReceipt3 = contractCreateTransaction.getReceipt(client);
-                    Logger.getLogger("Contract Filled " + fileReceipt3.contractId);
+                    System.out.println("Contract Filled " + fileReceipt3.contractId);
 
                     ContractId contractId = fileReceipt3.contractId;
 
                     if (contractId != null) {
-                        Auction auction = new Auction(contractId.toString(),
-                                bovineRepository.getBovine(auctionCreateDTO.getIdBovine()),
-                                userRepository.getUserByIDOwner(auctionCreateDTO.getIdOwner()),
-                                auctionCreateDTO.getAuctionDescription(),
+                        Auction auction = new Auction(contractId.toString(), auctionCreateDTO.getIdBovine(),
+                                auctionCreateDTO.getIdOwner(), auctionCreateDTO.getAuctionDescription(),
                                 auctionCreateDTO.getStartDate(), auctionCreateDTO.getEndDate(),
                                 auctionCreateDTO.getStatus(), auctionCreateDTO.getStartingPrice());
                         auctionRepository.save(auction);
@@ -173,7 +157,7 @@ public class AuctionService {
             if (auctionToUpdate == null) {
                 emptyDTO.setIdAuction(999999);
                 return emptyDTO;
-            } else if (auctionToUpdate.getAuctionStatus() != 0) {
+            } else if (auctionToUpdate.getStatus() != 0) {
                 return emptyDTO;
             }
 
@@ -193,13 +177,13 @@ public class AuctionService {
                     .execute(client);
 
             TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
-            Logger.getLogger("Status " + fileReceipt.status);
+            System.out.println("Status " + fileReceipt.status);
 
-            auctionToUpdate.setBovine(bovineRepository.getBovine(auctionDTO.getIdBovine()));
+            auctionToUpdate.setIdBovine(auctionDTO.getIdBovine());
             auctionToUpdate.setAuctionDescription(auctionDTO.getAuctionDescription());
             auctionToUpdate.setStartDate(auctionDTO.getStartDate());
             auctionToUpdate.setEndDate(auctionDTO.getEndDate());
-            auctionToUpdate.setAuctionStatus(auctionDTO.getStatus());
+            auctionToUpdate.setStatus(auctionDTO.getStatus());
             auctionRepository.save(auctionToUpdate);
 
             return convertToDTO(auctionToUpdate);
@@ -208,19 +192,5 @@ public class AuctionService {
             e.printStackTrace();
         }
         return emptyDTO;
-    }
-
-    public AuctionDTO updateAuctionStatus(long idAuction, int status) {
-        AuctionDTO emptyDTO = new AuctionDTO();
-        Auction auctionToUpdate = auctionRepository.getAuctionByIDAuction(idAuction);
-        if (auctionToUpdate == null) {
-            emptyDTO.setIdAuction(999999);
-            return emptyDTO;
-        }
-
-        auctionToUpdate.setAuctionStatus(status);
-        auctionRepository.save(auctionToUpdate);
-
-        return convertToDTO(auctionToUpdate);
     }
 }

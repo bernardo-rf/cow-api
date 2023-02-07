@@ -1,18 +1,11 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
-
 package cow.starter.utilities;
 
-import cow.starter.user.models.User;
+import cow.starter.User.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,10 +20,12 @@ public class JwtToken implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
+    //retrieve username from jwt token
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    //retrieve expiration date from jwt token
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
@@ -39,16 +34,18 @@ public class JwtToken implements Serializable {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
-
+    //for retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
+    //check if the token has expired
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
+    //generate token for user
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, user.getEmail());
@@ -61,6 +58,7 @@ public class JwtToken implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
+    //validate token
     public Boolean validateToken(String token, User user) {
         final String username = getUsernameFromToken(token);
         return (username.equals(user.getEmail()) && !isTokenExpired(token));

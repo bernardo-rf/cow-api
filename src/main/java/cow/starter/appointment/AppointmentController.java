@@ -1,13 +1,8 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
+package cow.starter.Appointment;
 
-package cow.starter.appointment;
-
-import cow.starter.appointment.models.*;
-import cow.starter.bovine.models.BovineRepository;
+import cow.starter.Appointment.models.*;
+import cow.starter.Bovine.models.Bovine;
+import cow.starter.Bovine.models.BovineRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@CrossOrigin(maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8081", maxAge = 3600)
 @Api("Handles management of COW Appointment")
 @RequestMapping(path = "api/appointment")
 public class AppointmentController {
@@ -26,6 +21,9 @@ public class AppointmentController {
 
     @Autowired
     private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private BovineRepository bovineRepository;
 
     public AppointmentController() {
         appointmentService = new AppointmentService();
@@ -84,12 +82,30 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentByIDUser(@PathVariable long userId)
             throws Exception {
         try {
+            List<AppointmentFullInfoDTO> emptyAppointmentList = new ArrayList<>();
             List<Appointment> appointments = appointmentRepository.getAllUserAppointment(userId);
-            List<AppointmentFullInfoDTO> appointmentDTOList = new ArrayList<>();
-            if(!appointments.isEmpty()){
-                appointmentDTOList = appointmentService.getAppointments(appointments);
+            if(!appointments.isEmpty()) {
+                List<Bovine> bovines = bovineRepository.getAllBovine();
+                List<AppointmentFullInfoDTO> appointmentDTOList = new ArrayList<>();
+                if (!bovines.isEmpty()) {
+                    for (Appointment appointment : appointments) {
+                        for (Bovine bovine : bovines) {
+                            if (bovine.getIdBovine() == appointment.getIdBovine()) {
+                                AppointmentFullInfoDTO appointmentFullInfoDTO = new AppointmentFullInfoDTO(
+                                        appointment.getIdAppointment(), appointment.getIdContract(),
+                                        appointment.getIdAppointmentRequest(), appointment.getIdBovine(),
+                                        appointment.getIdUser(), appointment.getAppointmentDate().toString(),
+                                        appointment.getAppointmentType(), appointment.getCost(),
+                                        appointment.getObservation(), bovine.getSerialNumber(),
+                                        appointment.getStatus());
+                                appointmentDTOList.add(appointmentFullInfoDTO);
+                            }
+                        }
+                    }
+                    return ResponseEntity.ok(appointmentDTOList);
+                }
             }
-            return ResponseEntity.ok(appointmentDTOList);
+            return ResponseEntity.ok(emptyAppointmentList);
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }

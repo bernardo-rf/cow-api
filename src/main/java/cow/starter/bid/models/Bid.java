@@ -1,16 +1,10 @@
-/*
- *
- * @Copyright 2023 POLITÉCNICO DE LEIRIA, @bernardo-rf.
- *
- */
+package cow.starter.Bid.models;
 
-package cow.starter.bid.models;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import cow.starter.auction.models.Auction;
-import cow.starter.user.models.User;
-import lombok.*;
-import org.hibernate.annotations.Nationalized;
+import cow.starter.Auction.models.Auction;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,35 +18,40 @@ import java.util.Date;
 @AllArgsConstructor
 public class Bid implements Serializable {
 
+    /**
+     * @param idBid
+     * @param idContract
+     * @param idAuction
+     * @param idBidder
+     * @param value
+     * @param bidDate
+     */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idBid;
 
     @Column(nullable = false)
-    @Nationalized
     private String idContract;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_auction")
-    @JsonBackReference
     private Auction auction;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
-    @JsonBackReference
-    private User user;
+    @Column(nullable = false)
+    private String idBidder;
 
     @Column(nullable = false, scale = 2)
-    private Double bidValue;
+    private Double value;
 
     @Column(nullable = false)
     private Date bidDate;
 
-    public Bid(String idContract, Auction auction, User user, Double bidValue, Date bidDate) {
+    public Bid(String idContract, Auction auction, String idBidder, Double value, Date bidDate) {
         this.idContract = idContract;
         this.auction = auction;
-        this.user = user;
-        this.bidValue = bidValue;
+        this.idBidder = idBidder;
+        this.value = value;
         this.bidDate = bidDate;
     }
 }
