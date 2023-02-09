@@ -128,7 +128,7 @@ public class FieldService {
                 fieldDTO.setIdField(999999);
                 return fieldDTO;
             }
-            File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Field\\Field.bin");
+            File myObj = new File(EnvUtils.getProjectPath() + "field/Field.bin");
             Scanner myReader = new Scanner(myObj);
 
             if (checkFieldValues(fieldCreateDTO.getIdOwner())) {

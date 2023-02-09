@@ -97,7 +97,7 @@ public class AuctionService {
                 return emptyDTO;
             }
 
-            File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Auction\\Auction.bin");
+            File myObj = new File(EnvUtils.getProjectPath() + "auction/Auction.bin");
             Scanner myReader = new Scanner(myObj);
 
             while (myReader.hasNextLine()) {

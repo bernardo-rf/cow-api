@@ -89,7 +89,7 @@ public class BidService {
                 return emptyDTO;
             }
 
-            File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Bid\\Bid.bin");
+            File myObj = new File(EnvUtils.getProjectPath() + "bid/Bid.bin");
             Scanner myReader = new Scanner(myObj);
 
             while (myReader.hasNextLine()) {

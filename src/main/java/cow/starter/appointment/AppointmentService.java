@@ -99,7 +99,7 @@ public class AppointmentService {
             }
 
             for (Bovine bovine: bovines) {
-                File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Appointment\\Appointment.bin");
+                File myObj = new File(EnvUtils.getProjectPath() + "appointment/Appointment.bin");
                 Scanner myReader = new Scanner(myObj);
 
                 if (checkAppointmentValues(appointmentCreateDTO.getIdUser(), bovine.getIdBovine())) {

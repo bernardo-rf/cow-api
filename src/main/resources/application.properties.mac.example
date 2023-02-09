@@ -1,6 +1,0 @@
-spring.datasource.url=datasource_url_in_string_format
-spring.datasource.username=datasource_username_in_string_format
-spring.datasource.password=datasource_pwd_in_string_format
-spring.datasource.driver-class-name=driver_class_in_string_format
-
-jwt.secret=jwt_secret_in_string_format
