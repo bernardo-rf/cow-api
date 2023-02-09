@@ -172,7 +172,7 @@ public class BovineService {
                 return emptyBovineDTO;
             }
 
-            File myObj = new File(EnvUtils.getProjectPath() + "COW.API\\src\\main\\java\\cow\\starter\\Bovine\\Bovine.bin");
+            File myObj = new File(EnvUtils.getProjectPath() + "bovine/Bovine.bin");
             Scanner myReader = new Scanner(myObj);
 
             if (checkBovineValues(bovineCreateDTO.getIdField(), bovineCreateDTO.getIdOwner())) {
