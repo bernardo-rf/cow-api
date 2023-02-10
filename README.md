@@ -13,7 +13,7 @@ MIRROR_NODE_ADDRESS=mirror_node_address_in_string_format
 BYTE_CODE=byte_code_in_string_format
 ```
 
-3. Create text file in the resources directory of the project named `application.properties`.
+3. Create text file in the resources folder of the project named `application.properties`.
 * MacOS application.properties tested with MariaDB
 ```
 spring.datasource.url=datasource_url_in_string_format
