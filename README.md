@@ -1,19 +1,23 @@
 # COW.API
  
 ## COW Rest API Setup
-1. Install JDK 11
-2. Create text file in the root directory of the project named `.env`.
+1. Install JDK 11.
+2. Create a Hedera Account in Hedera Portal `https://portal.hedera.com/register`. (only if you don't own a Hedera account already)
+3. Create text file in the root directory of the project named `.env` and add the following information.
 ```
+#Hedera Configurations
 OPERATOR_ID=account_id_in_string_format
 OPERATOR_KEY=account_private_key_in_string_format
 
 HEDERA_ENVIRONMENT=environment_in_string_format
 MIRROR_NODE_ADDRESS=mirror_node_address_in_string_format
 
-BYTE_CODE=byte_code_in_string_format
+#Project Configuration
+PROJECT_PATH=project_path_in_string_format
 ```
 
-3. Create text file in the resources folder of the project named `application.properties`.
+4. Install a database service and configure a user to access it.
+5. Create text file in the resources folder of the project named `application.properties`.
 * MacOS application.properties tested with MariaDB
 ```
 spring.datasource.url=datasource_url_in_string_format
