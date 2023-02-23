@@ -9,9 +9,6 @@
 OPERATOR_ID=account_id_in_string_format
 OPERATOR_KEY=account_private_key_in_string_format
 
-HEDERA_ENVIRONMENT=environment_in_string_format
-MIRROR_NODE_ADDRESS=mirror_node_address_in_string_format
-
 #Project Configuration
 PROJECT_PATH=project_path_in_string_format
 ```
@@ -49,3 +46,7 @@ Read more in https://learn.microsoft.com/en-us/sql/relational-databases/database
 6. Check `pom.xml` to comment/uncomment necessary dependencies depending on machine OS.
 7. Run `SpringHederaStarterProjectApplication`
 8. Check `http://localhost:8080/swagger-ui/` to view endpoints available.
+
+- NOTE:
+    - A .env.example is provided to help the setup of the project.
+    - An application.properties.example is provided to help the setup of the project.
