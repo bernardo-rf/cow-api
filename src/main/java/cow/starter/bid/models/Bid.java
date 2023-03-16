@@ -43,7 +43,7 @@ public class Bid implements Serializable {
     private User user;
 
     @Column(nullable = false, scale = 2)
-    private Double bidValue;
+    private double bidValue;
 
     @Column(nullable = false)
     private Date bidDate;

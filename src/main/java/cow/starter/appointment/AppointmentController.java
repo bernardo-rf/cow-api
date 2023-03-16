@@ -7,7 +7,6 @@
 package cow.starter.appointment;
 
 import cow.starter.appointment.models.*;
-import cow.starter.bovine.models.BovineRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Appointment")
-@RequestMapping(path = "api/appointment")
+@RequestMapping(path = "api/appointments")
 public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
@@ -48,7 +47,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/bovine/{bovineId}")
-    @ApiOperation("Get all appointments request by id bovine")
+    @ApiOperation("Get all appointments by id bovine")
     public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentsByIDBovine(@PathVariable long bovineId)
             throws Exception {
         try {
@@ -64,7 +63,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/bovines/{ownerId}")
-    @ApiOperation("Get all appointments request of my cows")
+    @ApiOperation("Get all appointments of my cows")
     public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentsOfOwnedCows(@PathVariable String ownerId)
             throws Exception {
         try {
@@ -80,7 +79,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/user/{userId}")
-    @ApiOperation("Get all appointments request by id bovine")
+    @ApiOperation("Get all appointments by id user")
     public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentByIDUser(@PathVariable long userId)
             throws Exception {
         try {
@@ -129,7 +128,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{appointmentId}/status")
-    @ApiOperation("Update a field")
+    @ApiOperation("Update a appointment status")
     public ResponseEntity<AppointmentDTO> updateAppointmentRequest(@PathVariable long appointmentId,
                                                                           @RequestParam int status )
             throws Exception {

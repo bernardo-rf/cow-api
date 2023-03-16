@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @CrossOrigin(maxAge = 3600)
 @Api("Handles management of COW Appointment Request")
-@RequestMapping(path = "api/appointmentRequest")
+@RequestMapping(path = "api/appointmentsRequest")
 public class AppointmentRequestController {
 
     @Autowired
@@ -112,7 +112,7 @@ public class AppointmentRequestController {
     }
 
     @PutMapping("/{appointmentRequestId}")
-    @ApiOperation("Update a field")
+    @ApiOperation("Update a appointment request")
     public ResponseEntity<AppointmentRequestDTO> updateAppointmentRequest(@PathVariable long appointmentRequestId,
                                                                           @RequestBody AppointmentRequestDTO appointmentRequestDTO )
             throws Exception {
@@ -131,7 +131,7 @@ public class AppointmentRequestController {
     }
 
     @PutMapping("/{appointmentRequestId}/status")
-    @ApiOperation("Update a field")
+    @ApiOperation("Update a appointment request status")
     public ResponseEntity<AppointmentRequestDTO> updateAppointmentRequest(@PathVariable long appointmentRequestId,
                                                                           @RequestParam int status )
             throws Exception {
