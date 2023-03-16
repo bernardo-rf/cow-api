@@ -35,14 +35,14 @@ public class UserTypeController {
         return userTypeRepository.getAllUserTypes();
     }
 
-    @GetMapping("/{idUserType}")
-    @ApiOperation("Get user type by id")
+    @GetMapping("/{userTypeId}")
+    @ApiOperation("Get user type by user type id")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "idUserType", required = true, type = "long", example = "1",
+            @ApiImplicitParam(name = "userTypeId", required = true, type = "long", example = "1",
                     value = "user type identifier.")
     })
-    public Optional<UserType> getUserType(@PathVariable long idUserType) {
-        return userTypeRepository.findById(idUserType);
+    public Optional<UserType> getUserType(@PathVariable long userTypeId) {
+        return userTypeRepository.findById(userTypeId);
     }
 
     @PostMapping("/")

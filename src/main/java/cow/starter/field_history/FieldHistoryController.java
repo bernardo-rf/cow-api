@@ -6,7 +6,6 @@
 
 package cow.starter.field_history;
 
-import cow.starter.field.models.*;
 import cow.starter.field_history.models.FieldHistoryCreatedDTO;
 import cow.starter.field_history.models.FieldHistoryDTO;
 import cow.starter.field_history.models.FieldHistoryFullInfoDTO;
@@ -32,7 +31,7 @@ public class FieldHistoryController {
     }
 
     @GetMapping("/{bovineId}")
-    @ApiOperation("Get all fields by bovineID")
+    @ApiOperation("Get all fields history records by bovine id")
     public ResponseEntity<List<FieldHistoryFullInfoDTO>> getFieldsFullInfo(@PathVariable long bovineId) throws Exception {
         try {
             return ResponseEntity.ok(fieldHistoryService.getFieldHistoryListFullInfoByIdBovine(bovineId));
@@ -42,7 +41,7 @@ public class FieldHistoryController {
     }
 
     @PostMapping("/")
-    @ApiOperation("Create a field history")
+    @ApiOperation("Create a field history record")
     public ResponseEntity<FieldHistoryDTO> createFieldHistory(@RequestBody FieldHistoryCreatedDTO fieldHistoryCreatedDTO)
             throws Exception {
         try {
@@ -56,13 +55,13 @@ public class FieldHistoryController {
         }
     }
 
-    @PutMapping("/{fieldHistoryID}")
-    @ApiOperation("Update a field history")
-    public ResponseEntity<FieldHistoryDTO> updateField( @PathVariable long fieldHistoryID,
+    @PutMapping("/{fieldHistoryId}")
+    @ApiOperation("Update a field history record")
+    public ResponseEntity<FieldHistoryDTO> updateField( @PathVariable long fieldHistoryId,
                                                         @RequestBody FieldHistoryDTO fieldHistoryDTO )
             throws Exception {
         try {
-            if(fieldHistoryID == fieldHistoryDTO.getIdFieldHistory()){
+            if(fieldHistoryId == fieldHistoryDTO.getIdFieldHistory()){
                 FieldHistoryDTO updatedFieldDTO = fieldHistoryService.updateFieldHistory(fieldHistoryDTO);
                 if (updatedFieldDTO.getIdField() != 0){
                     return ResponseEntity.ok(updatedFieldDTO);

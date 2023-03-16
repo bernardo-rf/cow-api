@@ -6,7 +6,6 @@
 
 package cow.starter.field;
 
-import cow.starter.bovine.BovineService;
 import cow.starter.bovine.models.BovineFullInfoDTO;
 import cow.starter.field.models.*;
 import io.swagger.annotations.*;
@@ -25,33 +24,30 @@ public class FieldController {
     @Autowired
     private FieldService fieldService;
 
-    @Autowired
-    private FieldRepository fieldRepository;
-
     public FieldController() { fieldService = new FieldService(); }
 
-    @GetMapping("{ownerId}/full_info")
+    @GetMapping("{userWallet}/full-info")
     @ApiOperation("Get all fields full info")
-    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsByIDOwner(@PathVariable String ownerId) throws Exception {
+    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsByIDOwner(@PathVariable String userWallet) throws Exception {
         try {
-            return ResponseEntity.ok(fieldService.getFieldsByIDOwner(ownerId));
+            return ResponseEntity.ok(fieldService.getFieldsByIDOwner(userWallet));
         }catch (Exception e){
             throw new Exception("ERROR: ", e);
         }
     }
 
-    @GetMapping("{ownerId}/not_occupied")
-    @ApiOperation("Get all fields full info")
-    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsNotOccupied(@PathVariable String ownerId) throws Exception {
+    @GetMapping("{userWallet}/not-occupied")
+    @ApiOperation("Get all fields owned by userWallet not occupied")
+    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsNotOccupied(@PathVariable String userWallet) throws Exception {
         try {
-            return ResponseEntity.ok(fieldService.getFieldsNotOccupied(ownerId));
+            return ResponseEntity.ok(fieldService.getFieldsNotOccupied(userWallet));
         }catch (Exception e){
             throw new Exception("ERROR: ", e);
         }
     }
 
     @GetMapping("/{fieldId}")
-    @ApiOperation("Get field by id")
+    @ApiOperation("Get field by filed id")
     public ResponseEntity<FieldFullInfoDTO> getField(@PathVariable long fieldId) throws Exception {
         try {
             FieldFullInfoDTO fullInfoDTO = fieldService.getField(fieldId);
@@ -64,8 +60,8 @@ public class FieldController {
         }
     }
 
-    @GetMapping("/bovines/{fieldId}")
-    @ApiOperation("Get field cows by id")
+    @GetMapping("/{fieldId}/bovines")
+    @ApiOperation("Get field bovines by field id")
     public ResponseEntity<FieldDTO> getFieldBovine(@PathVariable long fieldId) throws Exception {
         try {
             return ResponseEntity.ok(fieldService.getFieldBovines(fieldId));
@@ -74,8 +70,8 @@ public class FieldController {
         }
     }
 
-    @GetMapping("/bovines/{fieldId}/notIn")
-    @ApiOperation("Get field cows by id")
+    @GetMapping("/{fieldId}/bovines/not-in")
+    @ApiOperation("Get field bovines not in by field id")
     public ResponseEntity<List<BovineFullInfoDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception {
         try {
             return ResponseEntity.ok(fieldService.getFieldBovinesNotIn(fieldId));
