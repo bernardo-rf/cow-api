@@ -7,7 +7,6 @@
 package cow.starter.bovine;
 
 import cow.starter.bovine.models.*;
-import cow.starter.field.models.FieldRepository;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +20,6 @@ import java.util.*;
 public class BovineController {
     @Autowired
     BovineService bovineService;
-
-    @Autowired
-    BovineRepository bovineRepository;
 
     public BovineController() { bovineService = new BovineService(); }
 
@@ -61,21 +57,21 @@ public class BovineController {
         }
     }
 
-    @GetMapping("/{ownerId}/own")
+    @GetMapping("/{userWallet}/own")
     @ApiOperation("Get bovines by idOwner")
-    public ResponseEntity<List<BovineFullInfoDTO>> getOwnedBovines(@PathVariable String ownerId) throws Exception {
+    public ResponseEntity<List<BovineFullInfoDTO>> getOwnedBovines(@PathVariable String userWallet) throws Exception {
         try {
-            return ResponseEntity.ok( bovineService.getAllBovineOwned(ownerId));
+            return ResponseEntity.ok( bovineService.getAllBovineOwned(userWallet));
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }
     }
 
-    @GetMapping("/{ownerId}/own/auction")
+    @GetMapping("/{ownerWallet}/own/auction")
     @ApiOperation("Get bovines by idOwner")
-    public ResponseEntity<List<BovineFullInfoDTO>> getBovinesToAuction(@PathVariable String ownerId) throws Exception {
+    public ResponseEntity<List<BovineFullInfoDTO>> getBovinesToAuction(@PathVariable String userWallet) throws Exception {
         try {
-            return ResponseEntity.ok( bovineService.getAllBovineOwnedToAuction(ownerId));
+            return ResponseEntity.ok( bovineService.getAllBovineOwnedToAuction(userWallet));
         }catch(Exception e){
             throw new Exception("ERROR: ", e);
         }

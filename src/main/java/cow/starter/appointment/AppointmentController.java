@@ -62,12 +62,12 @@ public class AppointmentController {
         }
     }
 
-    @GetMapping("/bovines/{ownerId}")
+    @GetMapping("/bovines/{userWallet}")
     @ApiOperation("Get all appointments of my cows")
-    public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentsOfOwnedCows(@PathVariable String ownerId)
+    public ResponseEntity<List<AppointmentFullInfoDTO>> getAppointmentsOfOwnedCows(@PathVariable String userWallet)
             throws Exception {
         try {
-            List<Appointment> appointmentList = appointmentRepository.getAllOwnedBovineAppointment(ownerId);
+            List<Appointment> appointmentList = appointmentRepository.getAllOwnedBovineAppointment(userWallet);
             List<AppointmentFullInfoDTO> appointmentDTOList = new ArrayList<>();
             if(!appointmentList.isEmpty()){
                 appointmentDTOList = appointmentService.getAppointments(appointmentList);
