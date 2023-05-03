@@ -24,6 +24,7 @@
         <hedera.sdk>2.17.0</hedera.sdk>
         <lombok.version>1.18.16</lombok.version>
         <jjwt.version>0.9.1</jjwt.version>
+        <spring.boot.starter.test>2.5.0</spring.boot.starter.test>
     </properties>
 
     <dependencies>
