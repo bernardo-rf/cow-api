@@ -7,22 +7,21 @@
 package com.bernardo.figueiredo.cow.api.business.bovine.dto;
 
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.Appointment;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "COW_Bovine")
@@ -99,9 +98,22 @@ public class Bovine implements Serializable {
     @JsonManagedReference
     private Set<Auction> auctionSet = new HashSet<>();
 
-    public Bovine(String idContract, User user, Field field, long serialNumber, Date birthDate, Double weight,
-                  Double height, String breed, String color, Boolean active, String observation, Bovine bovineParent1,
-                  Bovine bovineParent2, boolean gender, String imageCID) {
+    public Bovine(
+            String idContract,
+            User user,
+            Field field,
+            long serialNumber,
+            Date birthDate,
+            Double weight,
+            Double height,
+            String breed,
+            String color,
+            Boolean active,
+            String observation,
+            Bovine bovineParent1,
+            Bovine bovineParent2,
+            boolean gender,
+            String imageCID) {
         this.idContract = idContract;
         this.user = user;
         this.field = field;

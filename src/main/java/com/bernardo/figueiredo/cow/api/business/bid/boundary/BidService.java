@@ -7,17 +7,14 @@
 package com.bernardo.figueiredo.cow.api.business.bid.boundary;
 
 import com.bernardo.figueiredo.cow.api.business.auction.boundary.AuctionRepository;
+import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.Bid;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.BidCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.BidDTO;
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
+import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.hedera.hashgraph.sdk.*;
-import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
@@ -27,6 +24,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BidService {
@@ -54,8 +53,13 @@ public class BidService {
     }
 
     public BidDTO convertToDTO(Bid bid) {
-        return new BidDTO(bid.getIdBid(), bid.getIdContract(), bid.getAuction().getIdAuction(),
-                bid.getUser().getIdWallet(), bid.getBidValue(), bid.getBidDate());
+        return new BidDTO(
+                bid.getIdBid(),
+                bid.getIdContract(),
+                bid.getAuction().getIdAuction(),
+                bid.getUser().getIdWallet(),
+                bid.getBidValue(),
+                bid.getBidDate());
     }
 
     public List<BidDTO> getAllBids() {
@@ -124,7 +128,8 @@ public class BidService {
                             .setConstructorParameters(new ContractFunctionParameters()
                                     .addUint256(BigInteger.valueOf((bidCreateDTO.getIdAuction())))
                                     .addString(bidCreateDTO.getIdBidder())
-                                    .addUint256(BigInteger.valueOf(bidCreateDTO.getBidDate().getTime())))
+                                    .addUint256(BigInteger.valueOf(
+                                            bidCreateDTO.getBidDate().getTime())))
                             .execute(client);
 
                     TransactionReceipt fileReceipt3 = contractCreateTransaction.getReceipt(client);
@@ -135,9 +140,12 @@ public class BidService {
                     if (contractId != null) {
                         Auction auction = auctionRepository.getAuctionByIDAuction(bidCreateDTO.getIdAuction());
                         if (auction != null) {
-                            Bid bid = new Bid(contractId.toString(), auction,
+                            Bid bid = new Bid(
+                                    contractId.toString(),
+                                    auction,
                                     userRepository.getUserByIDOwner(bidCreateDTO.getIdBidder()),
-                                    bidCreateDTO.getValue(), bidCreateDTO.getBidDate());
+                                    bidCreateDTO.getValue(),
+                                    bidCreateDTO.getBidDate());
                             bidRepository.save(bid);
 
                             BidDTO bidDTO = convertToDTO(bid);
@@ -148,8 +156,7 @@ public class BidService {
                     }
                 }
             }
-        } catch (PrecheckStatusException | TimeoutException | FileNotFoundException |
-                ReceiptStatusException ex) {
+        } catch (PrecheckStatusException | TimeoutException | FileNotFoundException | ReceiptStatusException ex) {
             ex.printStackTrace();
         }
         return emptyDTO;

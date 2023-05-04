@@ -6,16 +6,15 @@
 
 package com.bernardo.figueiredo.cow.api;
 
-import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.bernardo.figueiredo.cow.api.business.user_type.boundary.UserTypeRepository;
+import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.bernardo.figueiredo.cow.api.utils.Constants;
+import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-
-import java.util.List;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class CowAPI {
@@ -35,6 +34,4 @@ public class CowAPI {
             }
         };
     }
-
-
 }

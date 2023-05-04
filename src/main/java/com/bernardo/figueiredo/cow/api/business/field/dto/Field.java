@@ -8,19 +8,18 @@ package com.bernardo.figueiredo.cow.api.business.field.dto;
 
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistory;
+import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "COW_Field")
@@ -73,8 +72,16 @@ public class Field implements Serializable {
     @JsonManagedReference
     private Set<FieldHistory> fieldHistorySet = new HashSet();
 
-    public Field(String idContract, User user, String fieldDescription, String address, int limit, Double latitude,
-                 Double longitude, Boolean active, String observation) {
+    public Field(
+            String idContract,
+            User user,
+            String fieldDescription,
+            String address,
+            int limit,
+            Double latitude,
+            Double longitude,
+            Boolean active,
+            String observation) {
         this.idContract = idContract;
         this.user = user;
         this.fieldDescription = fieldDescription;

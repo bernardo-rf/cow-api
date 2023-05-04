@@ -7,15 +7,14 @@
 package com.bernardo.figueiredo.cow.api.business.appointment.dto;
 
 import com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto.AppointmentRequest;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
-import lombok.*;
-import org.hibernate.annotations.Nationalized;
-
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Table(name = "COW_Appointment")
@@ -34,7 +33,7 @@ public class Appointment implements Serializable {
     private String idContract;
 
     @OneToOne
-    @JoinColumn(name="id_appointment_request")
+    @JoinColumn(name = "id_appointment_request")
     private AppointmentRequest appointmentRequest;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -63,8 +62,16 @@ public class Appointment implements Serializable {
     @Column(nullable = false)
     private int appointmentStatus;
 
-    public Appointment(String idContract, AppointmentRequest appointmentRequest, Bovine bovine, User user, Date appointmentDate,
-                       String appointmentType, Double cost, String observation, int status) {
+    public Appointment(
+            String idContract,
+            AppointmentRequest appointmentRequest,
+            Bovine bovine,
+            User user,
+            Date appointmentDate,
+            String appointmentType,
+            Double cost,
+            String observation,
+            int status) {
         this.idContract = idContract;
         this.appointmentRequest = appointmentRequest;
         this.bovine = bovine;

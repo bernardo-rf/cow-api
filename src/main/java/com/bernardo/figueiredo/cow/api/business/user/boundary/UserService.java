@@ -7,16 +7,11 @@
 package com.bernardo.figueiredo.cow.api.business.user.boundary;
 
 import com.bernardo.figueiredo.cow.api.business.user.dto.*;
-import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.bernardo.figueiredo.cow.api.business.user_type.boundary.UserTypeRepository;
+import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.bernardo.figueiredo.cow.api.utils.JwtToken;
 import com.hedera.hashgraph.sdk.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
@@ -24,6 +19,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -48,22 +47,33 @@ public class UserService {
     public Client client = Client.forTestnet();
 
     public UserFullInfoDTO convertToDTO(User user, String userType) {
-        return new UserFullInfoDTO(user.getIdUser(), user.getIdContract(), user.getIdWallet(), user.getUserType().getIdUserType(),
-                userType, user.getName(), user.getBirthDate(), user.getEmail(), user.getPassword(), user.getActive(),
-                user.getBalance(), user.getFullName(), user.getImageCID());
+        return new UserFullInfoDTO(
+                user.getIdUser(),
+                user.getIdContract(),
+                user.getIdWallet(),
+                user.getUserType().getIdUserType(),
+                userType,
+                user.getName(),
+                user.getBirthDate(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getActive(),
+                user.getBalance(),
+                user.getFullName(),
+                user.getImageCID());
     }
 
     public UserFullInfoDTO getUserFullInfo(long idUser) {
         User user = userRepository.getUser(idUser);
         if (user != null) {
-            UserType userType = userTypeRepository.getUserType(user.getUserType().getIdUserType());
+            UserType userType =
+                    userTypeRepository.getUserType(user.getUserType().getIdUserType());
             if (userType != null) {
                 return convertToDTO(user, userType.getTypeDescription().toUpperCase());
             }
         }
         return new UserFullInfoDTO();
     }
-
 
     public UserAuthResponseDTO authenticate(UserAuthDTO userDTO) {
         UserAuthResponseDTO emptyUserAuthResponseDTO = new UserAuthResponseDTO();
@@ -120,8 +130,7 @@ public class UserService {
 
                 AccountBalance tokenBalance = null;
                 if (newAccountId != null) {
-                    AccountBalanceQuery query = new AccountBalanceQuery()
-                            .setAccountId(newAccountId);
+                    AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(newAccountId);
                     tokenBalance = query.execute(client);
                 }
 
@@ -156,9 +165,11 @@ public class UserService {
                                 .setAdminKey(operatorKey)
                                 .setConstructorParameters(new ContractFunctionParameters()
                                         .addUint256(BigInteger.valueOf(userCreateDTO.getIdUserType()))
-                                        .addString(userCreateDTO.getName()).addString("")
+                                        .addString(userCreateDTO.getName())
+                                        .addString("")
                                         .addString(userCreateDTO.getEmail())
-                                        .addString(bCryptPasswordEncoder.encode(userCreateDTO.getPassword().toUpperCase()))
+                                        .addString(bCryptPasswordEncoder.encode(
+                                                userCreateDTO.getPassword().toUpperCase()))
                                         .addBool(true)
                                         .addUint256(BigInteger.valueOf(Long.parseLong(balance))))
                                 .execute(client);
@@ -170,14 +181,24 @@ public class UserService {
                             String idContract = fileReceipt3.contractId.toString();
                             String idAccount = newAccountId.toString();
 
-                            User user = new User(idContract, idAccount, userType, userCreateDTO.getName(),
-                                    null, userCreateDTO.getEmail(),
-                                    bCryptPasswordEncoder.encode(userCreateDTO.getPassword()), true,
-                                    Double.valueOf(balance), "", "");
+                            User user = new User(
+                                    idContract,
+                                    idAccount,
+                                    userType,
+                                    userCreateDTO.getName(),
+                                    null,
+                                    userCreateDTO.getEmail(),
+                                    bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
+                                    true,
+                                    Double.valueOf(balance),
+                                    "",
+                                    "");
                             userRepository.save(user);
 
-                            return new UserAuthResponseDTO( jwtToken.generateToken(user),
-                                    convertToDTO(user, userType.getTypeDescription().toUpperCase()));
+                            return new UserAuthResponseDTO(
+                                    jwtToken.generateToken(user),
+                                    convertToDTO(
+                                            user, userType.getTypeDescription().toUpperCase()));
                         }
                     }
                 }
@@ -208,10 +229,13 @@ public class UserService {
             TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
                     .setContractId(ContractId.fromString(userDTO.getIdContract()))
                     .setGas(300000)
-                    .setFunction("setUpdate", new ContractFunctionParameters()
-                            .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
-                            .addUint256(BigInteger.valueOf(userDTO.getBirthDate().getTime()))
-                            .addBool(userDTO.getActive()))
+                    .setFunction(
+                            "setUpdate",
+                            new ContractFunctionParameters()
+                                    .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
+                                    .addUint256(BigInteger.valueOf(
+                                            userDTO.getBirthDate().getTime()))
+                                    .addBool(userDTO.getActive()))
                     .execute(client);
 
             TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
@@ -224,7 +248,8 @@ public class UserService {
             user.setImageCID(userDTO.getImageCID());
 
             if (!userDTO.getPassword().isEmpty()) {
-                user.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword().toUpperCase()));
+                user.setPassword(
+                        bCryptPasswordEncoder.encode(userDTO.getPassword().toUpperCase()));
             }
             userRepository.save(user);
 

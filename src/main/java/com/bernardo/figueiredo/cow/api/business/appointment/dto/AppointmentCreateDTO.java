@@ -6,13 +6,12 @@
 
 package com.bernardo.figueiredo.cow.api.business.appointment.dto;
 
+import java.util.ArrayList;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 @Getter
 @Setter
