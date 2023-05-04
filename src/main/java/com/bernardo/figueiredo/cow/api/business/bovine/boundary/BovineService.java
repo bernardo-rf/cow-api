@@ -7,18 +7,15 @@
 package com.bernardo.figueiredo.cow.api.business.bovine.boundary;
 
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.*;
-import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
 import com.bernardo.figueiredo.cow.api.business.field.boundary.FieldRepository;
+import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
 import com.bernardo.figueiredo.cow.api.business.field_history.boundary.FieldHistoryService;
 import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistoryCreatedDTO;
 import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistoryDTO;
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
+import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.hedera.hashgraph.sdk.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
@@ -29,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BovineService {
@@ -48,33 +47,62 @@ public class BovineService {
     private Client client = Client.forTestnet();
 
     public BovineDTO convertToDTO(Bovine bovine) {
-        return new BovineDTO(bovine.getIdBovine(), bovine.getIdContract(), bovine.getUser().getIdWallet(),
-                bovine.getField().getIdField(), bovine.getSerialNumber(), bovine.getBirthDate().toString(),
-                bovine.getWeight(), bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(),
+        return new BovineDTO(
+                bovine.getIdBovine(),
+                bovine.getIdContract(),
+                bovine.getUser().getIdWallet(),
+                bovine.getField().getIdField(),
+                bovine.getSerialNumber(),
+                bovine.getBirthDate().toString(),
+                bovine.getWeight(),
+                bovine.getHeight(),
+                bovine.getBreed(),
+                bovine.getColor(),
+                bovine.getActive(),
                 bovine.getObservation(),
                 bovine.getBovineParent1() != null ? bovine.getBovineParent1().getIdBovine() : 0,
                 bovine.getBovineParent2() != null ? bovine.getBovineParent2().getIdBovine() : 0,
-                bovine.isGender(), bovine.getImageCID());
+                bovine.isGender(),
+                bovine.getImageCID());
     }
 
     public BovineFullInfoDTO convertToFullDTO(Bovine bovine) {
-        return new BovineFullInfoDTO(bovine.getIdBovine(), bovine.getIdContract(), bovine.getUser(),
-                bovine.getField(), bovine.getSerialNumber(), bovine.getBirthDate().toString(), bovine.getWeight(),
-                bovine.getHeight(), bovine.getBreed(), bovine.getColor(), bovine.getActive(), bovine.getObservation(),
+        return new BovineFullInfoDTO(
+                bovine.getIdBovine(),
+                bovine.getIdContract(),
+                bovine.getUser(),
+                bovine.getField(),
+                bovine.getSerialNumber(),
+                bovine.getBirthDate().toString(),
+                bovine.getWeight(),
+                bovine.getHeight(),
+                bovine.getBreed(),
+                bovine.getColor(),
+                bovine.getActive(),
+                bovine.getObservation(),
                 bovine.getBovineParent1() != null ? bovine.getBovineParent1().getIdBovine() : 0,
                 bovine.getBovineParent2() != null ? bovine.getBovineParent2().getIdBovine() : 0,
-                bovine.isGender(), bovine.getImageCID());
+                bovine.isGender(),
+                bovine.getImageCID());
     }
 
     public Bovine convertToEntity(BovineCreateDTO bovineDTO, String idContract) {
-        return new Bovine(idContract, userRepository.getUserByIDOwner(bovineDTO.getIdOwner()),
-                fieldRepository.getField(bovineDTO.getIdField()), bovineDTO.getSerialNumber(),
-                bovineDTO.getBirthDate(), bovineDTO.getWeight(), bovineDTO.getHeight(),
-                bovineDTO.getBreed(), bovineDTO.getColor(),
-                bovineDTO.getActive(), bovineDTO.getObservation(),
+        return new Bovine(
+                idContract,
+                userRepository.getUserByIDOwner(bovineDTO.getIdOwner()),
+                fieldRepository.getField(bovineDTO.getIdField()),
+                bovineDTO.getSerialNumber(),
+                bovineDTO.getBirthDate(),
+                bovineDTO.getWeight(),
+                bovineDTO.getHeight(),
+                bovineDTO.getBreed(),
+                bovineDTO.getColor(),
+                bovineDTO.getActive(),
+                bovineDTO.getObservation(),
                 bovineRepository.getBovine(bovineDTO.getIdBovineParent1()),
                 bovineRepository.getBovine(bovineDTO.getIdBovineParent2()),
-                bovineDTO.isGender(), bovineDTO.getImageCID());
+                bovineDTO.isGender(),
+                bovineDTO.getImageCID());
     }
 
     public boolean checkBovineValues(long idField, String idOwner) {
@@ -165,8 +193,8 @@ public class BovineService {
     public BovineDTO createBovine(BovineCreateDTO bovineCreateDTO) {
         BovineDTO emptyBovineDTO = new BovineDTO();
         try {
-            Bovine bovineAux = bovineRepository.checkBovineSerialNumber(bovineCreateDTO.getSerialNumber(),
-                    bovineCreateDTO.getIdOwner());
+            Bovine bovineAux = bovineRepository.checkBovineSerialNumber(
+                    bovineCreateDTO.getSerialNumber(), bovineCreateDTO.getIdOwner());
             if (bovineAux != null) {
                 emptyBovineDTO.setIdBovine(999999);
                 return emptyBovineDTO;
@@ -209,7 +237,8 @@ public class BovineService {
                                         .addString(bovineCreateDTO.getIdOwner())
                                         .addUint256(BigInteger.valueOf(bovineCreateDTO.getIdField()))
                                         .addUint256(BigInteger.valueOf(bovineCreateDTO.getSerialNumber()))
-                                        .addUint256(BigInteger.valueOf(bovineCreateDTO.getBirthDate().getTime()))
+                                        .addUint256(BigInteger.valueOf(
+                                                bovineCreateDTO.getBirthDate().getTime()))
                                         .addBool(bovineCreateDTO.getActive())
                                         .addString(bovineCreateDTO.getObservation())
                                         .addUint256(BigInteger.valueOf(bovineCreateDTO.getIdBovineParent1()))
@@ -229,7 +258,8 @@ public class BovineService {
                             if (newBovineDTO.getIdBovine() != 0) {
                                 FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(
                                         bovineCreateDTO.getIdField(), newBovineDTO.getIdBovine(), new Date());
-                                FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
+                                FieldHistoryDTO fieldHistoryDTO =
+                                        fieldHistoryService.createFieldHistory(historyCreatedDTO);
                                 if (fieldHistoryDTO.getIdFieldHistory() != 0) {
                                     return newBovineDTO;
                                 }
@@ -257,14 +287,16 @@ public class BovineService {
                 TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
                         .setContractId(ContractId.fromString(bovineDTO.getIdContract()))
                         .setGas(1000000)
-                        .setFunction("setUpdate", new ContractFunctionParameters()
-                                .addUint256(BigInteger.valueOf(bovineDTO.getIdField()))
-                                .addUint256(BigInteger.valueOf(bovineDTO.getSerialNumber()))
-                                .addUint256(BigInteger.valueOf(birthDate.getTime()))
-                                .addBool(bovineDTO.getActive())
-                                .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent1()))
-                                .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent2()))
-                                .addBool(bovineDTO.isGender()))
+                        .setFunction(
+                                "setUpdate",
+                                new ContractFunctionParameters()
+                                        .addUint256(BigInteger.valueOf(bovineDTO.getIdField()))
+                                        .addUint256(BigInteger.valueOf(bovineDTO.getSerialNumber()))
+                                        .addUint256(BigInteger.valueOf(birthDate.getTime()))
+                                        .addBool(bovineDTO.getActive())
+                                        .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent1()))
+                                        .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent2()))
+                                        .addBool(bovineDTO.isGender()))
                         .execute(client);
 
                 TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
@@ -273,8 +305,8 @@ public class BovineService {
                 Bovine bovine = bovineRepository.getBovine(bovineDTO.getIdBovine());
                 if (bovine != null) {
                     if (bovine.getField().getIdField() != bovineDTO.getIdField()) {
-                        FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(bovineDTO.getIdField(),
-                                bovineDTO.getIdBovine(), new Date());
+                        FieldHistoryCreatedDTO historyCreatedDTO =
+                                new FieldHistoryCreatedDTO(bovineDTO.getIdField(), bovineDTO.getIdBovine(), new Date());
                         FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
                     }
 
@@ -288,10 +320,10 @@ public class BovineService {
                     bovine.setColor(bovineDTO.getColor());
                     bovine.setActive(bovineDTO.getActive());
                     bovine.setObservation(bovineDTO.getObservation());
-                    if (bovineDTO.getIdBovineParent1() != 0){
+                    if (bovineDTO.getIdBovineParent1() != 0) {
                         bovine.setBovineParent1(bovineRepository.getBovine(bovineDTO.getIdBovineParent1()));
                     }
-                    if (bovineDTO.getIdBovineParent2() != 0){
+                    if (bovineDTO.getIdBovineParent2() != 0) {
                         bovine.setBovineParent2(bovineRepository.getBovine(bovineDTO.getIdBovineParent2()));
                     }
                     bovine.setGender(bovineDTO.isGender());
@@ -314,8 +346,8 @@ public class BovineService {
                 bovine.setField(fieldRepository.getField(idField));
                 bovineRepository.save(bovine);
 
-                FieldHistoryCreatedDTO historyCreatedDTO = new FieldHistoryCreatedDTO(idField, bovineDTO.getIdBovine(),
-                        new Date());
+                FieldHistoryCreatedDTO historyCreatedDTO =
+                        new FieldHistoryCreatedDTO(idField, bovineDTO.getIdBovine(), new Date());
                 FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
             }
         }
@@ -335,7 +367,8 @@ public class BovineService {
                             .setTransferAccountId(client.getOperatorAccountId())
                             .setContractId(ContractId.fromString(bovineToDelete.getIdContract()));
 
-                    TransactionResponse txResponse = transaction.freezeWith(client).sign(operatorKey).execute(client);
+                    TransactionResponse txResponse =
+                            transaction.freezeWith(client).sign(operatorKey).execute(client);
                     TransactionReceipt receipt = txResponse.getReceipt(client);
                     Logger.getLogger("STATUS:" + receipt.status);
 

@@ -6,15 +6,14 @@
 
 package com.bernardo.figueiredo.cow.api.business.bid.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
-import lombok.*;
-import org.hibernate.annotations.Nationalized;
-
-import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Table(name = "COW_Bid")
@@ -56,5 +55,3 @@ public class Bid implements Serializable {
         this.bidDate = bidDate;
     }
 }
-
-

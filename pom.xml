@@ -5,26 +5,26 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.1.RELEASE</version>
+        <version>2.7.11</version>
         <relativePath/>
     </parent>
-    <groupId>hedera</groupId>
-    <artifactId>starter</artifactId>
+
+    <groupId>bernardo.figueiredo</groupId>
+    <artifactId>cow.api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring_hedera_starter_project</name>
-    <description>COW Project</description>
+    <name>cow_api</name>
+    <description>Cow API Project</description>
 
     <properties>
+        <grpc.netty.version>1.46.0</grpc.netty.version>
+        <hedera.sdk.version>2.24.1</hedera.sdk.version>
+        <java.dotenv.version>5.0.1</java.dotenv.version>
         <java.version>11</java.version>
-        <mariadb.jdbc>1.5.7</mariadb.jdbc>
-        <springfox.boot.starter>3.0.0</springfox.boot.starter>
-        <springfox.swagger.ui>3.0.0</springfox.swagger.ui>
-        <java.dotenv>5.0.1</java.dotenv>
-        <grpc.netty.shaded>1.40.0</grpc.netty.shaded>
-        <hedera.sdk>2.17.0</hedera.sdk>
-        <lombok.version>1.18.16</lombok.version>
-        <jjwt.version>0.9.1</jjwt.version>
-        <spring.boot.starter.test>2.5.0</spring.boot.starter.test>
+        <jwt.api.version>0.11.5</jwt.api.version>
+        <lombok.project.version>1.18.22</lombok.project.version>
+        <mariadb.jdbc.version>3.1.4</mariadb.jdbc.version>
+        <springfox.boot.version>3.0.0</springfox.boot.version>
+        <springfox.swagger.version>3.0.0</springfox.swagger.version>
     </properties>
 
     <dependencies>
@@ -41,45 +41,45 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.jdbc}</version>
-        </dependency>
-        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
-            <version>${springfox.boot.starter}</version>
+            <version>${springfox.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox.boot.starter}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>java-dotenv</artifactId>
-            <version>${java.dotenv}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.grpc</groupId>
-            <artifactId>grpc-netty-shaded</artifactId>
-            <version>${grpc.netty.shaded}</version>
+            <version>${springfox.swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>com.hedera.hashgraph</groupId>
             <artifactId>sdk</artifactId>
-            <version>${hedera.sdk}</version>
+            <version>${hedera.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpc.netty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>compile</scope>
+            <version>${lombok.project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${jjwt.version}</version>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.jdbc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>${java.dotenv.version}</version>
         </dependency>
     </dependencies>
 
@@ -89,7 +89,56 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.36.0</version>
+                <configuration>
+                    <java>
+                        <toggleOffOn/>
+                        <importOrder/>
+                        <removeUnusedImports/>
+                        <palantirJavaFormat>
+                            <version>2.27.0</version>
+                        </palantirJavaFormat>
+                        <indent>
+                            <spaces>true</spaces>
+                            <spacesPerTab>4</spacesPerTab>
+                        </indent>
+                        <formatAnnotations/>
+                    </java>
+                    <markdown>
+                        <includes>
+                            <include>**/*.md</include>
+                        </includes>
+                        <flexmark/>
+                    </markdown>
+                    <pom>
+                        <includes>
+                            <include>pom.xml</include>
+                        </includes>
+                        <sortPom>
+                            <encoding>UTF-8</encoding>
+                            <keepBlankLines>true</keepBlankLines>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <indentBlankLines>false</indentBlankLines>
+                            <indentSchemaLocation>true</indentSchemaLocation>
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <sortProperties>true</sortProperties>
+                        </sortPom>
+                    </pom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>format</id>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>apply</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
-
 </project>

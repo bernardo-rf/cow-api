@@ -9,19 +9,18 @@ package com.bernardo.figueiredo.cow.api.business.appointmentRequest.boundary;
 import com.bernardo.figueiredo.cow.api.business.appointment.boundary.AppointmentService;
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentDTO;
-import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
-import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineRepository;
 import com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto.*;
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
+import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineRepository;
+import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AppointmentRequestService {
@@ -39,42 +38,55 @@ public class AppointmentRequestService {
     AppointmentService appointmentService;
 
     public AppointmentRequestDTO convertToDTO(AppointmentRequest appointmentRequest) {
-        return new AppointmentRequestDTO(appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getUser().getIdUser(),
-                appointmentRequest.getUserRequest().getIdUser(), appointmentRequest.getBovine().getIdBovine(),
-                appointmentRequest.getAppointmentRequestDate().toString(), appointmentRequest.getMotive(),
+        return new AppointmentRequestDTO(
+                appointmentRequest.getIdAppointmentRequest(),
+                appointmentRequest.getUser().getIdUser(),
+                appointmentRequest.getUserRequest().getIdUser(),
+                appointmentRequest.getBovine().getIdBovine(),
+                appointmentRequest.getAppointmentRequestDate().toString(),
+                appointmentRequest.getMotive(),
                 appointmentRequest.getAppointmentRequestStatus());
     }
 
-    public AppointmentRequestFullInfoDTO convertFullInfoToDTO(AppointmentRequest appointmentRequest, String userName,
-                                                              String userRequestName, long serialNumber) {
-        return new AppointmentRequestFullInfoDTO(appointmentRequest.getIdAppointmentRequest(),
-                appointmentRequest.getUser().getIdUser(), appointmentRequest.getUserRequest().getIdUser(),
-                appointmentRequest.getBovine().getIdBovine(), appointmentRequest.getAppointmentRequestDate().toString(),
-                appointmentRequest.getMotive(), appointmentRequest.getAppointmentRequestStatus(), userName, userRequestName, serialNumber);
+    public AppointmentRequestFullInfoDTO convertFullInfoToDTO(
+            AppointmentRequest appointmentRequest, String userName, String userRequestName, long serialNumber) {
+        return new AppointmentRequestFullInfoDTO(
+                appointmentRequest.getIdAppointmentRequest(),
+                appointmentRequest.getUser().getIdUser(),
+                appointmentRequest.getUserRequest().getIdUser(),
+                appointmentRequest.getBovine().getIdBovine(),
+                appointmentRequest.getAppointmentRequestDate().toString(),
+                appointmentRequest.getMotive(),
+                appointmentRequest.getAppointmentRequestStatus(),
+                userName,
+                userRequestName,
+                serialNumber);
     }
 
-    public List<AppointmentRequestFullInfoDTO> getAppointmentsRequest(List<AppointmentRequest> appointmentRequestList){
+    public List<AppointmentRequestFullInfoDTO> getAppointmentsRequest(List<AppointmentRequest> appointmentRequestList) {
         List<AppointmentRequestFullInfoDTO> appointmentRequestDTOList = new ArrayList<>();
         if (!appointmentRequestList.isEmpty()) {
             for (AppointmentRequest appointmentRequest : appointmentRequestList) {
-                User userVeterinary = userRepository.getUser(appointmentRequest.getUser().getIdUser());
+                User userVeterinary =
+                        userRepository.getUser(appointmentRequest.getUser().getIdUser());
                 User user = userRepository.getUser(appointmentRequest.getUser().getIdUser());
-                Bovine bovine = bovineRepository.getBovine(appointmentRequest.getBovine().getIdBovine());
-                appointmentRequestDTOList.add(convertFullInfoToDTO(appointmentRequest, userVeterinary.getName(),
-                        user.getName(), bovine.getSerialNumber()));
+                Bovine bovine = bovineRepository.getBovine(
+                        appointmentRequest.getBovine().getIdBovine());
+                appointmentRequestDTOList.add(convertFullInfoToDTO(
+                        appointmentRequest, userVeterinary.getName(), user.getName(), bovine.getSerialNumber()));
             }
             return appointmentRequestDTOList;
         }
         return appointmentRequestDTOList;
     }
 
-    public boolean checkAppointmentRequestValues(long idUser, long idUserRequest, long idBovine){
+    public boolean checkAppointmentRequestValues(long idUser, long idUserRequest, long idBovine) {
         User user = userRepository.getUser(idUser);
         if (user != null) {
             User userRequest = userRepository.getUser(idUserRequest);
             if (userRequest != null) {
                 Bovine bovine = bovineRepository.getBovine(idBovine);
-                if (bovine != null){
+                if (bovine != null) {
                     return bovine.getIdBovine() != 0;
                 }
             }
@@ -82,20 +94,24 @@ public class AppointmentRequestService {
         return false;
     }
 
-    public List<AppointmentRequestDTO> createAppointmentRequest(AppointmentRequestCreateDTO appointmentRequestCreateDTO) {
+    public List<AppointmentRequestDTO> createAppointmentRequest(
+            AppointmentRequestCreateDTO appointmentRequestCreateDTO) {
         List<AppointmentRequestDTO> appointmentRequestDTOList = new ArrayList<>();
         try {
-            List<Bovine> bovines =  new ArrayList<>();
-            for ( long i : appointmentRequestCreateDTO.getBovineIds() ){
+            List<Bovine> bovines = new ArrayList<>();
+            for (long i : appointmentRequestCreateDTO.getBovineIds()) {
                 Bovine bovine = bovineRepository.getBovine(i);
                 bovines.add(bovine);
             }
 
-            for (Bovine bovine: bovines) {
+            for (Bovine bovine : bovines) {
                 AppointmentRequest appointmentRequest = appointmentRequestRepository.checkAppointmentRequest(
                         bovine.getIdBovine(), appointmentRequestCreateDTO.getAppointmentDate());
-                if (appointmentRequest == null && checkAppointmentRequestValues(appointmentRequestCreateDTO.getIdUser(),
-                        appointmentRequestCreateDTO.getIdUserRequest(), bovine.getIdBovine())) {
+                if (appointmentRequest == null
+                        && checkAppointmentRequestValues(
+                                appointmentRequestCreateDTO.getIdUser(),
+                                appointmentRequestCreateDTO.getIdUserRequest(),
+                                bovine.getIdBovine())) {
 
                     AppointmentRequest newAppointmentRequest = new AppointmentRequest(
                             userRepository.getUser(appointmentRequestCreateDTO.getIdUser()),
@@ -105,7 +121,7 @@ public class AppointmentRequestService {
                             appointmentRequestCreateDTO.getMotive(),
                             appointmentRequestCreateDTO.getStatus());
                     appointmentRequestRepository.save(newAppointmentRequest);
-                    if(newAppointmentRequest.getIdAppointmentRequest() != 0) {
+                    if (newAppointmentRequest.getIdAppointmentRequest() != 0) {
                         appointmentRequestDTOList.add(convertToDTO(newAppointmentRequest));
                     }
                 }
@@ -120,17 +136,19 @@ public class AppointmentRequestService {
     public AppointmentRequestDTO updateAppointmentRequest(AppointmentRequestDTO appointmentRequestDTO) {
         AppointmentRequestDTO emptyAppointmentRequestDTO = new AppointmentRequestDTO();
         try {
-            if (checkAppointmentRequestValues(appointmentRequestDTO.getIdUser(),
+            if (checkAppointmentRequestValues(
+                    appointmentRequestDTO.getIdUser(),
                     appointmentRequestDTO.getIdUserRequest(),
-                    appointmentRequestDTO.getIdBovine())){
+                    appointmentRequestDTO.getIdBovine())) {
                 DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
                 Date appointmentDate = formatter.parse(appointmentRequestDTO.getAppointmentDate());
 
-                AppointmentRequest appointmentRequest = appointmentRequestRepository.getAppointmentRequest(appointmentRequestDTO.getIdAppointmentRequest());
+                AppointmentRequest appointmentRequest = appointmentRequestRepository.getAppointmentRequest(
+                        appointmentRequestDTO.getIdAppointmentRequest());
                 if (appointmentRequest != null) {
                     appointmentRequest.setBovine(bovineRepository.getBovine(appointmentRequestDTO.getIdBovine()));
                     appointmentRequest.setUser(userRepository.getUser(appointmentRequestDTO.getIdUser()));
-                    appointmentRequest.setAppointmentRequestDate( appointmentDate );
+                    appointmentRequest.setAppointmentRequestDate(appointmentDate);
                     appointmentRequest.setMotive(appointmentRequestDTO.getMotive());
                     appointmentRequest.setAppointmentRequestStatus(appointmentRequestDTO.getStatus());
                     appointmentRequestRepository.save(appointmentRequest);
@@ -145,22 +163,28 @@ public class AppointmentRequestService {
 
     public AppointmentRequestDTO updateAppointmentRequestStatus(long idAppointmentRequest, int status) {
         try {
-            AppointmentRequest appointmentRequest = appointmentRequestRepository.getAppointmentRequest(idAppointmentRequest);
+            AppointmentRequest appointmentRequest =
+                    appointmentRequestRepository.getAppointmentRequest(idAppointmentRequest);
             if (appointmentRequest != null) {
                 appointmentRequest.setAppointmentRequestStatus(status);
                 appointmentRequestRepository.save(appointmentRequest);
 
-                    if (status == 1) {
-                        ArrayList<Integer> bovineIds = new ArrayList<>();
-                        bovineIds.add((int) appointmentRequest.getBovine().getIdBovine());
-                        AppointmentCreateDTO appointmentCreateDTO = new AppointmentCreateDTO(
-                                appointmentRequest.getIdAppointmentRequest(), appointmentRequest.getUser().getIdUser(),
-                                appointmentRequest.getAppointmentRequestDate(), appointmentRequest.getMotive(), 0.0,
-                                "", 0, bovineIds);
-                        AppointmentDTO appointmentDTO = appointmentService.createAppointment(appointmentCreateDTO);
-                        if (appointmentDTO.getIdAppointment() != 0) {
-                            return convertToDTO(appointmentRequest);
-                        }
+                if (status == 1) {
+                    ArrayList<Integer> bovineIds = new ArrayList<>();
+                    bovineIds.add((int) appointmentRequest.getBovine().getIdBovine());
+                    AppointmentCreateDTO appointmentCreateDTO = new AppointmentCreateDTO(
+                            appointmentRequest.getIdAppointmentRequest(),
+                            appointmentRequest.getUser().getIdUser(),
+                            appointmentRequest.getAppointmentRequestDate(),
+                            appointmentRequest.getMotive(),
+                            0.0,
+                            "",
+                            0,
+                            bovineIds);
+                    AppointmentDTO appointmentDTO = appointmentService.createAppointment(appointmentCreateDTO);
+                    if (appointmentDTO.getIdAppointment() != 0) {
+                        return convertToDTO(appointmentRequest);
+                    }
                 }
                 return convertToDTO(appointmentRequest);
             }
@@ -170,9 +194,10 @@ public class AppointmentRequestService {
         return new AppointmentRequestDTO();
     }
 
-    public boolean deleteAppointmentRequest(long idAppointmentRequest){
+    public boolean deleteAppointmentRequest(long idAppointmentRequest) {
         try {
-            AppointmentRequest appointmentToRequest = appointmentRequestRepository.getAppointmentRequest(idAppointmentRequest);
+            AppointmentRequest appointmentToRequest =
+                    appointmentRequestRepository.getAppointmentRequest(idAppointmentRequest);
             if (appointmentToRequest != null) {
                 appointmentRequestRepository.delete(appointmentToRequest);
                 return true;

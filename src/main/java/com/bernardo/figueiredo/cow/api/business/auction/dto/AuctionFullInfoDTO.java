@@ -9,14 +9,13 @@ package com.bernardo.figueiredo.cow.api.business.auction.dto;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.Bid;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter

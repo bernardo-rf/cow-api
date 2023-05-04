@@ -11,20 +11,19 @@ import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
-@Table(name="COW_Auction")
+@Table(name = "COW_Auction")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -69,8 +68,15 @@ public class Auction implements Serializable {
     @JsonManagedReference
     private Set<Bid> bidSet = new HashSet<>();
 
-    public Auction(String idContract, Bovine bovine, User user, String auctionDescription, Date startDate,
-                   Date endDate, int auctionStatus, double startingPrice) {
+    public Auction(
+            String idContract,
+            Bovine bovine,
+            User user,
+            String auctionDescription,
+            Date startDate,
+            Date endDate,
+            int auctionStatus,
+            double startingPrice) {
         this.idContract = idContract;
         this.bovine = bovine;
         this.user = user;

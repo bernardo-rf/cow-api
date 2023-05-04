@@ -6,19 +6,16 @@
 
 package com.bernardo.figueiredo.cow.api.business.auction.boundary;
 
-import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineRepository;
-import com.hedera.hashgraph.sdk.*;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionDTO;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionFullInfoDTO;
+import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineRepository;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
+import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.hedera.hashgraph.sdk.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
@@ -28,6 +25,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AuctionService {
@@ -55,15 +54,30 @@ public class AuctionService {
     }
 
     public AuctionDTO convertToDTO(Auction auction) {
-        return new AuctionDTO(auction.getIdAuction(), auction.getBovine().getIdBovine(), auction.getIdContract(),
-                auction.getUser().getIdWallet(), auction.getAuctionDescription(), auction.getStartDate(),
-                auction.getEndDate(), auction.getAuctionStatus(), auction.getStartingPrice());
+        return new AuctionDTO(
+                auction.getIdAuction(),
+                auction.getBovine().getIdBovine(),
+                auction.getIdContract(),
+                auction.getUser().getIdWallet(),
+                auction.getAuctionDescription(),
+                auction.getStartDate(),
+                auction.getEndDate(),
+                auction.getAuctionStatus(),
+                auction.getStartingPrice());
     }
 
     public AuctionFullInfoDTO convertToFullDTO(Auction auction) {
-        return new AuctionFullInfoDTO(auction.getIdAuction(), auction.getIdContract(), auction.getBovine(),
-                auction.getUser(), auction.getAuctionDescription(), auction.getStartDate(),
-                auction.getEndDate(), auction.getAuctionStatus(), auction.getStartingPrice(), auction.getBidSet());
+        return new AuctionFullInfoDTO(
+                auction.getIdAuction(),
+                auction.getIdContract(),
+                auction.getBovine(),
+                auction.getUser(),
+                auction.getAuctionDescription(),
+                auction.getStartDate(),
+                auction.getEndDate(),
+                auction.getAuctionStatus(),
+                auction.getStartingPrice(),
+                auction.getBidSet());
     }
 
     public List<AuctionFullInfoDTO> getAllAuctions() {
@@ -133,8 +147,10 @@ public class AuctionService {
                                     .addUint256(BigInteger.valueOf((auctionCreateDTO.getIdBovine())))
                                     .addString(auctionCreateDTO.getIdOwner())
                                     .addString(auctionCreateDTO.getAuctionDescription())
-                                    .addUint256(BigInteger.valueOf(auctionCreateDTO.getStartDate().getTime()))
-                                    .addUint256(BigInteger.valueOf(auctionCreateDTO.getEndDate().getTime()))
+                                    .addUint256(BigInteger.valueOf(
+                                            auctionCreateDTO.getStartDate().getTime()))
+                                    .addUint256(BigInteger.valueOf(
+                                            auctionCreateDTO.getEndDate().getTime()))
                                     .addUint32(auctionCreateDTO.getStatus()))
                             .execute(client);
 
@@ -144,12 +160,15 @@ public class AuctionService {
                     ContractId contractId = fileReceipt3.contractId;
 
                     if (contractId != null) {
-                        Auction auction = new Auction(contractId.toString(),
+                        Auction auction = new Auction(
+                                contractId.toString(),
                                 bovineRepository.getBovine(auctionCreateDTO.getIdBovine()),
                                 userRepository.getUserByIDOwner(auctionCreateDTO.getIdOwner()),
                                 auctionCreateDTO.getAuctionDescription(),
-                                auctionCreateDTO.getStartDate(), auctionCreateDTO.getEndDate(),
-                                auctionCreateDTO.getStatus(), auctionCreateDTO.getStartingPrice());
+                                auctionCreateDTO.getStartDate(),
+                                auctionCreateDTO.getEndDate(),
+                                auctionCreateDTO.getStatus(),
+                                auctionCreateDTO.getStartingPrice());
                         auctionRepository.save(auction);
 
                         AuctionDTO auctionDTO = convertToDTO(auction);
@@ -159,8 +178,7 @@ public class AuctionService {
                     }
                 }
             }
-        } catch (PrecheckStatusException | TimeoutException | FileNotFoundException |
-                ReceiptStatusException ex) {
+        } catch (PrecheckStatusException | TimeoutException | FileNotFoundException | ReceiptStatusException ex) {
             ex.printStackTrace();
         }
         return emptyDTO;
@@ -186,10 +204,14 @@ public class AuctionService {
             TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
                     .setContractId(ContractId.fromString(auctionToUpdate.getIdContract()))
                     .setGas(400000)
-                    .setFunction("setUpdate", new ContractFunctionParameters()
-                            .addUint256(BigInteger.valueOf(auctionDTO.getIdBovine()))
-                            .addUint256(BigInteger.valueOf(auctionDTO.getStartDate().getTime()))
-                            .addUint256(BigInteger.valueOf(auctionDTO.getEndDate().getTime())))
+                    .setFunction(
+                            "setUpdate",
+                            new ContractFunctionParameters()
+                                    .addUint256(BigInteger.valueOf(auctionDTO.getIdBovine()))
+                                    .addUint256(BigInteger.valueOf(
+                                            auctionDTO.getStartDate().getTime()))
+                                    .addUint256(BigInteger.valueOf(
+                                            auctionDTO.getEndDate().getTime())))
                     .execute(client);
 
             TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);

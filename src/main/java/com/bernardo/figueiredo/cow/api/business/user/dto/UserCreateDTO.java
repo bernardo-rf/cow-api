@@ -6,7 +6,6 @@
 
 package com.bernardo.figueiredo.cow.api.business.user.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

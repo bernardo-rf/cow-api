@@ -11,17 +11,17 @@ import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.BovineDTO;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.BovineFullInfoDTO;
 import com.bernardo.figueiredo.cow.api.business.field.dto.*;
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
+import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.hedera.hashgraph.sdk.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class FieldService {
@@ -38,32 +38,50 @@ public class FieldService {
     public Client client = Client.forTestnet();
 
     public FieldDTO convertToDTO(Field field, Set<BovineDTO> bovines) {
-        return new FieldDTO(field.getIdField(), field.getUser().getIdWallet(), field.getIdContract(),
-                field.getFieldDescription(), field.getLatitude(), field.getLongitude(), field.getAddress(),
-                field.getFieldLimit(), field.getActive(), field.getObservation(), bovines);
+        return new FieldDTO(
+                field.getIdField(),
+                field.getUser().getIdWallet(),
+                field.getIdContract(),
+                field.getFieldDescription(),
+                field.getLatitude(),
+                field.getLongitude(),
+                field.getAddress(),
+                field.getFieldLimit(),
+                field.getActive(),
+                field.getObservation(),
+                bovines);
     }
 
     public FieldFullInfoDTO convertFullInfoToDTO(Field field) {
         int fieldCurrentOccupation = field.getBovineSet().size();
-        int currentOccupationPercentage = (int)(((fieldCurrentOccupation*1.0)/field.getFieldLimit())*100);
+        int currentOccupationPercentage = (int) (((fieldCurrentOccupation * 1.0) / field.getFieldLimit()) * 100);
 
-        return new FieldFullInfoDTO(field.getIdField(), field.getUser(), field.getIdContract(),
-                field.getFieldDescription(), field.getLatitude(), field.getLongitude(), field.getAddress(),
-                field.getFieldLimit(), field.getActive(), field.getObservation(), fieldCurrentOccupation,
+        return new FieldFullInfoDTO(
+                field.getIdField(),
+                field.getUser(),
+                field.getIdContract(),
+                field.getFieldDescription(),
+                field.getLatitude(),
+                field.getLongitude(),
+                field.getAddress(),
+                field.getFieldLimit(),
+                field.getActive(),
+                field.getObservation(),
+                fieldCurrentOccupation,
                 currentOccupationPercentage);
     }
 
-    public boolean checkFieldValues(String idOwner){
+    public boolean checkFieldValues(String idOwner) {
         User user = userRepository.getUserByIDOwner(idOwner);
         if (user != null) {
-                return user.getIdUser() != 0;
-            }
+            return user.getIdUser() != 0;
+        }
         return false;
     }
 
-    public FieldFullInfoDTO getField(long fieldId){
+    public FieldFullInfoDTO getField(long fieldId) {
         Field field = fieldRepository.getField(fieldId);
-        if (field == null){
+        if (field == null) {
             return new FieldFullInfoDTO();
         }
         return convertFullInfoToDTO(field);
@@ -72,11 +90,11 @@ public class FieldService {
     public List<FieldFullInfoDTO> getFieldsByIDOwner(String idOwner) {
         List<FieldFullInfoDTO> fieldsList = new ArrayList<>();
         List<Field> fields = fieldRepository.getFieldsByIDOwner(idOwner);
-        if (fields.isEmpty()){
+        if (fields.isEmpty()) {
             return fieldsList;
         }
 
-        for (Field field: fields) {
+        for (Field field : fields) {
             fieldsList.add(convertFullInfoToDTO(field));
         }
         return fieldsList;
@@ -85,12 +103,12 @@ public class FieldService {
     public List<FieldFullInfoDTO> getFieldsNotOccupied(String idOwner) {
         List<FieldFullInfoDTO> fieldsList = new ArrayList<>();
         List<Field> fields = fieldRepository.getFieldsByIDOwner(idOwner);
-        if (fields.isEmpty()){
+        if (fields.isEmpty()) {
             return fieldsList;
         }
 
-        for (Field field: fields) {
-            if(field.getBovineSet().size() != field.getFieldLimit()){
+        for (Field field : fields) {
+            if (field.getBovineSet().size() != field.getFieldLimit()) {
                 fieldsList.add(convertFullInfoToDTO(field));
             }
         }
@@ -100,21 +118,21 @@ public class FieldService {
     public FieldDTO getFieldBovines(long idField) {
         FieldDTO fieldDTO = new FieldDTO();
         Field field = fieldRepository.getField(idField);
-        if (field == null){
+        if (field == null) {
             return fieldDTO;
         }
 
         Set<BovineDTO> bovineDTOS = new HashSet<>();
-        for (Bovine bovine: field.getBovineSet()) {
+        for (Bovine bovine : field.getBovineSet()) {
             bovineDTOS.add(bovineService.convertToDTO(bovine));
         }
 
         return convertToDTO(field, bovineDTOS);
     }
 
-    public List<BovineFullInfoDTO>  getFieldBovinesNotIn(long idField){
+    public List<BovineFullInfoDTO> getFieldBovinesNotIn(long idField) {
         Field field = fieldRepository.getField(idField);
-        if(field == null) {
+        if (field == null) {
             return new ArrayList<>();
         }
         return bovineService.getAllBovineNotInField(idField, field.getUser().getIdWallet());
@@ -123,8 +141,9 @@ public class FieldService {
     public FieldDTO createField(FieldCreateDTO fieldCreateDTO) {
         FieldDTO fieldDTO = new FieldDTO();
         try {
-            Field field = fieldRepository.checkFieldByAddressAndIDOwner(fieldCreateDTO.getAddress(), fieldCreateDTO.getIdOwner());
-            if (field != null){
+            Field field = fieldRepository.checkFieldByAddressAndIDOwner(
+                    fieldCreateDTO.getAddress(), fieldCreateDTO.getIdOwner());
+            if (field != null) {
                 fieldDTO.setIdField(999999);
                 return fieldDTO;
             }
@@ -175,11 +194,15 @@ public class FieldService {
 
                         ContractId contractId = fileReceipt3.contractId;
                         if (contractId != null) {
-                            Field newField = new Field(fileReceipt3.contractId.toString(),
+                            Field newField = new Field(
+                                    fileReceipt3.contractId.toString(),
                                     userRepository.getUserByIDOwner(fieldCreateDTO.getIdOwner()),
-                                    fieldCreateDTO.getFieldDescription(), fieldCreateDTO.getAddress(),
-                                    fieldCreateDTO.getLimit(), fieldCreateDTO.getLatitude(),
-                                    fieldCreateDTO.getLongitude(), fieldCreateDTO.getActive(),
+                                    fieldCreateDTO.getFieldDescription(),
+                                    fieldCreateDTO.getAddress(),
+                                    fieldCreateDTO.getLimit(),
+                                    fieldCreateDTO.getLatitude(),
+                                    fieldCreateDTO.getLongitude(),
+                                    fieldCreateDTO.getActive(),
                                     fieldCreateDTO.getObservation());
                             fieldRepository.save(newField);
 
@@ -188,7 +211,6 @@ public class FieldService {
                                 bovineService.updateBovineLocation(fieldCreateDTO.getBovines(), newField.getIdField());
                                 return fieldDTO;
                             }
-
                         }
                     }
                 }
@@ -200,59 +222,59 @@ public class FieldService {
     }
 
     public FieldDTO updateField(FieldDTO fieldDTO) {
-            FieldDTO emptyFieldDTO = new FieldDTO();
-            try {
-                if (checkFieldValues(fieldDTO.getIdOwner())) {
-                    Field field = fieldRepository.getField(fieldDTO.getIdField());
-                    if (field != null) {
-                        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+        FieldDTO emptyFieldDTO = new FieldDTO();
+        try {
+            if (checkFieldValues(fieldDTO.getIdOwner())) {
+                Field field = fieldRepository.getField(fieldDTO.getIdField());
+                if (field != null) {
+                    client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
 
-                        TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
-                                .setContractId(ContractId.fromString(field.getIdContract()))
-                                .setGas(1000000)
-                                .setFunction("setUpdate", new ContractFunctionParameters()
-                                        .addBool(fieldDTO.getActive()))
-                                .execute(client);
+                    TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
+                            .setContractId(ContractId.fromString(field.getIdContract()))
+                            .setGas(1000000)
+                            .setFunction("setUpdate", new ContractFunctionParameters().addBool(fieldDTO.getActive()))
+                            .execute(client);
 
-                        TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
-                        Logger.getLogger("Status " + fileReceipt.status);
+                    TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
+                    Logger.getLogger("Status " + fileReceipt.status);
 
-                        field.setFieldDescription(fieldDTO.getFieldDescription());
-                        field.setAddress(fieldDTO.getAddress());
-                        field.setFieldLimit(fieldDTO.getLimit());
-                        field.setLatitude(fieldDTO.getLatitude());
-                        field.setLongitude(fieldDTO.getLongitude());
-                        field.setActive(fieldDTO.getActive());
-                        field.setObservation(fieldDTO.getObservation());
-                        fieldRepository.save(field);
+                    field.setFieldDescription(fieldDTO.getFieldDescription());
+                    field.setAddress(fieldDTO.getAddress());
+                    field.setFieldLimit(fieldDTO.getLimit());
+                    field.setLatitude(fieldDTO.getLatitude());
+                    field.setLongitude(fieldDTO.getLongitude());
+                    field.setActive(fieldDTO.getActive());
+                    field.setObservation(fieldDTO.getObservation());
+                    fieldRepository.save(field);
 
-                        Set<BovineDTO> bovineDTOS = new HashSet<>();
-                        if (!fieldDTO.getBovines().isEmpty()){
-                            bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(), fieldDTO.getIdField());
-                            return convertToDTO(field, bovineDTOS);
-                        }
+                    Set<BovineDTO> bovineDTOS = new HashSet<>();
+                    if (!fieldDTO.getBovines().isEmpty()) {
+                        bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(), fieldDTO.getIdField());
                         return convertToDTO(field, bovineDTOS);
                     }
+                    return convertToDTO(field, bovineDTOS);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return emptyFieldDTO;
     }
 
-    public Boolean deleteField(long idField){
+    public Boolean deleteField(long idField) {
         try {
             PrivateKey operatorKey = EnvUtils.getOperatorKey();
             client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
 
-            if (client.getOperatorAccountId() != null){
+            if (client.getOperatorAccountId() != null) {
                 Field fieldToDelete = fieldRepository.getField(idField);
 
                 ContractDeleteTransaction transaction = new ContractDeleteTransaction()
                         .setTransferAccountId(client.getOperatorAccountId())
                         .setContractId(ContractId.fromString(fieldToDelete.getIdContract()));
 
-                TransactionResponse txResponse = transaction.freezeWith(client).sign(operatorKey).execute(client);
+                TransactionResponse txResponse =
+                        transaction.freezeWith(client).sign(operatorKey).execute(client);
                 TransactionReceipt receipt = txResponse.getReceipt(client);
                 Logger.getLogger("STATUS:" + receipt.status);
 

@@ -7,7 +7,6 @@
 package com.bernardo.figueiredo.cow.api.apiconfiguration.boundary;
 
 import java.util.Collections;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;

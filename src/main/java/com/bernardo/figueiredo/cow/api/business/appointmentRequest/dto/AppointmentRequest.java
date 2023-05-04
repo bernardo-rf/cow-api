@@ -8,20 +8,19 @@ package com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto;
 
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.Appointment;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
-
 @Entity
-@Table(name="COW_AppointmentRequest")
+@Table(name = "COW_AppointmentRequest")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -48,7 +47,7 @@ public class AppointmentRequest implements Serializable {
     private Bovine bovine;
 
     @OneToOne
-    @JoinColumn(name="id_appointment")
+    @JoinColumn(name = "id_appointment")
     private Appointment appointment;
 
     @Column(nullable = false)
@@ -61,8 +60,8 @@ public class AppointmentRequest implements Serializable {
     @Column(nullable = false)
     private int appointmentRequestStatus;
 
-    public AppointmentRequest(User user, User userRequest, Bovine bovine, Date appointmentRequestDate, String motive,
-                              int status ) {
+    public AppointmentRequest(
+            User user, User userRequest, Bovine bovine, Date appointmentRequestDate, String motive, int status) {
         this.user = user;
         this.userRequest = userRequest;
         this.bovine = bovine;

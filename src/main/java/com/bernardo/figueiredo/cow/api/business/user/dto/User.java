@@ -7,26 +7,25 @@
 package com.bernardo.figueiredo.cow.api.business.user.dto;
 
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.Appointment;
+import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
+import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
-import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
-@Table(name="COW_User")
+@Table(name = "COW_User")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -50,7 +49,7 @@ public class User implements Serializable {
     @JsonBackReference
     private UserType userType;
 
-    @Column(nullable = false, length=15)
+    @Column(nullable = false, length = 15)
     @Nationalized
     private String name;
 
@@ -93,8 +92,18 @@ public class User implements Serializable {
     @JsonManagedReference
     private Set<Field> fieldSet = new HashSet<>();
 
-    public User(String idContract, String idWallet, UserType userType, String name, Date birthDate, String email,
-                String password, Boolean active, Double balance, String fullName, String imageCID) {
+    public User(
+            String idContract,
+            String idWallet,
+            UserType userType,
+            String name,
+            Date birthDate,
+            String email,
+            String password,
+            Boolean active,
+            Double balance,
+            String fullName,
+            String imageCID) {
         this.idContract = idContract;
         this.idWallet = idWallet;
         this.userType = userType;

@@ -11,11 +11,10 @@ import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionDTO;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionFullInfoDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -44,8 +43,8 @@ public class AuctionController {
     @ApiOperation("Get auction by auction id")
     public ResponseEntity<AuctionFullInfoDTO> getAllAuctionsByIDAuction(@PathVariable long auctionID) throws Exception {
         try {
-            AuctionFullInfoDTO auctionDTO =  auctionService.getAuction(auctionID);
-            if (auctionDTO.getIdAuction() == 0){
+            AuctionFullInfoDTO auctionDTO = auctionService.getAuction(auctionID);
+            if (auctionDTO.getIdAuction() == 0) {
                 return ResponseEntity.status(404).build();
             }
             return ResponseEntity.ok(auctionDTO);
@@ -72,8 +71,8 @@ public class AuctionController {
 
     @PutMapping("/{auctionID}")
     @ApiOperation("Update a auction")
-    public ResponseEntity<AuctionDTO> updateAuction(@PathVariable long auctionID,
-                                                    @RequestBody AuctionDTO auctionDTO) throws Exception {
+    public ResponseEntity<AuctionDTO> updateAuction(@PathVariable long auctionID, @RequestBody AuctionDTO auctionDTO)
+            throws Exception {
         try {
             if (auctionID != auctionDTO.getIdAuction()) {
                 return ResponseEntity.status(409).build();
@@ -93,7 +92,8 @@ public class AuctionController {
 
     @PutMapping("/{auctionID}/status")
     @ApiOperation("Update a auction status")
-    public ResponseEntity<AuctionDTO> updateAuctionStatus(@PathVariable long auctionID, @RequestParam int status ) throws Exception {
+    public ResponseEntity<AuctionDTO> updateAuctionStatus(@PathVariable long auctionID, @RequestParam int status)
+            throws Exception {
         try {
             AuctionDTO updatedAuctionDTO = auctionService.updateAuctionStatus(auctionID, status);
             if (updatedAuctionDTO.getIdAuction() == 999999) {

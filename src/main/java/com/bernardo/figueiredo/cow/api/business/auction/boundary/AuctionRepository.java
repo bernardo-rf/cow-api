@@ -7,10 +7,9 @@
 package com.bernardo.figueiredo.cow.api.business.auction.boundary;
 
 import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
@@ -19,5 +18,4 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     @Query("SELECT a FROM Auction a WHERE a.idAuction = :idAuction")
     Auction getAuctionByIDAuction(long idAuction);
-
 }

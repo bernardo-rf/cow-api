@@ -6,20 +6,19 @@
 
 package com.bernardo.figueiredo.cow.api.business.field_history.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
-
 @Entity
-@Table(name="COW_FieldHistory")
+@Table(name = "COW_FieldHistory")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -44,7 +43,7 @@ public class FieldHistory implements Serializable {
 
     public FieldHistory(Field field, Bovine bovine, Date switchDate) {
         this.field = field;
-        this.bovine=bovine;
-        this.switchDate=switchDate;
+        this.bovine = bovine;
+        this.switchDate = switchDate;
     }
 }

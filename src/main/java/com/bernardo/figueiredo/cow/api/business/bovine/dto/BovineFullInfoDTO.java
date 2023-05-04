@@ -8,13 +8,12 @@ package com.bernardo.figueiredo.cow.api.business.bovine.dto;
 
 import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
+import java.time.LocalDate;
+import java.time.Period;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.time.Period;
 
 @Getter
 @Setter
@@ -39,10 +38,23 @@ public class BovineFullInfoDTO {
     private String age;
     private String imageCID;
 
-    public BovineFullInfoDTO(long idBovine, String idContract, User user, Field field, long serialNumber,
-                             String birthDate, Double weight, Double height, String breed, String color, Boolean active,
-                             String observation, long idBovineParent1, long idBovineParent2,
-                             boolean gender, String imageCID) {
+    public BovineFullInfoDTO(
+            long idBovine,
+            String idContract,
+            User user,
+            Field field,
+            long serialNumber,
+            String birthDate,
+            Double weight,
+            Double height,
+            String breed,
+            String color,
+            Boolean active,
+            String observation,
+            long idBovineParent1,
+            long idBovineParent2,
+            boolean gender,
+            String imageCID) {
         this.idBovine = idBovine;
         this.idContract = idContract;
         this.user = user;
@@ -71,8 +83,8 @@ public class BovineFullInfoDTO {
                 this.age = age + " days";
             }
         }
-        if(age == 1){
-            this.age = this.age.substring(0, this.age.length()-1);
+        if (age == 1) {
+            this.age = this.age.substring(0, this.age.length() - 1);
         }
     }
 }

@@ -11,11 +11,10 @@ import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistoryDT
 import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistoryFullInfoDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(maxAge = 3600)
@@ -32,44 +31,44 @@ public class FieldHistoryController {
 
     @GetMapping("/{bovineId}")
     @ApiOperation("Get all fields history records by bovine id")
-    public ResponseEntity<List<FieldHistoryFullInfoDTO>> getFieldsFullInfo(@PathVariable long bovineId) throws Exception {
+    public ResponseEntity<List<FieldHistoryFullInfoDTO>> getFieldsFullInfo(@PathVariable long bovineId)
+            throws Exception {
         try {
             return ResponseEntity.ok(fieldHistoryService.getFieldHistoryListFullInfoByIdBovine(bovineId));
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("ERROR: ", e);
         }
     }
 
     @PostMapping("/")
     @ApiOperation("Create a field history record")
-    public ResponseEntity<FieldHistoryDTO> createFieldHistory(@RequestBody FieldHistoryCreatedDTO fieldHistoryCreatedDTO)
-            throws Exception {
+    public ResponseEntity<FieldHistoryDTO> createFieldHistory(
+            @RequestBody FieldHistoryCreatedDTO fieldHistoryCreatedDTO) throws Exception {
         try {
             FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(fieldHistoryCreatedDTO);
-            if (fieldHistoryDTO.getIdField() != 0){
+            if (fieldHistoryDTO.getIdField() != 0) {
                 return ResponseEntity.ok(fieldHistoryDTO);
             }
             return ResponseEntity.status(404).build();
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new Exception("ERROR: ", e);
         }
     }
 
     @PutMapping("/{fieldHistoryId}")
     @ApiOperation("Update a field history record")
-    public ResponseEntity<FieldHistoryDTO> updateField( @PathVariable long fieldHistoryId,
-                                                        @RequestBody FieldHistoryDTO fieldHistoryDTO )
-            throws Exception {
+    public ResponseEntity<FieldHistoryDTO> updateField(
+            @PathVariable long fieldHistoryId, @RequestBody FieldHistoryDTO fieldHistoryDTO) throws Exception {
         try {
-            if(fieldHistoryId == fieldHistoryDTO.getIdFieldHistory()){
+            if (fieldHistoryId == fieldHistoryDTO.getIdFieldHistory()) {
                 FieldHistoryDTO updatedFieldDTO = fieldHistoryService.updateFieldHistory(fieldHistoryDTO);
-                if (updatedFieldDTO.getIdField() != 0){
+                if (updatedFieldDTO.getIdField() != 0) {
                     return ResponseEntity.ok(updatedFieldDTO);
                 }
                 return ResponseEntity.status(404).build();
             }
             return ResponseEntity.status(409).build();
-        } catch  (Exception e){
+        } catch (Exception e) {
             throw new Exception("ERROR: ", e);
         }
     }
