@@ -24,7 +24,7 @@ public class CowAPI {
     }
 
     @Bean
-    public CommandLineRunner demoData(UserTypeRepository userTypeRepository) {
+    public CommandLineRunner onStart(UserTypeRepository userTypeRepository) {
         return args -> {
             List<UserType> userTypes = userTypeRepository.getAllUserTypes();
             if (userTypes.isEmpty()) {
