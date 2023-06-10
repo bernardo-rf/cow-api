@@ -12,6 +12,8 @@ import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +29,9 @@ public class AppointmentController {
     @Autowired
     private AppointmentMapper appointmentMapper;
 
-    public AppointmentController(AppointmentService appointmentService) {
-        this.appointmentService = appointmentService;
+    public AppointmentController() {
+        this.appointmentService = new AppointmentService();
+        this.appointmentMapper = new AppointmentMapper(new ModelMapper());
     }
 
     @GetMapping("/{id}")
@@ -85,10 +88,10 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentMapper.mapEntityToDTO(appointment));
     }
 
-    //    @DeleteMapping("/{id}")
-    //    @ApiOperation("Delete appointment")
-    //    public ResponseEntity<String> deleteAppointment(@PathVariable long id) {
-    //        Appointment appointment = appointmentService.deleteAppointment(id);
-    //        return ResponseEntity.ok("Operation done with success.");
-    //    }
+    @DeleteMapping("/{id}")
+    @ApiOperation("Delete appointment")
+    public ResponseEntity<String> deleteAppointment(@PathVariable long id) {
+        appointmentService.deleteAppointment(id);
+        return ResponseEntity.ok("Appointment deleted with success.");
+    }
 }

@@ -282,31 +282,49 @@ public class AppointmentService extends BaseService {
         return appointmentRepository.save(appointment);
     }
 
-    //        public boolean deleteAppointment(long id) {
-    //            try {
-    //                PrivateKey operatorKey = EnvUtils.getOperatorKey();
-    //                client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
-    //
-    //                if (client.getOperatorAccountId() != null) {
-    //                    Appointment appointmentToDelete = appointmentRepository.getAppointment(idAppointmentRequest);
-    //
-    //                    ContractDeleteTransaction transaction = new ContractDeleteTransaction()
-    //                            .setTransferAccountId(client.getOperatorAccountId())
-    //                            .setContractId(ContractId.fromString(appointmentToDelete.getIdContract()));
-    //
-    //                    TransactionResponse txResponse =
-    //                            transaction.freezeWith(client).sign(operatorKey).execute(client);
-    //                    TransactionReceipt receipt = txResponse.getReceipt(client);
-    //                    Logger.getLogger("STATUS:" + receipt.status);
-    //
-    //                    if (appointmentToDelete.getIdAppointment() != 0) {
-    //                        appointmentRepository.delete(appointmentToDelete);
-    //                        return true;
-    //                    }
-    //                }
-    //            } catch (Exception e) {
-    //                e.printStackTrace();
-    //            }
-    //            return false;
-    //        }
+    public void deleteAppointment(long id) {
+
+        Appointment deleteAppointment = appointmentRepository.getAppointmentById(id);
+        if (deleteAppointment == null) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_NOT_FOUND);
+        }
+
+        HederaReceipt receipt;
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getAppointmentDeleteReceipt(client, deleteAppointment.getIdContract());
+
+            validateReceiptStatus(receipt);
+
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        appointmentRepository.delete(deleteAppointment);
+    }
+
+    private HederaReceipt getAppointmentDeleteReceipt(Client client, String appointmentContract)
+            throws TimeoutException {
+        try {
+            return buildAppointmentDeleteReceipt(client, appointmentContract);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
+        }
+    }
+
+    private HederaReceipt buildAppointmentDeleteReceipt(Client client, String appointmentContractId)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractDeleteTransaction contractDeleteTransaction = new ContractDeleteTransaction()
+                .setTransferAccountId(EnvUtils.getOperatorId())
+                .setContractId(ContractId.fromString(appointmentContractId));
+
+        return freezeWithSignExecute(client, EnvUtils.getOperatorKey(), contractDeleteTransaction);
+    }
 }
