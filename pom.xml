@@ -25,6 +25,7 @@
         <jwt.api.version>0.11.5</jwt.api.version>
         <lombok.project.version>1.18.22</lombok.project.version>
         <mariadb.jdbc.version>3.1.4</mariadb.jdbc.version>
+        <model.mapper.version>3.1.0</model.mapper.version>
         <springfox.boot.version>3.0.0</springfox.boot.version>
         <springfox.swagger.version>3.0.0</springfox.swagger.version>
     </properties>
@@ -87,6 +88,11 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>${hibernate-validator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>${model.mapper.version}</version>
         </dependency>
     </dependencies>
 
