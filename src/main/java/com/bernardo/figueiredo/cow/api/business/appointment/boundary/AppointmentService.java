@@ -82,17 +82,6 @@ public class AppointmentService extends BaseService {
         return appointments;
     }
 
-    public List<Appointment> getAppointmentsByUserAddress(String address) {
-
-        List<Appointment> appointments = appointmentRepository.getAppointmentsByUserAddress(address);
-
-        if (appointments.isEmpty()) {
-            throw new ErrorCodeException(ErrorCode.APPOINTMENT_BOVINE_NOT_FOUND);
-        }
-
-        return appointments;
-    }
-
     public List<Appointment> createAppointment(AppointmentCreateDTO appointmentCreateDTO) {
 
         HederaReceipt receipt;
@@ -120,7 +109,6 @@ public class AppointmentService extends BaseService {
                 Bovine bovine = bovineService.getBovineById(bovineId);
 
                 Appointment newAppointment = new Appointment();
-                newAppointment.setIdContract(receipt.getContractId().toString());
                 newAppointment.setAppointmentRequest(null);
                 newAppointment.setBovine(bovine);
                 newAppointment.setUser(user);
@@ -131,6 +119,7 @@ public class AppointmentService extends BaseService {
                 newAppointment.setObservation(appointmentCreateDTO.getObservation());
 
                 receipt = getAppointmentDeployReceipt(client, fileId, newAppointment);
+                newAppointment.setIdContract(receipt.getContractId().toString());
 
                 validateReceiptStatus(receipt);
 
@@ -235,7 +224,7 @@ public class AppointmentService extends BaseService {
         updateAppointment.setAppointmentType(updateAppointmentDTO.getAppointmentType());
         updateAppointment.setCost(updateAppointmentDTO.getCost());
         updateAppointment.setObservation(updateAppointmentDTO.getObservation());
-        updateAppointment.setAppointmentStatus(updateAppointmentDTO.getStatus());
+        updateAppointment.setAppointmentStatus(updateAppointmentDTO.getAppointmentStatus());
 
         return appointmentRepository.save(updateAppointment);
     }

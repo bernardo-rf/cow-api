@@ -12,8 +12,6 @@ import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +29,6 @@ public class AppointmentController {
 
     public AppointmentController() {
         this.appointmentService = new AppointmentService();
-        this.appointmentMapper = new AppointmentMapper(new ModelMapper());
     }
 
     @GetMapping("/{id}")
@@ -53,14 +50,6 @@ public class AppointmentController {
     @ApiOperation("Get appointments by user id")
     public ResponseEntity<List<AppointmentDTO>> getAppointmentByUserId(@PathVariable long id) {
         List<Appointment> appointments = appointmentService.getAppointmentsByUserId(id);
-        return ResponseEntity.ok(appointmentMapper.mapSourceListToTargetList(appointments));
-    }
-
-    @GetMapping("/user/{userAddress}")
-    @ApiOperation("Get appointments by user address")
-    public ResponseEntity<List<AppointmentDTO>> getAppointmentsByUserAddress(@PathVariable String userAddress) {
-
-        List<Appointment> appointments = appointmentService.getAppointmentsByUserAddress(userAddress);
         return ResponseEntity.ok(appointmentMapper.mapSourceListToTargetList(appointments));
     }
 

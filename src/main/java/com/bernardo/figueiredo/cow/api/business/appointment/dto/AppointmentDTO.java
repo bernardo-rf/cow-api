@@ -25,19 +25,5 @@ public class AppointmentDTO {
     private String appointmentType;
     private Double cost;
     private String observation;
-    private int status;
-
-    public AppointmentDTO convertToDTO(Appointment appointment) {
-        return new AppointmentDTO(
-                appointment.getIdAppointment(),
-                appointment.getIdContract(),
-                appointment.getAppointmentRequest().getIdAppointmentRequest(),
-                appointment.getBovine().getIdBovine(),
-                appointment.getUser().getIdUser(),
-                appointment.getAppointmentDate().toString(),
-                appointment.getAppointmentType(),
-                appointment.getCost(),
-                appointment.getObservation(),
-                appointment.getAppointmentStatus());
-    }
+    private int appointmentStatus;
 }

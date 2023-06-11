@@ -41,6 +41,6 @@ public interface BovineRepository extends JpaRepository<Bovine, Long> {
             nativeQuery = true)
     List<Bovine> getGenealogy(long idBovine);
 
-    @Query("SELECT b FROM Bovine b WHERE b.idBovine = :idBovine ORDER BY b.idBovine ASC")
+    @Query("SELECT b FROM Bovine b WHERE b.idBovine = :id and b.active = true ORDER BY b.idBovine ASC")
     Bovine getBovineById(long id);
 }
