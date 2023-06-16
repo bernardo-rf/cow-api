@@ -31,8 +31,8 @@ public enum ErrorCode {
             10, HttpStatus.BAD_REQUEST, "Hedera Error: Registering Appointment on Hedera."),
     APPOINTMENT_NOT_FOUND(11, HttpStatus.NOT_FOUND, "Error: No appointment record found."),
     APPOINTMENT_BOVINE_NOT_FOUND(12, HttpStatus.NOT_FOUND, "No appointment records found for bovine."),
-    APPOINTMENT_DEPLOY_FAILED(13, HttpStatus.NOT_FOUND, "Hedera Error:  Appointment deploy failed."),
-    APPOINTMENT_UPDATE_FAILED(14, HttpStatus.NOT_FOUND, "Error: Appointment update failed."),
+    APPOINTMENT_DEPLOY_FAILED(13, HttpStatus.BAD_REQUEST, "Hedera Error:  Appointment deploy failed."),
+    APPOINTMENT_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Error: Appointment update failed."),
     USER_NOT_FOUND(15, HttpStatus.NOT_FOUND, "Error: No user record found."),
     BOVINE_NOT_FOUND(16, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
 

@@ -66,11 +66,11 @@ public class Field implements Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "field")
     @JsonManagedReference
-    private Set<Bovine> bovineSet = new HashSet();
+    private Set<Bovine> bovineSet = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "field")
     @JsonManagedReference
-    private Set<FieldHistory> fieldHistorySet = new HashSet();
+    private Set<FieldHistory> fieldHistorySet = new HashSet<>();
 
     public Field(
             String idContract,

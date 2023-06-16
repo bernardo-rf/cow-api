@@ -84,9 +84,9 @@ public class AppointmentService extends BaseService {
 
     public List<Appointment> createAppointment(AppointmentCreateDTO appointmentCreateDTO) {
 
+        List<Appointment> newAppointments = new ArrayList<>();
         HederaReceipt receipt;
         FileId fileId;
-        List<Appointment> newAppointments = new ArrayList<>();
 
         User user = userService.getUserById(appointmentCreateDTO.getIdUser());
 
