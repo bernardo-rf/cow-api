@@ -6,6 +6,8 @@
 
 package com.bernardo.figueiredo.cow.api.business.bovine.boundary;
 
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCodeException;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.*;
 import com.bernardo.figueiredo.cow.api.business.field.boundary.FieldRepository;
 import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
@@ -84,6 +86,16 @@ public class BovineService {
                 bovine.getBovineParent2() != null ? bovine.getBovineParent2().getIdBovine() : 0,
                 bovine.isGender(),
                 bovine.getImageCID());
+    }
+
+    public Bovine getBovineById(long id) {
+        Bovine bovine = bovineRepository.getBovineById(id);
+
+        if (bovine == null) {
+            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
+        }
+
+        return bovine;
     }
 
     public Bovine convertToEntity(BovineCreateDTO bovineDTO, String idContract) {

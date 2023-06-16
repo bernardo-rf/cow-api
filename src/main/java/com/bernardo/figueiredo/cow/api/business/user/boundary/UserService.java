@@ -6,6 +6,8 @@
 
 package com.bernardo.figueiredo.cow.api.business.user.boundary;
 
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCodeException;
 import com.bernardo.figueiredo.cow.api.business.user.dto.*;
 import com.bernardo.figueiredo.cow.api.business.user_type.boundary.UserTypeRepository;
 import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
@@ -61,6 +63,16 @@ public class UserService {
                 user.getBalance(),
                 user.getFullName(),
                 user.getImageCID());
+    }
+
+    public User getUserById(long id) {
+        User user = userRepository.getUser(id);
+
+        if (user == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return user;
     }
 
     public UserFullInfoDTO getUserFullInfo(long idUser) {

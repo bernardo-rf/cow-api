@@ -25,5 +25,5 @@ public class AppointmentDTO {
     private String appointmentType;
     private Double cost;
     private String observation;
-    private int status;
+    private int appointmentStatus;
 }

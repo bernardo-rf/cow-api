@@ -8,7 +8,6 @@ package com.bernardo.figueiredo.cow.api.business.appointmentRequest.boundary;
 
 import com.bernardo.figueiredo.cow.api.business.appointment.boundary.AppointmentService;
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentCreateDTO;
-import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentDTO;
 import com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto.*;
 import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineRepository;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
@@ -181,10 +180,8 @@ public class AppointmentRequestService {
                             "",
                             0,
                             bovineIds);
-                    AppointmentDTO appointmentDTO = appointmentService.createAppointment(appointmentCreateDTO);
-                    if (appointmentDTO.getIdAppointment() != 0) {
-                        return convertToDTO(appointmentRequest);
-                    }
+
+                    return convertToDTO(appointmentRequest);
                 }
                 return convertToDTO(appointmentRequest);
             }

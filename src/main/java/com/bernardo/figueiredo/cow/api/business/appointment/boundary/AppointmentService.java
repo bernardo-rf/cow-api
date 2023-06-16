@@ -6,297 +6,314 @@
 
 package com.bernardo.figueiredo.cow.api.business.appointment.boundary;
 
+import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.*;
+
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseByteCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseService;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCodeException;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaReceipt;
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.Appointment;
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentDTO;
-import com.bernardo.figueiredo.cow.api.business.appointment.dto.AppointmentFullInfoDTO;
-import com.bernardo.figueiredo.cow.api.business.appointmentRequest.boundary.AppointmentRequestRepository;
-import com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto.AppointmentRequest;
-import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineRepository;
+import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineService;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
-import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
+import com.bernardo.figueiredo.cow.api.business.user.boundary.UserService;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.hedera.hashgraph.sdk.*;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AppointmentService {
+public class AppointmentService extends BaseService {
 
     @Autowired
     AppointmentRepository appointmentRepository;
 
     @Autowired
-    AppointmentRequestRepository appointmentRequestRepository;
+    BaseByteCode baseByteCode;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @Autowired
-    BovineRepository bovineRepository;
+    BovineService bovineService;
 
-    public Client client = Client.forTestnet();
-    private PrivateKey operatorKey = EnvUtils.getOperatorKey();
+    public Appointment getAppointmentById(long id) {
 
-    public AppointmentDTO convertToDTO(Appointment appointment) {
-        return new AppointmentDTO(
-                appointment.getIdAppointment(),
-                appointment.getIdContract(),
-                appointment.getAppointmentRequest().getIdAppointmentRequest(),
-                appointment.getBovine().getIdBovine(),
-                appointment.getUser().getIdUser(),
-                appointment.getAppointmentDate().toString(),
-                appointment.getAppointmentType(),
-                appointment.getCost(),
-                appointment.getObservation(),
-                appointment.getAppointmentStatus());
-    }
+        Appointment appointment = appointmentRepository.getAppointmentById(id);
 
-    public AppointmentFullInfoDTO convertFullInfoToDTO(Appointment appointment, long serialNumber) {
-        return new AppointmentFullInfoDTO(
-                appointment.getIdAppointment(),
-                appointment.getIdContract(),
-                appointment.getAppointmentRequest().getIdAppointmentRequest(),
-                appointment.getBovine().getIdBovine(),
-                appointment.getUser().getIdUser(),
-                appointment.getAppointmentDate().toString(),
-                appointment.getAppointmentType(),
-                appointment.getCost(),
-                appointment.getObservation(),
-                serialNumber,
-                appointment.getAppointmentStatus());
-    }
-
-    public List<AppointmentFullInfoDTO> getAppointments(List<Appointment> appointmentList) {
-        List<AppointmentFullInfoDTO> appointmentDTOList = new ArrayList<>();
-        if (!appointmentList.isEmpty()) {
-            for (Appointment appointment : appointmentList) {
-                Bovine bovine =
-                        bovineRepository.getBovine(appointment.getBovine().getIdBovine());
-                appointmentDTOList.add(convertFullInfoToDTO(appointment, bovine.getSerialNumber()));
-            }
-            return appointmentDTOList;
+        if (appointment == null) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_NOT_FOUND);
         }
-        return appointmentDTOList;
+
+        return appointment;
     }
 
-    public boolean checkAppointmentValues(long idUser, long idBovine) {
-        User user = userRepository.getUser(idUser);
-        if (user != null) {
-            Bovine bovine = bovineRepository.getBovine(idBovine);
-            if (bovine != null) {
-                return bovine.getIdBovine() != 0;
-            }
+    public List<Appointment> getAppointmentsByBovineId(long id) {
+
+        List<Appointment> appointments = appointmentRepository.getAppointmentsByBovineId(id);
+
+        if (appointments.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_BOVINE_NOT_FOUND);
         }
-        return false;
+
+        return appointments;
     }
 
-    public AppointmentDTO createAppointment(AppointmentCreateDTO appointmentCreateDTO) {
-        AppointmentDTO appointmentDTO = new AppointmentDTO();
-        try {
-            Appointment newAppointment = new Appointment();
-            List<Bovine> bovines = new ArrayList<>();
+    public List<Appointment> getAppointmentsByUserId(long id) {
 
-            for (int i : appointmentCreateDTO.getBovineIds()) {
-                Bovine bovine = bovineRepository.getBovine(i);
-                bovines.add(bovine);
-            }
+        List<Appointment> appointments = appointmentRepository.getAppointmentsByUserId(id);
 
-            for (Bovine bovine : bovines) {
-                File myObj = new File(EnvUtils.getProjectPath() + "appointment/Appointment.bin");
-                Scanner myReader = new Scanner(myObj);
+        if (appointments.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_BOVINE_NOT_FOUND);
+        }
 
-                if (checkAppointmentValues(appointmentCreateDTO.getIdUser(), bovine.getIdBovine())) {
-                    while (myReader.hasNextLine()) {
-                        client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+        return appointments;
+    }
 
-                        String objectByteCode = myReader.nextLine();
-                        byte[] bytecode = objectByteCode.getBytes(StandardCharsets.UTF_8);
+    public List<Appointment> createAppointment(AppointmentCreateDTO appointmentCreateDTO) {
 
-                        TransactionResponse fileCreateTx = new FileCreateTransaction()
-                                .setKeys(operatorKey)
-                                .freezeWith(client)
-                                .execute(client);
+        List<Appointment> newAppointments = new ArrayList<>();
+        HederaReceipt receipt;
+        FileId fileId;
 
-                        TransactionReceipt fileReceipt1 = fileCreateTx.getReceipt(client);
-                        FileId bytecodeFileId = fileReceipt1.fileId;
+        User user = userService.getUserById(appointmentCreateDTO.getIdUser());
 
-                        if (bytecodeFileId != null) {
-                            TransactionResponse fileAppendTransaction = new FileAppendTransaction()
-                                    .setFileId(bytecodeFileId)
-                                    .setContents(bytecode)
-                                    .setMaxChunks(10)
-                                    .setMaxTransactionFee(new Hbar(2))
-                                    .execute(client);
+        try (Client client = getHederaClient()) {
 
-                            TransactionReceipt fileReceipt2 = fileAppendTransaction.getReceipt(client);
-                            Logger.getLogger("Contract Created =" + fileReceipt2);
+            validateClientInstance(client);
 
-                            TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
-                                    .setBytecodeFileId(bytecodeFileId)
-                                    .setGas(300000)
-                                    .setAdminKey(operatorKey)
-                                    .setConstructorParameters(new ContractFunctionParameters()
-                                            .addUint256(BigInteger.valueOf(bovine.getIdBovine()))
-                                            .addUint256(BigInteger.valueOf(appointmentCreateDTO.getIdUser()))
-                                            .addUint256(BigInteger.valueOf(appointmentCreateDTO
-                                                    .getAppointmentDate()
-                                                    .getTime()))
-                                            .addString(appointmentCreateDTO.getAppointmentType())
-                                            .addUint256(BigDecimal.valueOf(appointmentCreateDTO.getCost())
-                                                    .toBigInteger())
-                                            .addString(appointmentCreateDTO.getObservation()))
-                                    .execute(client);
+            receipt = getHederaContractFile(client);
 
-                            TransactionReceipt fileReceipt3 = contractCreateTransaction.getReceipt(client);
-                            Logger.getLogger("Contract Filled " + fileReceipt3.contractId);
+            validateReceiptStatus(receipt);
 
-                            ContractId contractId = fileReceipt3.contractId;
+            fileId = receipt.getFileId();
 
-                            if (contractId != null) {
-                                User user = userRepository.getUser(appointmentCreateDTO.getIdUser());
-                                if (user != null) {
-                                    AppointmentRequest appointmentRequest =
-                                            appointmentRequestRepository.getAppointmentRequest(
-                                                    appointmentCreateDTO.getIdAppointmentRequest());
-                                    if (appointmentRequest != null) {
-                                        newAppointment = new Appointment(
-                                                contractId.toString(),
-                                                appointmentRequest,
-                                                bovine,
-                                                user,
-                                                appointmentCreateDTO.getAppointmentDate(),
-                                                appointmentCreateDTO.getAppointmentType(),
-                                                appointmentCreateDTO.getCost(),
-                                                appointmentCreateDTO.getObservation(),
-                                                appointmentCreateDTO.getStatus());
-                                        appointmentRepository.save(newAppointment);
-                                    }
-                                }
-                            }
-                        }
-                    }
+            receipt = getHederaContractFileAppend(client, fileId, baseByteCode.getAppointmentByteCode(), 15, 2);
+
+            validateReceiptStatus(receipt);
+
+            for (long bovineId : appointmentCreateDTO.getBovineIds()) {
+
+                Bovine bovine = bovineService.getBovineById(bovineId);
+
+                Appointment newAppointment = new Appointment();
+                newAppointment.setAppointmentRequest(null);
+                newAppointment.setBovine(bovine);
+                newAppointment.setUser(user);
+                newAppointment.setAppointmentDate(appointmentCreateDTO.getAppointmentDate());
+                newAppointment.setCost(appointmentCreateDTO.getCost());
+                newAppointment.setAppointmentType(appointmentCreateDTO.getAppointmentType());
+                newAppointment.setAppointmentStatus(appointmentCreateDTO.getStatus());
+                newAppointment.setObservation(appointmentCreateDTO.getObservation());
+
+                receipt = getAppointmentDeployReceipt(client, fileId, newAppointment);
+                newAppointment.setIdContract(receipt.getContractId().toString());
+
+                validateReceiptStatus(receipt);
+
+                if (receipt.getContractId() == null) {
+                    throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
                 }
+
+                Appointment savedAppointment = appointmentRepository.save(newAppointment);
+                newAppointments.add(savedAppointment);
             }
-            appointmentDTO = convertToDTO(newAppointment);
-            if (appointmentDTO.getIdAppointment() != 0) {
-                return appointmentDTO;
-            }
-        } catch (FileNotFoundException | TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
-            e.printStackTrace();
+
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
         }
-        return appointmentDTO;
+
+        return newAppointments;
     }
 
-    public AppointmentDTO updateAppointment(AppointmentDTO appointmentDTO) {
-        AppointmentDTO emptyAppointmentDTO = new AppointmentDTO();
+    private HederaReceipt getAppointmentDeployReceipt(Client client, FileId fileId, Appointment appointment)
+            throws TimeoutException {
         try {
-            if (checkAppointmentValues(appointmentDTO.getIdUser(), appointmentDTO.getIdBovine())) {
-                client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
-
-                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-                Date appointmentDate = formatter.parse(appointmentDTO.getAppointmentDate());
-
-                TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
-                        .setContractId(ContractId.fromString(appointmentDTO.getIdContract()))
-                        .setGas(3000000)
-                        .setFunction(
-                                "setUpdate",
-                                new ContractFunctionParameters()
-                                        .addUint256(BigInteger.valueOf(appointmentDTO.getIdBovine()))
-                                        .addUint256(BigInteger.valueOf(appointmentDTO.getIdUser()))
-                                        .addUint256(BigInteger.valueOf(appointmentDate.getTime())))
-                        .execute(client);
-
-                TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
-                Logger.getLogger("Status " + fileReceipt.status);
-
-                Appointment appointment = appointmentRepository.getAppointment(appointmentDTO.getIdAppointment());
-                if (appointment != null) {
-                    Bovine bovine = bovineRepository.getBovine(appointmentDTO.getIdBovine());
-                    if (bovine != null) {
-                        User user = userRepository.getUser(appointmentDTO.getIdUser());
-                        if (user != null) {
-                            if (appointmentDTO.getIdAppointmentRequest() != 0) {
-                                AppointmentRequest appointmentRequest =
-                                        appointmentRequestRepository.getAppointmentRequest(
-                                                appointmentDTO.getIdAppointmentRequest());
-                                appointment.setAppointmentRequest(appointmentRequest);
-                            }
-                            appointment.setBovine(bovine);
-                            appointment.setUser(user);
-                            appointment.setAppointmentDate(appointmentDate);
-                            appointment.setAppointmentType(appointmentDTO.getAppointmentType());
-                            appointment.setCost(appointmentDTO.getCost());
-                            appointment.setObservation(appointmentDTO.getObservation());
-                            appointment.setAppointmentStatus(appointmentDTO.getStatus());
-                            appointmentRepository.save(appointment);
-                            return convertToDTO(appointment);
-                        }
-                    }
-                }
-            }
-        } catch (TimeoutException | PrecheckStatusException | ReceiptStatusException | ParseException e) {
-            e.printStackTrace();
+            return buildAppointmentDeployReceipt(client, fileId, appointment);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
         }
-        return emptyAppointmentDTO;
     }
 
-    public AppointmentDTO updateAppointmentStatus(long idAppointment, int status) {
-        try {
-            Appointment appointment = appointmentRepository.getAppointment(idAppointment);
-            if (appointment != null) {
-                appointment.setAppointmentStatus(status);
-                appointmentRepository.save(appointment);
+    private HederaReceipt buildAppointmentDeployReceipt(
+            Client client, FileId byteCodeFileId, Appointment newAppointment)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
-                return convertToDTO(appointment);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new AppointmentDTO();
+        ContractCreateTransaction contractCreateTransaction = new ContractCreateTransaction()
+                .setBytecodeFileId(byteCodeFileId)
+                .setGas(300_000)
+                .setAdminKey(EnvUtils.getOperatorKey())
+                .setConstructorParameters(new ContractFunctionParameters()
+                        .addUint256(
+                                BigInteger.valueOf(newAppointment.getBovine().getIdBovine()))
+                        .addUint256(BigInteger.valueOf(newAppointment.getUser().getIdUser()))
+                        .addUint256(BigInteger.valueOf(
+                                newAppointment.getAppointmentDate().getTime()))
+                        .addString(newAppointment.getAppointmentType())
+                        .addUint256(BigDecimal.valueOf(newAppointment.getCost()).toBigInteger())
+                        .addString(newAppointment.getObservation()));
+
+        return execute(client, contractCreateTransaction);
     }
 
-    public boolean deleteAppointment(long idAppointmentRequest) {
-        try {
-            PrivateKey operatorKey = EnvUtils.getOperatorKey();
-            client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+    public Appointment updateAppointment(long id, AppointmentDTO updateAppointmentDTO) {
 
-            if (client.getOperatorAccountId() != null) {
-                Appointment appointmentToDelete = appointmentRepository.getAppointment(idAppointmentRequest);
-
-                ContractDeleteTransaction transaction = new ContractDeleteTransaction()
-                        .setTransferAccountId(client.getOperatorAccountId())
-                        .setContractId(ContractId.fromString(appointmentToDelete.getIdContract()));
-
-                TransactionResponse txResponse =
-                        transaction.freezeWith(client).sign(operatorKey).execute(client);
-                TransactionReceipt receipt = txResponse.getReceipt(client);
-                Logger.getLogger("STATUS:" + receipt.status);
-
-                if (appointmentToDelete.getIdAppointment() != 0) {
-                    appointmentRepository.delete(appointmentToDelete);
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        Appointment updateAppointment = appointmentRepository.getAppointmentById(id);
+        if (updateAppointment == null) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_NOT_FOUND);
         }
-        return false;
+
+        User user = userService.getUserById(updateAppointmentDTO.getIdUser());
+        if (user == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        Bovine bovine = bovineService.getBovineById(updateAppointmentDTO.getIdBovine());
+        if (bovineService.getBovineById(updateAppointmentDTO.getIdBovine()) == null) {
+            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
+        }
+
+        Date appointmentDate;
+
+        try {
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            appointmentDate = formatter.parse(updateAppointmentDTO.getAppointmentDate());
+
+        } catch (ParseException e) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_UPDATE_FAILED);
+        }
+
+        HederaReceipt receipt;
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getAppointmentUpdateReceipt(
+                    client, updateAppointment.getIdContract(), updateAppointmentDTO, appointmentDate);
+
+            validateReceiptStatus(receipt);
+
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        updateAppointment.setBovine(bovine);
+        updateAppointment.setUser(user);
+        updateAppointment.setAppointmentDate(appointmentDate);
+        updateAppointment.setAppointmentType(updateAppointmentDTO.getAppointmentType());
+        updateAppointment.setCost(updateAppointmentDTO.getCost());
+        updateAppointment.setObservation(updateAppointmentDTO.getObservation());
+        updateAppointment.setAppointmentStatus(updateAppointmentDTO.getAppointmentStatus());
+
+        return appointmentRepository.save(updateAppointment);
+    }
+
+    private HederaReceipt getAppointmentUpdateReceipt(
+            Client client, String appointmentContract, AppointmentDTO appointmentDTO, Date appointmentDate)
+            throws TimeoutException {
+        try {
+            return buildAppointmentUpdateReceipt(client, appointmentContract, appointmentDTO, appointmentDate);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
+        }
+    }
+
+    private HederaReceipt buildAppointmentUpdateReceipt(
+            Client client, String appointmentContractId, AppointmentDTO appointmentDTO, Date appointmentDate)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractExecuteTransaction contractCreateTransaction = new ContractExecuteTransaction()
+                .setContractId(ContractId.fromString(appointmentContractId))
+                .setGas(300_000)
+                .setFunction(
+                        "setUpdate",
+                        new ContractFunctionParameters()
+                                .addUint256(BigInteger.valueOf(appointmentDTO.getIdBovine()))
+                                .addUint256(BigInteger.valueOf(appointmentDTO.getIdUser()))
+                                .addUint256(BigInteger.valueOf(appointmentDate.getTime())));
+
+        return execute(client, contractCreateTransaction);
+    }
+
+    public Appointment updateAppointmentStatus(long id, int status) {
+
+        Appointment appointment = appointmentRepository.getAppointmentById(id);
+
+        if (appointment == null) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_NOT_FOUND);
+        }
+
+        appointment.setAppointmentStatus(status);
+        return appointmentRepository.save(appointment);
+    }
+
+    public void deleteAppointment(long id) {
+
+        Appointment deleteAppointment = appointmentRepository.getAppointmentById(id);
+        if (deleteAppointment == null) {
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_NOT_FOUND);
+        }
+
+        HederaReceipt receipt;
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getAppointmentDeleteReceipt(client, deleteAppointment.getIdContract());
+
+            validateReceiptStatus(receipt);
+
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        appointmentRepository.delete(deleteAppointment);
+    }
+
+    private HederaReceipt getAppointmentDeleteReceipt(Client client, String appointmentContract)
+            throws TimeoutException {
+        try {
+            return buildAppointmentDeleteReceipt(client, appointmentContract);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
+        }
+    }
+
+    private HederaReceipt buildAppointmentDeleteReceipt(Client client, String appointmentContractId)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractDeleteTransaction contractDeleteTransaction = new ContractDeleteTransaction()
+                .setTransferAccountId(EnvUtils.getOperatorId())
+                .setContractId(ContractId.fromString(appointmentContractId));
+
+        return freezeWithSignExecute(client, EnvUtils.getOperatorKey(), contractDeleteTransaction);
     }
 }
