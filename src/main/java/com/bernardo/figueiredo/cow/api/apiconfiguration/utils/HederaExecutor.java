@@ -34,15 +34,6 @@ public class HederaExecutor {
         return new HederaReceipt(transactionResponse.getReceipt(client));
     }
 
-    public static <T extends Transaction<T>> HederaReceipt signOperatorFreezeWithExecute(
-            Client client, Transaction<T> transaction)
-            throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-
-        TransactionResponse transactionResponse =
-                transaction.signWithOperator(client).freezeWith(client).execute(client);
-        return new HederaReceipt(transactionResponse.getReceipt(client));
-    }
-
     public static <T extends Transaction<T>> HederaReceipt freezeWithSignExecute(
             Client client, PrivateKey submitKey, Transaction<T> transaction)
             throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
