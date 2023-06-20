@@ -13,12 +13,12 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    @Query("SELECT a FROM Appointment a WHERE a.idAppointment = :id ORDER BY a.appointmentDate ASC")
+    @Query("SELECT a FROM Appointment a WHERE a.id = :id ORDER BY a.appointmentDate ASC")
     Appointment getAppointmentById(long id);
 
     @Query("SELECT a FROM Appointment a WHERE a.bovine.idBovine = :id ORDER BY a.appointmentDate ASC")
     List<Appointment> getAppointmentsByBovineId(long id);
 
-    @Query("SELECT a FROM Appointment a WHERE a.user.idUser = :id ORDER BY a.appointmentDate ASC")
+    @Query("SELECT a FROM Appointment a WHERE a.veterinary.idUser = :id ORDER BY a.appointmentDate ASC")
     List<Appointment> getAppointmentsByUserId(long id);
 }

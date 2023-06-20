@@ -16,15 +16,17 @@
     <description>Cow API Project</description>
 
     <properties>
-        <springfox.boot.version>3.0.0</springfox.boot.version>
-        <springfox.swagger.version>3.0.0</springfox.swagger.version>
-        <hedera.sdk.version>2.24.1</hedera.sdk.version>
         <grpc.netty.version>1.46.0</grpc.netty.version>
-        <lombok.project.version>1.18.22</lombok.project.version>
+        <hedera.sdk.version>2.25.0</hedera.sdk.version>
         <hibernate.validator.version>8.0.0.Final</hibernate.validator.version>
         <java.dotenv.version>5.0.1</java.dotenv.version>
         <jwt.api.version>0.11.5</jwt.api.version>
+        <lombok.project.version>1.18.22</lombok.project.version>
         <mariadb.jdbc.version>3.1.4</mariadb.jdbc.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <springfox.boot.version>3.0.0</springfox.boot.version>
+        <springfox.swagger.version>3.0.0</springfox.swagger.version>
     </properties>
 
     <dependencies>

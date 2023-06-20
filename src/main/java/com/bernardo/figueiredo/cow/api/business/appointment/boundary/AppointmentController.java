@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "appointments")
 @Api("Management endpoints to handle appointments")
 @CrossOrigin(maxAge = 3600)
+@SuppressWarnings("unused")
 public class AppointmentController {
     @Autowired
     private final AppointmentService appointmentService;

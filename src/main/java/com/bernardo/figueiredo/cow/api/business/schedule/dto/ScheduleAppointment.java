@@ -4,7 +4,7 @@
  *
  */
 
-package com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto;
+package com.bernardo.figueiredo.cow.api.business.schedule.dto;
 
 import com.bernardo.figueiredo.cow.api.business.appointment.dto.Appointment;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
@@ -20,53 +20,43 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 @Entity
-@Table(name = "COW_AppointmentRequest")
+@Table(name = "COW_ScheduleAppointment")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentRequest implements Serializable {
+public class ScheduleAppointment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idAppointmentRequest;
+    private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user_1", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User user;
+    private User veterinary;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user_2", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User userRequest;
+    private User owner;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_bovine")
     @JsonBackReference
     private Bovine bovine;
 
-    @OneToOne
-    @JoinColumn(name = "id_appointment")
-    private Appointment appointment;
-
     @Column(nullable = false)
-    private Date appointmentRequestDate;
+    private Date scheduleDate;
 
     @Column(nullable = false, length = 50)
     @Nationalized
     private String motive;
 
     @Column(nullable = false)
-    private int appointmentRequestStatus;
+    private int scheduleStatus;
 
-    public AppointmentRequest(
-            User user, User userRequest, Bovine bovine, Date appointmentRequestDate, String motive, int status) {
-        this.user = user;
-        this.userRequest = userRequest;
-        this.bovine = bovine;
-        this.appointmentRequestDate = appointmentRequestDate;
-        this.motive = motive;
-        this.appointmentRequestStatus = status;
-    }
+    @OneToOne
+    @JoinColumn(name = "id_appointment")
+    private Appointment appointment;
 }

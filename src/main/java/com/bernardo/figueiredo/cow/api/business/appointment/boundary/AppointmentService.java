@@ -76,7 +76,7 @@ public class AppointmentService extends BaseService {
         List<Appointment> appointments = appointmentRepository.getAppointmentsByUserId(id);
 
         if (appointments.isEmpty()) {
-            throw new ErrorCodeException(ErrorCode.APPOINTMENT_BOVINE_NOT_FOUND);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_USER_NOT_FOUND);
         }
 
         return appointments;
@@ -88,7 +88,8 @@ public class AppointmentService extends BaseService {
         HederaReceipt receipt;
         FileId fileId;
 
-        User user = userService.getUserById(appointmentCreateDTO.getIdUser());
+        User user = userService.getUserById(appointmentCreateDTO.getIdVeterinary());
+        Bovine bovine = bovineService.getBovineById(appointmentCreateDTO.getIdBovine());
 
         try (Client client = getHederaClient()) {
 
@@ -104,32 +105,27 @@ public class AppointmentService extends BaseService {
 
             validateReceiptStatus(receipt);
 
-            for (long bovineId : appointmentCreateDTO.getBovineIds()) {
+            Appointment newAppointment = new Appointment();
+            newAppointment.setScheduleAppointment(null);
+            newAppointment.setBovine(bovine);
+            newAppointment.setVeterinary(user);
+            newAppointment.setAppointmentDate(appointmentCreateDTO.getAppointmentDate());
+            newAppointment.setCost(appointmentCreateDTO.getCost());
+            newAppointment.setAppointmentType(appointmentCreateDTO.getAppointmentType());
+            newAppointment.setAppointmentStatus(appointmentCreateDTO.getStatus());
+            newAppointment.setObservation(appointmentCreateDTO.getObservation());
 
-                Bovine bovine = bovineService.getBovineById(bovineId);
+            receipt = getAppointmentDeployReceipt(client, fileId, newAppointment);
+            newAppointment.setIdContract(receipt.getContractId().toString());
 
-                Appointment newAppointment = new Appointment();
-                newAppointment.setAppointmentRequest(null);
-                newAppointment.setBovine(bovine);
-                newAppointment.setUser(user);
-                newAppointment.setAppointmentDate(appointmentCreateDTO.getAppointmentDate());
-                newAppointment.setCost(appointmentCreateDTO.getCost());
-                newAppointment.setAppointmentType(appointmentCreateDTO.getAppointmentType());
-                newAppointment.setAppointmentStatus(appointmentCreateDTO.getStatus());
-                newAppointment.setObservation(appointmentCreateDTO.getObservation());
+            validateReceiptStatus(receipt);
 
-                receipt = getAppointmentDeployReceipt(client, fileId, newAppointment);
-                newAppointment.setIdContract(receipt.getContractId().toString());
-
-                validateReceiptStatus(receipt);
-
-                if (receipt.getContractId() == null) {
-                    throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
-                }
-
-                Appointment savedAppointment = appointmentRepository.save(newAppointment);
-                newAppointments.add(savedAppointment);
+            if (receipt.getContractId() == null) {
+                throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
             }
+
+            Appointment savedAppointment = appointmentRepository.save(newAppointment);
+            newAppointments.add(savedAppointment);
 
         } catch (ReceiptStatusException e) {
             validateGas(e);
@@ -166,7 +162,8 @@ public class AppointmentService extends BaseService {
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addUint256(
                                 BigInteger.valueOf(newAppointment.getBovine().getIdBovine()))
-                        .addUint256(BigInteger.valueOf(newAppointment.getUser().getIdUser()))
+                        .addUint256(BigInteger.valueOf(
+                                newAppointment.getVeterinary().getIdUser()))
                         .addUint256(BigInteger.valueOf(
                                 newAppointment.getAppointmentDate().getTime()))
                         .addString(newAppointment.getAppointmentType())
@@ -183,7 +180,7 @@ public class AppointmentService extends BaseService {
             throw new ErrorCodeException(ErrorCode.APPOINTMENT_NOT_FOUND);
         }
 
-        User user = userService.getUserById(updateAppointmentDTO.getIdUser());
+        User user = userService.getUserById(updateAppointmentDTO.getIdVeterinary());
         if (user == null) {
             throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
         }
@@ -219,7 +216,7 @@ public class AppointmentService extends BaseService {
         }
 
         updateAppointment.setBovine(bovine);
-        updateAppointment.setUser(user);
+        updateAppointment.setVeterinary(user);
         updateAppointment.setAppointmentDate(appointmentDate);
         updateAppointment.setAppointmentType(updateAppointmentDTO.getAppointmentType());
         updateAppointment.setCost(updateAppointmentDTO.getCost());
@@ -253,7 +250,7 @@ public class AppointmentService extends BaseService {
                         "setUpdate",
                         new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(appointmentDTO.getIdBovine()))
-                                .addUint256(BigInteger.valueOf(appointmentDTO.getIdUser()))
+                                .addUint256(BigInteger.valueOf(appointmentDTO.getIdVeterinary()))
                                 .addUint256(BigInteger.valueOf(appointmentDate.getTime())));
 
         return execute(client, contractCreateTransaction);

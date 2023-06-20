@@ -4,7 +4,7 @@
  *
  */
 
-package com.bernardo.figueiredo.cow.api.business.appointment.dto;
+package com.bernardo.figueiredo.cow.api.business.schedule.dto;
 
 import java.util.Date;
 import lombok.AllArgsConstructor;
@@ -16,13 +16,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentCreateDTO {
-    private long idAppointmentRequest;
+public class ScheduleAppointmentCreateDTO {
     private long idVeterinary;
+    private long idOwner;
     private long idBovine;
-    private Date appointmentDate;
-    private String appointmentType;
-    private Double cost;
-    private String observation;
-    private int status;
+    private String motive;
+    private Date scheduleDate;
+    private int scheduleStatus;
 }

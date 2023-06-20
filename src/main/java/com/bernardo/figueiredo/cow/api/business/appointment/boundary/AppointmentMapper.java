@@ -11,15 +11,15 @@ public class AppointmentMapper {
 
     public AppointmentDTO mapEntityToDTO(Appointment appointment) {
         long appointmentRequestId = 0;
-        if (appointment.getAppointmentRequest() != null) {
-            appointmentRequestId = appointment.getAppointmentRequest().getIdAppointmentRequest();
+        if (appointment.getScheduleAppointment() != null) {
+            appointmentRequestId = appointment.getScheduleAppointment().getId();
         }
         return new AppointmentDTO(
-                appointment.getIdAppointment(),
+                appointment.getId(),
                 appointment.getIdContract(),
                 appointmentRequestId,
                 appointment.getBovine().getIdBovine(),
-                appointment.getUser().getIdUser(),
+                appointment.getVeterinary().getIdUser(),
                 appointment.getAppointmentDate().toString(),
                 appointment.getAppointmentType(),
                 appointment.getCost(),

@@ -37,7 +37,7 @@ class AppointmentControllerTest {
 
         Appointment appointment = new Appointment();
         appointment.setBovine(new Bovine());
-        appointment.setUser(new User());
+        appointment.setVeterinary(new User());
         appointment.setAppointmentDate(new Date());
 
         Mockito.when(appointmentService.getAppointmentById(999999)).thenReturn(appointment);
