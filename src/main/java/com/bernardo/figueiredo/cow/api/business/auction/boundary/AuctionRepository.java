@@ -13,9 +13,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
-    @Query("SELECT a FROM Auction a ORDER BY a.auctionStatus")
-    List<Auction> getAllAuction();
+    @Query("SELECT a FROM Auction a WHERE a.id = :id")
+    Auction getAuctionById(long id);
 
-    @Query("SELECT a FROM Auction a WHERE a.idAuction = :idAuction")
-    Auction getAuctionByIDAuction(long idAuction);
+    @Query("SELECT a FROM Auction a ORDER BY a.auctionStatus ASC, a.startDate ASC")
+    List<Auction> getAuctions();
 }

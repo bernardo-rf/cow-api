@@ -17,13 +17,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuctionDTO {
-    private long idAuction;
-    private long idBovine;
+    private long id;
     private String idContract;
-    private String idOwner;
+    private long idBovine;
+    private long idAuctioneer;
+    private long idHighestBidder;
     private String auctionDescription;
     private Date startDate;
     private Date endDate;
-    private int status;
-    private double startingPrice;
+    private double initialPrice;
+    private int auctionStatus;
 }

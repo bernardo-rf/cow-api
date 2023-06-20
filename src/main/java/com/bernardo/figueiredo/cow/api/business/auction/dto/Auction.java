@@ -32,7 +32,7 @@ public class Auction implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idAuction;
+    private long id;
 
     @Column(nullable = false, unique = true)
     @Nationalized
@@ -44,13 +44,21 @@ public class Auction implements Serializable {
     private Bovine bovine;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
+    @JoinColumn(name = "id_user_1", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User user;
+    private User auctioneer;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_user_2", referencedColumnName = "idWallet")
+    @JsonBackReference
+    private User highestBidder;
 
     @Column(nullable = false, length = 50)
     @Nationalized
     private String auctionDescription;
+
+    @Column(scale = 2)
+    private double initialPrice;
 
     @Column(nullable = false)
     private Date startDate;
@@ -61,9 +69,6 @@ public class Auction implements Serializable {
     @Column(nullable = false)
     private int auctionStatus;
 
-    @Column(scale = 2)
-    private double startingPrice;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "auction")
     @JsonManagedReference
     private Set<Bid> bidSet = new HashSet<>();
@@ -71,19 +76,21 @@ public class Auction implements Serializable {
     public Auction(
             String idContract,
             Bovine bovine,
-            User user,
+            User auctioneer,
+            User highestBidder,
             String auctionDescription,
             Date startDate,
             Date endDate,
             int auctionStatus,
-            double startingPrice) {
+            double initialPrice) {
         this.idContract = idContract;
         this.bovine = bovine;
-        this.user = user;
+        this.auctioneer = auctioneer;
+        this.highestBidder = highestBidder;
         this.auctionDescription = auctionDescription;
         this.startDate = startDate;
         this.endDate = endDate;
         this.auctionStatus = auctionStatus;
-        this.startingPrice = startingPrice;
+        this.initialPrice = initialPrice;
     }
 }

@@ -1,7 +1,8 @@
 # COW.API
 
 ## Description
-Welcome to COW Rest API this is the first step to decentralize food supply chains. 
+
+Welcome to COW Rest API this is the first step to decentralize food supply chains.
 
 ## Installation
 
@@ -31,8 +32,8 @@ spring.datasource.driver-class-name=driver_class_in_string_format
 
 jwt.secret=jwt_secret_in_string_format
 ```
-Read more in https://mariadb.com/kb/en/documentation/
 
+Read more in https://mariadb.com/kb/en/documentation/
 
 * Windows OS application.properties tested with SQLServer
 
@@ -49,6 +50,7 @@ spring.jpa.properties.hibernate.dialect=hibernate_dialect_in_string_format
 
 jwt.secret=jwt_secret_in_string_format
 ```
+
 Read more in https://learn.microsoft.com/en-us/sql/relational-databases/databases/create-a-database?view=sql-server-ver16
 
 6. Check `pom.xml` to comment/uncomment necessary dependencies depending on OS.
@@ -56,6 +58,7 @@ Read more in https://learn.microsoft.com/en-us/sql/relational-databases/database
 8. Check `http://localhost:8080/swagger-ui/` to view endpoints available.
 
 #### NOTE:
+
 A .env.example is provided to help the setup of the project.
 
 An application.properties.example is provided to help the setup of the project.
@@ -77,5 +80,5 @@ If you have any questions, suggestions, or feedback, please feel free to contact
 
 - Email: [bernardo.figueiredo@outlook.com]
 - GitHub: [bernardo-rf](https://github.com/bernardo-rf)
-
+- Trello: [cow-api](https://trello.com/b/5CnlL9nG/cow-project)
 

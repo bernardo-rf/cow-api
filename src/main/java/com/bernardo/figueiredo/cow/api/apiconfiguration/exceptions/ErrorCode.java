@@ -33,7 +33,7 @@ public enum ErrorCode {
     APPOINTMENT_BOVINE_NOT_FOUND(12, HttpStatus.NOT_FOUND, "Error: No appointment records found for bovine."),
     APPOINTMENT_USER_NOT_FOUND(13, HttpStatus.NOT_FOUND, "Error: No appointment records found for user."),
     APPOINTMENT_DEPLOY_FAILED(13, HttpStatus.BAD_REQUEST, "Hedera Error:  Appointment deploy failed."),
-    APPOINTMENT_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Error: Appointment update failed."),
+    APPOINTMENT_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Appointment update failed."),
     SCHEDULE_APPOINTMENT_NOT_FOUND(15, HttpStatus.NOT_FOUND, "Error: No schedule appointment record found."),
     SCHEDULE_APPOINTMENT_BOVINE_NOT_FOUND(
             16, HttpStatus.NOT_FOUND, "Error: No schedule appointment records found for bovine."),
@@ -42,8 +42,13 @@ public enum ErrorCode {
     SCHEDULE_APPOINTMENT_OWNER_NOT_FOUND(
             18, HttpStatus.NOT_FOUND, "Error: No schedule appointment records found for owner."),
     SCHEDULE_APPOINTMENT_DATE_INVALID(19, HttpStatus.BAD_REQUEST, "Error: Schedule appointment date invalid."),
-    USER_NOT_FOUND(20, HttpStatus.NOT_FOUND, "Error: No user record found."),
-    BOVINE_NOT_FOUND(21, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
+    AUCTION_NOT_FOUND(20, HttpStatus.NOT_FOUND, "Error: No auction record found."),
+    AUCTION_DEPLOY_FAILED(21, HttpStatus.BAD_REQUEST, "Hedera Error:  Auction deploy failed."),
+    AUCTION_UPDATE_FAILED(22, HttpStatus.BAD_REQUEST, "Hedera Error: Auction update failed."),
+    AUCTION_START_DATE_INVALID(23, HttpStatus.BAD_REQUEST, "Error: Auction start date invalid."),
+    AUCTION_END_DATE_INVALID(24, HttpStatus.BAD_REQUEST, "Error: Auction end date invalid."),
+    USER_NOT_FOUND(25, HttpStatus.NOT_FOUND, "Error: No user record found."),
+    BOVINE_NOT_FOUND(26, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
 
     private final int code;
 

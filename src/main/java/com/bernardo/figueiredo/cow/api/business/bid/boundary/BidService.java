@@ -42,7 +42,7 @@ public class BidService {
     private Client client = Client.forTestnet();
 
     public boolean checkBidValues(long idAuction, String idOwner) {
-        Auction auction = auctionRepository.getAuctionByIDAuction(idAuction);
+        Auction auction = auctionRepository.getAuctionById(idAuction);
         if (auction != null) {
             User user = userRepository.getUserByIDOwner(idOwner);
             if (user != null) {
@@ -56,7 +56,7 @@ public class BidService {
         return new BidDTO(
                 bid.getIdBid(),
                 bid.getIdContract(),
-                bid.getAuction().getIdAuction(),
+                bid.getAuction().getId(),
                 bid.getUser().getIdWallet(),
                 bid.getBidValue(),
                 bid.getBidDate());
@@ -138,7 +138,7 @@ public class BidService {
                     ContractId contractId = fileReceipt3.contractId;
 
                     if (contractId != null) {
-                        Auction auction = auctionRepository.getAuctionByIDAuction(bidCreateDTO.getIdAuction());
+                        Auction auction = auctionRepository.getAuctionById(bidCreateDTO.getIdAuction());
                         if (auction != null) {
                             Bid bid = new Bid(
                                     contractId.toString(),

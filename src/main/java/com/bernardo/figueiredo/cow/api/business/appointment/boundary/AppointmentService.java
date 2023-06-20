@@ -116,13 +116,14 @@ public class AppointmentService extends BaseService {
             newAppointment.setObservation(appointmentCreateDTO.getObservation());
 
             receipt = getAppointmentDeployReceipt(client, fileId, newAppointment);
-            newAppointment.setIdContract(receipt.getContractId().toString());
 
             validateReceiptStatus(receipt);
 
             if (receipt.getContractId() == null) {
                 throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
             }
+
+            newAppointment.setIdContract(receipt.getContractId().toString());
 
             Appointment savedAppointment = appointmentRepository.save(newAppointment);
             newAppointments.add(savedAppointment);
@@ -186,7 +187,7 @@ public class AppointmentService extends BaseService {
         }
 
         Bovine bovine = bovineService.getBovineById(updateAppointmentDTO.getIdBovine());
-        if (bovineService.getBovineById(updateAppointmentDTO.getIdBovine()) == null) {
+        if (bovine == null) {
             throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
         }
 
@@ -233,9 +234,9 @@ public class AppointmentService extends BaseService {
             return buildAppointmentUpdateReceipt(client, appointmentContract, appointmentDTO, appointmentDate);
         } catch (ReceiptStatusException e) {
             validateGas(e);
-            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_UPDATE_FAILED);
         } catch (PrecheckStatusException e) {
-            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_UPDATE_FAILED));
         }
     }
 
