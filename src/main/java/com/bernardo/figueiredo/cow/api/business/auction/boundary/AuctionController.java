@@ -6,9 +6,9 @@
 
 package com.bernardo.figueiredo.cow.api.business.auction.boundary;
 
+import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionDTO;
-import com.bernardo.figueiredo.cow.api.business.auction.dto.AuctionFullInfoDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
@@ -17,13 +17,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(path = "auctions")
 @CrossOrigin(maxAge = 3600)
-@Api("Handles management of COW Auction")
-@RequestMapping(path = "api/auctions")
+@Api("Management endpoints to handle auctions")
+@SuppressWarnings("unused")
 public class AuctionController {
 
     @Autowired
     AuctionService auctionService;
+
+    @Autowired
+    private AuctionMapper auctionMapper;
 
     public AuctionController() {
         auctionService = new AuctionService();
@@ -31,79 +35,36 @@ public class AuctionController {
 
     @GetMapping("/")
     @ApiOperation("Get all auctions")
-    public ResponseEntity<List<AuctionFullInfoDTO>> getAllAuctions() throws Exception {
-        try {
-            return ResponseEntity.ok(auctionService.getAllAuctions());
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    public ResponseEntity<List<AuctionDTO>> getAuctions() {
+        List<Auction> auctions = auctionService.getAuctions();
+        return ResponseEntity.ok(auctionMapper.mapSourceListToTargetList(auctions));
     }
 
-    @GetMapping("/{auctionID}")
+    @GetMapping("/{id}")
     @ApiOperation("Get auction by auction id")
-    public ResponseEntity<AuctionFullInfoDTO> getAllAuctionsByIDAuction(@PathVariable long auctionID) throws Exception {
-        try {
-            AuctionFullInfoDTO auctionDTO = auctionService.getAuction(auctionID);
-            if (auctionDTO.getIdAuction() == 0) {
-                return ResponseEntity.status(404).build();
-            }
-            return ResponseEntity.ok(auctionDTO);
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    public ResponseEntity<AuctionDTO> getAuctionByAuctionId(@PathVariable long id) {
+        Auction auction = auctionService.getAuctionById(id);
+        return ResponseEntity.ok(auctionMapper.mapEntityToDTO(auction));
     }
 
     @PostMapping("/")
     @ApiOperation("Create a auction")
-    public ResponseEntity<AuctionDTO> createBovine(@RequestBody AuctionCreateDTO auctionCreateDTO) throws Exception {
-        try {
-            AuctionDTO auctionDTO = auctionService.createAuction(auctionCreateDTO);
-            if (auctionDTO.getIdAuction() == 999999) {
-                return ResponseEntity.status(409).build();
-            } else if (auctionDTO.getIdAuction() == 0) {
-                return ResponseEntity.status(404).build();
-            }
-            return ResponseEntity.ok(auctionDTO);
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    public ResponseEntity<AuctionDTO> createBovine(@RequestBody AuctionCreateDTO auctionCreateDTO) {
+        Auction auction = auctionService.createAuction(auctionCreateDTO);
+        return ResponseEntity.ok(auctionMapper.mapEntityToDTO(auction));
     }
 
-    @PutMapping("/{auctionID}")
+    @PutMapping("/{id}")
     @ApiOperation("Update a auction")
-    public ResponseEntity<AuctionDTO> updateAuction(@PathVariable long auctionID, @RequestBody AuctionDTO auctionDTO)
-            throws Exception {
-        try {
-            if (auctionID != auctionDTO.getIdAuction()) {
-                return ResponseEntity.status(409).build();
-            }
-
-            AuctionDTO updatedAuctionDTO = auctionService.updateAuction(auctionDTO);
-            if (updatedAuctionDTO.getIdAuction() == 999999) {
-                return ResponseEntity.status(409).build();
-            } else if (updatedAuctionDTO.getIdAuction() == 0) {
-                return ResponseEntity.status(404).build();
-            }
-            return ResponseEntity.ok(updatedAuctionDTO);
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    public ResponseEntity<AuctionDTO> updateAuction(@PathVariable long id, @RequestBody AuctionDTO auctionDTO) {
+        Auction auction = auctionService.updateAuction(id, auctionDTO);
+        return ResponseEntity.ok(auctionMapper.mapEntityToDTO(auction));
     }
 
-    @PutMapping("/{auctionID}/status")
+    @PutMapping("/{id}/status")
     @ApiOperation("Update a auction status")
-    public ResponseEntity<AuctionDTO> updateAuctionStatus(@PathVariable long auctionID, @RequestParam int status)
-            throws Exception {
-        try {
-            AuctionDTO updatedAuctionDTO = auctionService.updateAuctionStatus(auctionID, status);
-            if (updatedAuctionDTO.getIdAuction() == 999999) {
-                return ResponseEntity.status(409).build();
-            } else if (updatedAuctionDTO.getIdAuction() == 0) {
-                return ResponseEntity.status(404).build();
-            }
-            return ResponseEntity.ok(updatedAuctionDTO);
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    public ResponseEntity<AuctionDTO> updateAuctionStatus(@PathVariable long id, @RequestParam int status) {
+        Auction auction = auctionService.updateAuctionStatus(id, status);
+        return ResponseEntity.ok(auctionMapper.mapEntityToDTO(auction));
     }
 }
