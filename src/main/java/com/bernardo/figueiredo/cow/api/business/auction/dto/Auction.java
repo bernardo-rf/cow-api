@@ -76,7 +76,8 @@ public class Auction implements Serializable {
     public Auction(
             String idContract,
             Bovine bovine,
-            User user,
+            User auctioneer,
+            User highestBidder,
             String auctionDescription,
             Date startDate,
             Date endDate,
@@ -84,7 +85,8 @@ public class Auction implements Serializable {
             double initialPrice) {
         this.idContract = idContract;
         this.bovine = bovine;
-        this.highestBidder = user;
+        this.auctioneer = auctioneer;
+        this.highestBidder = highestBidder;
         this.auctionDescription = auctionDescription;
         this.startDate = startDate;
         this.endDate = endDate;

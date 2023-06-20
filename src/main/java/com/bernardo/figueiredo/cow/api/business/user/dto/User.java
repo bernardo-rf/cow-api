@@ -80,7 +80,7 @@ public class User implements Serializable {
     @JsonManagedReference
     private Set<Appointment> appointmentSet = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "auctioneer")
     @JsonManagedReference
     private Set<Auction> auctionSet = new HashSet<>();
 
