@@ -30,11 +30,20 @@ public enum ErrorCode {
     HEDERA_APPOINTMENT_REGISTRATION_FAILED(
             10, HttpStatus.BAD_REQUEST, "Hedera Error: Registering Appointment on Hedera."),
     APPOINTMENT_NOT_FOUND(11, HttpStatus.NOT_FOUND, "Error: No appointment record found."),
-    APPOINTMENT_BOVINE_NOT_FOUND(12, HttpStatus.NOT_FOUND, "No appointment records found for bovine."),
+    APPOINTMENT_BOVINE_NOT_FOUND(12, HttpStatus.NOT_FOUND, "Error: No appointment records found for bovine."),
+    APPOINTMENT_USER_NOT_FOUND(13, HttpStatus.NOT_FOUND, "Error: No appointment records found for user."),
     APPOINTMENT_DEPLOY_FAILED(13, HttpStatus.BAD_REQUEST, "Hedera Error:  Appointment deploy failed."),
     APPOINTMENT_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Error: Appointment update failed."),
-    USER_NOT_FOUND(15, HttpStatus.NOT_FOUND, "Error: No user record found."),
-    BOVINE_NOT_FOUND(16, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
+    SCHEDULE_APPOINTMENT_NOT_FOUND(15, HttpStatus.NOT_FOUND, "Error: No schedule appointment record found."),
+    SCHEDULE_APPOINTMENT_BOVINE_NOT_FOUND(
+            16, HttpStatus.NOT_FOUND, "Error: No schedule appointment records found for bovine."),
+    SCHEDULE_APPOINTMENT_VETERINARY_NOT_FOUND(
+            17, HttpStatus.NOT_FOUND, "Error: No schedule appointment records found for veterinary."),
+    SCHEDULE_APPOINTMENT_OWNER_NOT_FOUND(
+            18, HttpStatus.NOT_FOUND, "Error: No schedule appointment records found for owner."),
+    SCHEDULE_APPOINTMENT_DATE_INVALID(19, HttpStatus.BAD_REQUEST, "Error: Schedule appointment date invalid."),
+    USER_NOT_FOUND(20, HttpStatus.NOT_FOUND, "Error: No user record found."),
+    BOVINE_NOT_FOUND(21, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
 
     private final int code;
 

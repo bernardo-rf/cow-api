@@ -6,8 +6,8 @@
 
 package com.bernardo.figueiredo.cow.api.business.appointment.dto;
 
-import com.bernardo.figueiredo.cow.api.business.appointmentRequest.dto.AppointmentRequest;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
+import com.bernardo.figueiredo.cow.api.business.schedule.dto.ScheduleAppointment;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
@@ -26,15 +26,15 @@ public class Appointment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idAppointment;
+    private long id;
 
     @Column(nullable = false)
     @Nationalized
     private String idContract;
 
     @OneToOne
-    @JoinColumn(name = "id_appointment_request")
-    private AppointmentRequest appointmentRequest;
+    @JoinColumn(name = "id_schedule_appointment")
+    private ScheduleAppointment scheduleAppointment;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_bovine")
@@ -42,9 +42,9 @@ public class Appointment implements Serializable {
     private Bovine bovine;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
+    @JoinColumn(name = "id_user_1", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User user;
+    private User veterinary;
 
     @Column(nullable = false)
     private Date appointmentDate;
@@ -61,25 +61,4 @@ public class Appointment implements Serializable {
 
     @Column(nullable = false)
     private int appointmentStatus;
-
-    public Appointment(
-            String idContract,
-            AppointmentRequest appointmentRequest,
-            Bovine bovine,
-            User user,
-            Date appointmentDate,
-            String appointmentType,
-            Double cost,
-            String observation,
-            int status) {
-        this.idContract = idContract;
-        this.appointmentRequest = appointmentRequest;
-        this.bovine = bovine;
-        this.user = user;
-        this.appointmentDate = appointmentDate;
-        this.appointmentType = appointmentType;
-        this.cost = cost;
-        this.observation = observation;
-        this.appointmentStatus = status;
-    }
 }

@@ -20,7 +20,7 @@ public class AppointmentDTO {
     private String idContract;
     private long idAppointmentRequest;
     private long idBovine;
-    private long idUser;
+    private long idVeterinary;
     private String appointmentDate;
     private String appointmentType;
     private Double cost;

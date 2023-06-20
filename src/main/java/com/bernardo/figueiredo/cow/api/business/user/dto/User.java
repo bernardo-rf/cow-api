@@ -76,7 +76,7 @@ public class User implements Serializable {
     @Nationalized
     private String imageCID;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "veterinary")
     @JsonManagedReference
     private Set<Appointment> appointmentSet = new HashSet<>();
 

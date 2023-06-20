@@ -1,6 +1,9 @@
 package com.bernardo.figueiredo.cow.api.apiconfiguration.boundary;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
@@ -17,7 +20,7 @@ public class BaseByteCode {
     private byte[] userByteCode;
 
     @PostConstruct
-    public void init() throws IOException {
+    public void init() throws IOException, URISyntaxException {
         appointmentByteCode = loadFile("smartContracts/appointmentByteCode");
         auctionByteCode = loadFile("smartContracts/auctionByteCode");
         bidByteCode = loadFile("smartContracts/bidByteCode");
@@ -26,11 +29,9 @@ public class BaseByteCode {
         userByteCode = loadFile("smartContracts/userByteCode");
     }
 
-    private byte[] loadFile(String filePath) throws IOException {
-
-        try (var inputStream = this.getClass().getClassLoader().getResourceAsStream(filePath)) {
-
-            return Objects.requireNonNull(inputStream).readAllBytes();
-        }
+    private byte[] loadFile(String filePath) throws IOException, URISyntaxException {
+        return Files.readAllBytes(Paths.get(
+                Objects.requireNonNull(this.getClass().getClassLoader().getResource(filePath))
+                        .toURI()));
     }
 }
