@@ -119,11 +119,11 @@ public class AppointmentService extends BaseService {
 
             validateReceiptStatus(receipt);
 
-            newAppointment.setIdContract(receipt.getContractId().toString());
-
             if (receipt.getContractId() == null) {
                 throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
             }
+
+            newAppointment.setIdContract(receipt.getContractId().toString());
 
             Appointment savedAppointment = appointmentRepository.save(newAppointment);
             newAppointments.add(savedAppointment);

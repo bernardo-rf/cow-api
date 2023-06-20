@@ -109,11 +109,11 @@ public class AuctionService extends BaseService {
 
             validateReceiptStatus(receipt);
 
-            newAuction.setIdContract(receipt.getContractId().toString());
-
             if (receipt.getContractId() == null) {
                 throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
             }
+
+            newAuction.setIdContract(receipt.getContractId().toString());
 
             auction = auctionRepository.save(newAuction);
 
