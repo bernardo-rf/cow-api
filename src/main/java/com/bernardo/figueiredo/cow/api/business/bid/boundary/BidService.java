@@ -6,159 +6,142 @@
 
 package com.bernardo.figueiredo.cow.api.business.bid.boundary;
 
-import com.bernardo.figueiredo.cow.api.business.auction.boundary.AuctionRepository;
+import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.*;
+
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseByteCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseService;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCodeException;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaReceipt;
+import com.bernardo.figueiredo.cow.api.business.auction.boundary.AuctionService;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.Bid;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.BidCreateDTO;
-import com.bernardo.figueiredo.cow.api.business.bid.dto.BidDTO;
-import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
+import com.bernardo.figueiredo.cow.api.business.user.boundary.UserService;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.hedera.hashgraph.sdk.*;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BidService {
+public class BidService extends BaseService {
 
     @Autowired
     BidRepository bidRepository;
 
     @Autowired
-    AuctionRepository auctionRepository;
+    BaseByteCode baseByteCode;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
-    private Client client = Client.forTestnet();
+    @Autowired
+    AuctionService auctionService;
 
-    public boolean checkBidValues(long idAuction, String idOwner) {
-        Auction auction = auctionRepository.getAuctionById(idAuction);
-        if (auction != null) {
-            User user = userRepository.getUserByIDOwner(idOwner);
-            if (user != null) {
-                return user.getIdUser() != 0;
-            }
-        }
-        return false;
-    }
+    public List<Bid> getBids() {
+        List<Bid> bids = bidRepository.getBids();
 
-    public BidDTO convertToDTO(Bid bid) {
-        return new BidDTO(
-                bid.getIdBid(),
-                bid.getIdContract(),
-                bid.getAuction().getId(),
-                bid.getUser().getIdWallet(),
-                bid.getBidValue(),
-                bid.getBidDate());
-    }
-
-    public List<BidDTO> getAllBids() {
-        List<BidDTO> bidDTOList = new ArrayList<>();
-        List<Bid> bids = bidRepository.getAllBids();
-        if (bids == null) {
-            return bidDTOList;
+        if (bids.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.BID_NOT_FOUND);
         }
 
-        for (Bid bid : bids) {
-            BidDTO bidDTO = convertToDTO(bid);
-            bidDTOList.add(bidDTO);
-        }
-        return bidDTOList;
+        return bids;
     }
 
-    public BidDTO getBid(long idBid) {
-        Bid bid = bidRepository.getBidByIDBid(idBid);
+    public Bid getBidById(long id) {
+        Bid bid = bidRepository.getBidByBidId(id);
+
         if (bid == null) {
-            return new BidDTO();
+            throw new ErrorCodeException(ErrorCode.BID_NOT_FOUND);
         }
-        return convertToDTO(bid);
+
+        return bid;
     }
 
-    public BidDTO createBid(BidCreateDTO bidCreateDTO) {
-        BidDTO emptyDTO = new BidDTO();
-        try {
-            boolean isCheck = checkBidValues(bidCreateDTO.getIdAuction(), bidCreateDTO.getIdBidder());
-            if (!isCheck) {
-                emptyDTO.setIdBid(999999);
-                return emptyDTO;
-            }
+    public Bid createBid(BidCreateDTO bidCreateDTO) {
+        Bid bid;
 
-            File myObj = new File(EnvUtils.getProjectPath() + "bid/Bid.bin");
-            Scanner myReader = new Scanner(myObj);
+        HederaReceipt receipt;
+        FileId fileId;
 
-            while (myReader.hasNextLine()) {
-                PrivateKey operatorKey = EnvUtils.getOperatorKey();
-                client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
+        User user = userService.getUserById(bidCreateDTO.getId());
+        Auction auction = auctionService.getAuctionById(bidCreateDTO.getIdAuction());
 
-                String objectByteCode = myReader.nextLine();
-                byte[] bytecode = objectByteCode.getBytes(StandardCharsets.UTF_8);
-
-                TransactionResponse fileCreateTx = new FileCreateTransaction()
-                        .setKeys(operatorKey)
-                        .freezeWith(client)
-                        .execute(client);
-
-                TransactionReceipt fileReceipt1 = fileCreateTx.getReceipt(client);
-                FileId bytecodeFileId = fileReceipt1.fileId;
-
-                if (bytecodeFileId != null) {
-                    TransactionResponse fileAppendTransaction = new FileAppendTransaction()
-                            .setFileId(bytecodeFileId)
-                            .setContents(bytecode)
-                            .setMaxChunks(10)
-                            .setMaxTransactionFee(new Hbar(2))
-                            .execute(client);
-                    TransactionReceipt fileReceipt2 = fileAppendTransaction.getReceipt(client);
-                    Logger.getLogger("Contract Created =" + fileReceipt2);
-
-                    TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
-                            .setBytecodeFileId(bytecodeFileId)
-                            .setGas(300000)
-                            .setAdminKey(operatorKey)
-                            .setConstructorParameters(new ContractFunctionParameters()
-                                    .addUint256(BigInteger.valueOf((bidCreateDTO.getIdAuction())))
-                                    .addString(bidCreateDTO.getIdBidder())
-                                    .addUint256(BigInteger.valueOf(
-                                            bidCreateDTO.getBidDate().getTime())))
-                            .execute(client);
-
-                    TransactionReceipt fileReceipt3 = contractCreateTransaction.getReceipt(client);
-                    Logger.getLogger("Contract Filled " + fileReceipt3.contractId);
-
-                    ContractId contractId = fileReceipt3.contractId;
-
-                    if (contractId != null) {
-                        Auction auction = auctionRepository.getAuctionById(bidCreateDTO.getIdAuction());
-                        if (auction != null) {
-                            Bid bid = new Bid(
-                                    contractId.toString(),
-                                    auction,
-                                    userRepository.getUserByIDOwner(bidCreateDTO.getIdBidder()),
-                                    bidCreateDTO.getValue(),
-                                    bidCreateDTO.getBidDate());
-                            bidRepository.save(bid);
-
-                            BidDTO bidDTO = convertToDTO(bid);
-                            if (bidDTO.getIdBid() != 0) {
-                                return bidDTO;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (PrecheckStatusException | TimeoutException | FileNotFoundException | ReceiptStatusException ex) {
-            ex.printStackTrace();
+        if (bidCreateDTO.getBidDate().after(new Date())) {
+            throw new ErrorCodeException(ErrorCode.BID_DATE_INVALID);
         }
-        return emptyDTO;
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getHederaContractFile(client);
+
+            validateReceiptStatus(receipt);
+
+            fileId = receipt.getFileId();
+
+            receipt = getHederaContractFileAppend(client, fileId, baseByteCode.getBidByteCode(), 10, 2);
+
+            validateReceiptStatus(receipt);
+
+            Bid newBid = new Bid();
+            newBid.setAuction(auction);
+            newBid.setBidder(user);
+            newBid.setBidValue(bidCreateDTO.getBidValue());
+            newBid.setBidDate(bidCreateDTO.getBidDate());
+
+            receipt = getBidDeployReceipt(client, fileId, newBid);
+
+            validateReceiptStatus(receipt);
+
+            if (receipt.getContractId() == null) {
+                throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
+            }
+
+            newBid.setIdContract(receipt.getContractId().toString());
+
+            bid = bidRepository.save(newBid);
+
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.BID_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.BID_DEPLOY_FAILED));
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+        return bid;
+    }
+
+    private HederaReceipt getBidDeployReceipt(Client client, FileId fileId, Bid bid) throws TimeoutException {
+        try {
+            return buildBidDeployReceipt(client, fileId, bid);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.BID_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.BID_DEPLOY_FAILED));
+        }
+    }
+
+    private HederaReceipt buildBidDeployReceipt(Client client, FileId byteCodeFileId, Bid newBid)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractCreateTransaction contractCreateTransaction = new ContractCreateTransaction()
+                .setBytecodeFileId(byteCodeFileId)
+                .setGas(300_000)
+                .setAdminKey(EnvUtils.getOperatorKey())
+                .setConstructorParameters(new ContractFunctionParameters()
+                        .addUint256(BigInteger.valueOf((newBid.getAuction().getId())))
+                        .addString(newBid.getBidder().getIdContract())
+                        .addUint256(BigInteger.valueOf(newBid.getBidDate().getTime())));
+
+        return execute(client, contractCreateTransaction);
     }
 }

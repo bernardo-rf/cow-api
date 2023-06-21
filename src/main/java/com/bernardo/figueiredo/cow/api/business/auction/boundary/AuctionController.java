@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuctionController {
 
     @Autowired
-    AuctionService auctionService;
+    private final AuctionService auctionService;
 
     @Autowired
     private AuctionMapper auctionMapper;
@@ -34,7 +34,7 @@ public class AuctionController {
     }
 
     @GetMapping("/")
-    @ApiOperation("Get all auctions")
+    @ApiOperation("Get auctions")
     public ResponseEntity<List<AuctionDTO>> getAuctions() {
         List<Auction> auctions = auctionService.getAuctions();
         return ResponseEntity.ok(auctionMapper.mapSourceListToTargetList(auctions));

@@ -13,9 +13,12 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
-    @Query("SELECT b FROM Bid b")
-    List<Bid> getAllBids();
+    @Query("SELECT b FROM Bid b ORDER BY bidDate DESC")
+    List<Bid> getBids();
 
-    @Query("SELECT b FROM Bid b WHERE b.idBid = :idBid")
-    Bid getBidByIDBid(long idBid);
+    @Query("SELECT b FROM Bid b WHERE b.id = :id ORDER BY bidDate DESC")
+    Bid getBidByBidId(long id);
+
+    @Query("SELECT b FROM Bid b WHERE b.auction.id = :id ORDER BY bidDate DESC")
+    List<Bid> getBidByAuctionId(long id);
 }
