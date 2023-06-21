@@ -25,7 +25,7 @@ public class Bid implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idBid;
+    private long id;
 
     @Column(nullable = false)
     @Nationalized
@@ -39,7 +39,7 @@ public class Bid implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User user;
+    private User bidder;
 
     @Column(nullable = false, scale = 2)
     private double bidValue;
@@ -50,7 +50,7 @@ public class Bid implements Serializable {
     public Bid(String idContract, Auction auction, User user, Double bidValue, Date bidDate) {
         this.idContract = idContract;
         this.auction = auction;
-        this.user = user;
+        this.bidder = user;
         this.bidValue = bidValue;
         this.bidDate = bidDate;
     }

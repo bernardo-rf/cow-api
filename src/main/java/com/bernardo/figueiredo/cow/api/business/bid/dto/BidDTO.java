@@ -17,10 +17,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BidDTO {
-    private long idBid;
+    private long id;
     private String idContract;
     private long idAuction;
     private String idBidder;
-    private Double value;
+    private Double bidValue;
     private Date bidDate;
 }

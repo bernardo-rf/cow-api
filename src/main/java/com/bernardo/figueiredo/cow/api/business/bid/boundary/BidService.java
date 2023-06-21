@@ -6,6 +6,8 @@
 
 package com.bernardo.figueiredo.cow.api.business.bid.boundary;
 
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseByteCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseService;
 import com.bernardo.figueiredo.cow.api.business.auction.boundary.AuctionRepository;
 import com.bernardo.figueiredo.cow.api.business.auction.dto.Auction;
 import com.bernardo.figueiredo.cow.api.business.bid.dto.Bid;
@@ -28,29 +30,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BidService {
+public class BidService extends BaseService {
 
     @Autowired
     BidRepository bidRepository;
+
+    @Autowired
+    BaseByteCode baseByteCode;
 
     @Autowired
     AuctionRepository auctionRepository;
 
     @Autowired
     UserRepository userRepository;
-
-    private Client client = Client.forTestnet();
-
-    public boolean checkBidValues(long idAuction, String idOwner) {
-        Auction auction = auctionRepository.getAuctionById(idAuction);
-        if (auction != null) {
-            User user = userRepository.getUserByIDOwner(idOwner);
-            if (user != null) {
-                return user.getIdUser() != 0;
-            }
-        }
-        return false;
-    }
 
     public BidDTO convertToDTO(Bid bid) {
         return new BidDTO(
@@ -62,7 +54,7 @@ public class BidService {
                 bid.getBidDate());
     }
 
-    public List<BidDTO> getAllBids() {
+    public List<Bid> getBids() {
         List<BidDTO> bidDTOList = new ArrayList<>();
         List<Bid> bids = bidRepository.getAllBids();
         if (bids == null) {
