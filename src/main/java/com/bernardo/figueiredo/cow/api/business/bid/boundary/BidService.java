@@ -54,13 +54,23 @@ public class BidService extends BaseService {
     }
 
     public Bid getBidById(long id) {
-        Bid bid = bidRepository.getBidByBidId(id);
+        Bid bid = bidRepository.getBidById(id);
 
         if (bid == null) {
             throw new ErrorCodeException(ErrorCode.BID_NOT_FOUND);
         }
 
         return bid;
+    }
+
+    public List<Bid> getBidByAuctionId(long id) {
+        List<Bid> bids = bidRepository.getBidByAuctionId(id);
+
+        if (bids.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.BID_NOT_FOUND);
+        }
+
+        return bids;
     }
 
     public Bid createBid(BidCreateDTO bidCreateDTO) {
