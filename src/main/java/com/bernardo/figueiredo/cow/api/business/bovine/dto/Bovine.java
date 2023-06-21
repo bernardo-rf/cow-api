@@ -33,7 +33,7 @@ public class Bovine implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idBovine;
+    private long id;
 
     @Column(nullable = false)
     @Nationalized
@@ -42,7 +42,7 @@ public class Bovine implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User user;
+    private User owner;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_field")
@@ -115,7 +115,7 @@ public class Bovine implements Serializable {
             boolean gender,
             String imageCID) {
         this.idContract = idContract;
-        this.user = user;
+        this.owner = user;
         this.field = field;
         this.serialNumber = serialNumber;
         this.birthDate = birthDate;

@@ -149,7 +149,7 @@ public class AuctionService extends BaseService {
                 .setGas(300_000)
                 .setAdminKey(EnvUtils.getOperatorKey())
                 .setConstructorParameters(new ContractFunctionParameters()
-                        .addUint256(BigInteger.valueOf((newAuction.getBovine().getIdBovine())))
+                        .addUint256(BigInteger.valueOf((newAuction.getBovine().getId())))
                         .addString(newAuction.getAuctioneer().getIdContract())
                         .addString(newAuction.getAuctionDescription())
                         .addUint256(BigInteger.valueOf(newAuction.getStartDate().getTime()))

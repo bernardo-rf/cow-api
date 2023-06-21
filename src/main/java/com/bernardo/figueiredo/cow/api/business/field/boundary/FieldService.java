@@ -6,10 +6,10 @@
 
 package com.bernardo.figueiredo.cow.api.business.field.boundary;
 
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCodeException;
 import com.bernardo.figueiredo.cow.api.business.bovine.boundary.BovineService;
-import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
 import com.bernardo.figueiredo.cow.api.business.bovine.dto.BovineDTO;
-import com.bernardo.figueiredo.cow.api.business.bovine.dto.BovineFullInfoDTO;
 import com.bernardo.figueiredo.cow.api.business.field.dto.*;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserRepository;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
@@ -79,6 +79,14 @@ public class FieldService {
         return false;
     }
 
+    public Field getFieldById(long id) {
+        Field field = fieldRepository.getFieldById(id);
+        if (field == null) {
+            throw new ErrorCodeException(ErrorCode.FIELD_NOT_FOUND);
+        }
+        return field;
+    }
+
     public FieldFullInfoDTO getField(long fieldId) {
         Field field = fieldRepository.getField(fieldId);
         if (field == null) {
@@ -115,28 +123,30 @@ public class FieldService {
         return fieldsList;
     }
 
-    public FieldDTO getFieldBovines(long idField) {
-        FieldDTO fieldDTO = new FieldDTO();
-        Field field = fieldRepository.getField(idField);
-        if (field == null) {
-            return fieldDTO;
-        }
+    // TODO
+    //    public FieldDTO getFieldBovines(long idField) {
+    //        FieldDTO fieldDTO = new FieldDTO();
+    //        Field field = fieldRepository.getField(idField);
+    //        if (field == null) {
+    //            return fieldDTO;
+    //        }
+    //
+    //        Set<BovineDTO> bovineDTOS = new HashSet<>();
+    //        for (Bovine bovine : field.getBovineSet()) {
+    //            bovineDTOS.add(bovineService.convertToDTO(bovine));
+    //        }
+    //
+    //        return convertToDTO(field, bovineDTOS);
+    //    }
 
-        Set<BovineDTO> bovineDTOS = new HashSet<>();
-        for (Bovine bovine : field.getBovineSet()) {
-            bovineDTOS.add(bovineService.convertToDTO(bovine));
-        }
-
-        return convertToDTO(field, bovineDTOS);
-    }
-
-    public List<BovineFullInfoDTO> getFieldBovinesNotIn(long idField) {
-        Field field = fieldRepository.getField(idField);
-        if (field == null) {
-            return new ArrayList<>();
-        }
-        return bovineService.getAllBovineNotInField(idField, field.getUser().getIdWallet());
-    }
+    // TODO
+    //    public List<BovineFullInfoDTO> getFieldBovinesNotIn(long idField) {
+    //        Field field = fieldRepository.getField(idField);
+    //        if (field == null) {
+    //            return new ArrayList<>();
+    //        }
+    //        return bovineService.getAllBovineNotInField(idField, field.getUser().getIdWallet());
+    //    }
 
     public FieldDTO createField(FieldCreateDTO fieldCreateDTO) {
         FieldDTO fieldDTO = new FieldDTO();
@@ -208,7 +218,9 @@ public class FieldService {
 
                             fieldDTO = convertToDTO(newField, new HashSet<>());
                             if (fieldDTO.getIdField() != 0) {
-                                bovineService.updateBovineLocation(fieldCreateDTO.getBovines(), newField.getIdField());
+                                //
+                                // bovineService.updateBovineLocation(fieldCreateDTO.getBovines(),
+                                // newField.getIdField());
                                 return fieldDTO;
                             }
                         }
@@ -249,7 +261,8 @@ public class FieldService {
 
                     Set<BovineDTO> bovineDTOS = new HashSet<>();
                     if (!fieldDTO.getBovines().isEmpty()) {
-                        bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(), fieldDTO.getIdField());
+                        //                        bovineDTOS = bovineService.updateBovineLocation(fieldDTO.getBovines(),
+                        // fieldDTO.getIdField());
                         return convertToDTO(field, bovineDTOS);
                     }
                     return convertToDTO(field, bovineDTOS);

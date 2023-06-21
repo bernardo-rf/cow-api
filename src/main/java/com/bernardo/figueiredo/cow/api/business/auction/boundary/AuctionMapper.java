@@ -12,7 +12,7 @@ public class AuctionMapper {
         return new AuctionDTO(
                 auction.getId(),
                 auction.getIdContract(),
-                auction.getBovine().getIdBovine(),
+                auction.getBovine().getId(),
                 auction.getAuctioneer().getIdUser(),
                 auction.getHighestBidder().getIdUser(),
                 auction.getAuctionDescription(),

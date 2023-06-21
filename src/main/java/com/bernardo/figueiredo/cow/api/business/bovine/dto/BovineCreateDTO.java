@@ -17,7 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BovineCreateDTO {
-    private String idOwner;
+    private long idOwner;
     private long idField;
     private long serialNumber;
     private Date birthDate;

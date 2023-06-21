@@ -34,6 +34,7 @@ public enum ErrorCode {
     APPOINTMENT_USER_NOT_FOUND(13, HttpStatus.NOT_FOUND, "Error: No appointment records found for user."),
     APPOINTMENT_DEPLOY_FAILED(13, HttpStatus.BAD_REQUEST, "Hedera Error:  Appointment deploy failed."),
     APPOINTMENT_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Appointment update failed."),
+    APPOINTMENT_DELETE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Appointment delete failed."),
     SCHEDULE_APPOINTMENT_NOT_FOUND(15, HttpStatus.NOT_FOUND, "Error: No schedule appointment record found."),
     SCHEDULE_APPOINTMENT_BOVINE_NOT_FOUND(
             16, HttpStatus.NOT_FOUND, "Error: No schedule appointment records found for bovine."),
@@ -51,7 +52,13 @@ public enum ErrorCode {
     BID_DATE_INVALID(26, HttpStatus.BAD_REQUEST, "Error: Bid date invalid."),
     BID_DEPLOY_FAILED(27, HttpStatus.BAD_REQUEST, "Hedera Error: Bid deploy failed."),
     USER_NOT_FOUND(28, HttpStatus.NOT_FOUND, "Error: No user record found."),
-    BOVINE_NOT_FOUND(29, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
+    FIELD_NOT_FOUND(28, HttpStatus.NOT_FOUND, "Error: No field record found."),
+    BOVINE_NOT_FOUND(29, HttpStatus.NOT_FOUND, "Error: No bovine record found."),
+    BOVINE_DEPLOY_FAILED(13, HttpStatus.BAD_REQUEST, "Hedera Error:  Bovine deploy failed."),
+    BOVINE_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine update failed."),
+    BOVINE_DELETE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine delete failed."),
+    BOVINE_SERIAL_NUMBER_INVALID(14, HttpStatus.BAD_REQUEST, "Error: Bovine serial number invalid."),
+    HISTORY_FIELD_CREATE_FAILED(14, HttpStatus.BAD_REQUEST, "Error: History Field create failed.");
 
     private final int code;
 

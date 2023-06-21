@@ -21,6 +21,9 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
     @Query("SELECT f FROM Field f WHERE f.idField = :idField and f.active = true")
     Field getField(long idField);
 
+    @Query("SELECT f FROM Field f WHERE f.idField = :id and f.active = true")
+    Field getFieldById(long id);
+
     @Query(
             "SELECT f.fieldDescription FROM Field f WHERE f.fieldDescription = :fieldDescription and f.user.idWallet = :idOwner")
     Field checkFieldByAddressAndIDOwner(String fieldDescription, String idOwner);

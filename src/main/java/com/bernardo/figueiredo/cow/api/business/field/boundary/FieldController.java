@@ -6,7 +6,6 @@
 
 package com.bernardo.figueiredo.cow.api.business.field.boundary;
 
-import com.bernardo.figueiredo.cow.api.business.bovine.dto.BovineFullInfoDTO;
 import com.bernardo.figueiredo.cow.api.business.field.dto.FieldCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.field.dto.FieldDTO;
 import com.bernardo.figueiredo.cow.api.business.field.dto.FieldFullInfoDTO;
@@ -64,25 +63,28 @@ public class FieldController {
         }
     }
 
-    @GetMapping("/{fieldId}/bovines")
-    @ApiOperation("Get field bovines by field id")
-    public ResponseEntity<FieldDTO> getFieldBovine(@PathVariable long fieldId) throws Exception {
-        try {
-            return ResponseEntity.ok(fieldService.getFieldBovines(fieldId));
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
-    }
+    // TODO
+    //    @GetMapping("/{fieldId}/bovines")
+    //    @ApiOperation("Get field bovines by field id")
+    //    public ResponseEntity<FieldDTO> getFieldBovine(@PathVariable long fieldId) throws Exception {
+    //        try {
+    //            return ResponseEntity.ok(fieldService.getFieldBovines(fieldId));
+    //        } catch (Exception e) {
+    //            throw new Exception("ERROR: ", e);
+    //        }
+    //    }
 
-    @GetMapping("/{fieldId}/bovines/not-in")
-    @ApiOperation("Get field bovines not in by field id")
-    public ResponseEntity<List<BovineFullInfoDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception {
-        try {
-            return ResponseEntity.ok(fieldService.getFieldBovinesNotIn(fieldId));
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
-    }
+    // TODO
+    //    @GetMapping("/{fieldId}/bovines/not-in")
+    //    @ApiOperation("Get field bovines not in by field id")
+    //    public ResponseEntity<List<BovineFullInfoDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception
+    // {
+    //        try {
+    //            return ResponseEntity.ok(fieldService.getFieldBovinesNotIn(fieldId));
+    //        } catch (Exception e) {
+    //            throw new Exception("ERROR: ", e);
+    //        }
+    //    }
 
     @PostMapping("/")
     @ApiOperation("Create a field")
