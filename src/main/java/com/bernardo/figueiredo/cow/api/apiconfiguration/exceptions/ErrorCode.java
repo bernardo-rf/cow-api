@@ -47,8 +47,11 @@ public enum ErrorCode {
     AUCTION_UPDATE_FAILED(22, HttpStatus.BAD_REQUEST, "Hedera Error: Auction update failed."),
     AUCTION_START_DATE_INVALID(23, HttpStatus.BAD_REQUEST, "Error: Auction start date invalid."),
     AUCTION_END_DATE_INVALID(24, HttpStatus.BAD_REQUEST, "Error: Auction end date invalid."),
-    USER_NOT_FOUND(25, HttpStatus.NOT_FOUND, "Error: No user record found."),
-    BOVINE_NOT_FOUND(26, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
+    BID_NOT_FOUND(25, HttpStatus.NOT_FOUND, "Error: No bid records found."),
+    BID_DATE_INVALID(26, HttpStatus.BAD_REQUEST, "Error: Bid date invalid."),
+    BID_DEPLOY_FAILED(27, HttpStatus.BAD_REQUEST, "Hedera Error: Bid deploy failed."),
+    USER_NOT_FOUND(28, HttpStatus.NOT_FOUND, "Error: No user record found."),
+    BOVINE_NOT_FOUND(29, HttpStatus.NOT_FOUND, "Error: No bovine record found.");
 
     private final int code;
 

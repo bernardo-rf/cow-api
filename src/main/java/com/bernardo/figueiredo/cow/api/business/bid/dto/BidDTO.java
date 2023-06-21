@@ -20,7 +20,7 @@ public class BidDTO {
     private long id;
     private String idContract;
     private long idAuction;
-    private String idBidder;
+    private long idBidder;
     private Double bidValue;
     private Date bidDate;
 }

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class ScheduleAppointmentController {
 
     @Autowired
-    private ScheduleAppointmentService scheduleAppointmentService;
+    private final ScheduleAppointmentService scheduleAppointmentService;
 
     @Autowired
     private ScheduleAppointmentMapper scheduleAppointmentMapper;
