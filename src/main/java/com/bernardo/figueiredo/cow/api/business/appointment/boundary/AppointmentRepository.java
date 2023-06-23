@@ -16,7 +16,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     @Query("SELECT a FROM Appointment a WHERE a.id = :id ORDER BY a.appointmentDate ASC")
     Appointment getAppointmentById(long id);
 
-    @Query("SELECT a FROM Appointment a WHERE a.bovine.idBovine = :id ORDER BY a.appointmentDate ASC")
+    @Query("SELECT a FROM Appointment a WHERE a.bovine.id = :id ORDER BY a.appointmentDate ASC")
     List<Appointment> getAppointmentsByBovineId(long id);
 
     @Query("SELECT a FROM Appointment a WHERE a.veterinary.idUser = :id ORDER BY a.appointmentDate ASC")

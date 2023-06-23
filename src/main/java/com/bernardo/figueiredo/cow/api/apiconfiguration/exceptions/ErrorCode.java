@@ -54,6 +54,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(28, HttpStatus.NOT_FOUND, "Error: No user record found."),
     FIELD_NOT_FOUND(29, HttpStatus.NOT_FOUND, "Error: No field record found."),
     FIELD_HISTORY_NOT_FOUND(30, HttpStatus.NOT_FOUND, "Error: No field history record found."),
+    FIELD_HISTORY_CREATE_FAILED(31, HttpStatus.BAD_REQUEST, "Error: Field history create failed."),
     BOVINE_NOT_FOUND(31, HttpStatus.NOT_FOUND, "Error: No bovine record found."),
     BOVINE_DEPLOY_FAILED(32, HttpStatus.BAD_REQUEST, "Hedera Error:  Bovine deploy failed."),
     BOVINE_UPDATE_FAILED(33, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine update failed."),

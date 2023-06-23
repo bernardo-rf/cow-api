@@ -17,8 +17,8 @@ import com.bernardo.figueiredo.cow.api.business.bovine.dto.*;
 import com.bernardo.figueiredo.cow.api.business.field.boundary.FieldService;
 import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
 import com.bernardo.figueiredo.cow.api.business.field_history.boundary.FieldHistoryService;
+import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistory;
 import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistoryCreatedDTO;
-import com.bernardo.figueiredo.cow.api.business.field_history.dto.FieldHistoryDTO;
 import com.bernardo.figueiredo.cow.api.business.user.boundary.UserService;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
@@ -102,8 +102,7 @@ public class BovineService extends BaseService {
         HederaReceipt receipt;
         FileId fileId;
 
-        Bovine checkBovine = bovineRepository.getBovineBySerialNumberAndUserWalletId(
-                bovineCreateDTO.getSerialNumber(), bovineCreateDTO.getIdOwner());
+        Bovine checkBovine = bovineRepository.getBovineBySerialNumber(bovineCreateDTO.getSerialNumber());
         if (checkBovine != null) {
             throw new ErrorCodeException(ErrorCode.BOVINE_SERIAL_NUMBER_INVALID);
         }
@@ -152,8 +151,15 @@ public class BovineService extends BaseService {
             }
 
             newBovine.setIdContract(receipt.getContractId().toString());
-
             bovine = bovineRepository.save(newBovine);
+
+            FieldHistoryCreatedDTO historyCreatedDTO =
+                    new FieldHistoryCreatedDTO(field.getIdField(), bovine.getId(), new Date());
+            FieldHistory fieldHistory = fieldHistoryService.createFieldHistory(historyCreatedDTO);
+
+            if (fieldHistory == null) {
+                throw new ErrorCodeException(ErrorCode.HISTORY_FIELD_CREATE_FAILED);
+            }
 
         } catch (ReceiptStatusException e) {
             validateGas(e);
@@ -257,14 +263,12 @@ public class BovineService extends BaseService {
         updateBovine.setImageCID(bovineDTO.getImageCID());
         bovineRepository.save(updateBovine);
 
-        if (updateBovine.getField().getIdField() != bovineDTO.getIdField()) {
-            FieldHistoryCreatedDTO historyCreatedDTO =
-                    new FieldHistoryCreatedDTO(bovineDTO.getIdField(), bovineDTO.getIdBovine(), new Date());
-            FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
+        FieldHistoryCreatedDTO historyCreatedDTO =
+                new FieldHistoryCreatedDTO(field.getIdField(), updateBovine.getId(), new Date());
+        FieldHistory fieldHistory = fieldHistoryService.createFieldHistory(historyCreatedDTO);
 
-            if (fieldHistoryDTO == null) {
-                throw new ErrorCodeException(ErrorCode.HISTORY_FIELD_CREATE_FAILED);
-            }
+        if (fieldHistory == null) {
+            throw new ErrorCodeException(ErrorCode.HISTORY_FIELD_CREATE_FAILED);
         }
 
         return bovineRepository.save(updateBovine);

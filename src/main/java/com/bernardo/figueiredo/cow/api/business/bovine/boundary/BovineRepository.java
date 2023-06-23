@@ -16,9 +16,8 @@ public interface BovineRepository extends JpaRepository<Bovine, Long> {
     @Query("SELECT b FROM Bovine b WHERE b.id = :id and b.active = true ORDER BY b.id ASC")
     Bovine getBovineById(long id);
 
-    @Query(
-            "SELECT b FROM Bovine b WHERE b.serialNumber = :serialNumber and b.user.idUser = :idOwner and b.active = true")
-    Bovine getBovineBySerialNumberAndUserWalletId(long serialNumber, long idOwner);
+    @Query("SELECT b FROM Bovine b WHERE b.serialNumber = :serialNumber and b.active = true")
+    Bovine getBovineBySerialNumber(long serialNumber);
 
     @Query("SELECT b FROM Bovine b WHERE b.active = true")
     List<Bovine> getBovinesActive();
@@ -28,12 +27,12 @@ public interface BovineRepository extends JpaRepository<Bovine, Long> {
 
     @Query(
             value =
-                    "SELECT B.* FROM cow_bovine as B WHERE B.id_user = :idWallet and B.id_bovine NOT IN (SELECT A.id_bovine FROM cow_auction as A WHERE A.auction_status != 2) and B.active = 1 ORDER BY B.serial_number ASC",
+                    "SELECT B.* FROM cow_bovine as B WHERE B.id_wallet = :idWallet and B.id_bovine NOT IN (SELECT A.id_bovine FROM cow_auction as A WHERE A.auction_status != 2) and B.active = 1 ORDER BY B.serial_number ASC",
             nativeQuery = true)
     List<Bovine> getBovineToAuctionByUserWalletId(String idWallet);
 
-    @Query(" SELECT b FROM Bovine b LEFT JOIN Field f ON b.field.idField = f.idField "
-            + "WHERE b.field.idField <> :idField and b.user.idWallet = :idWallet and b.active = true")
+    @Query(
+            "SELECT b FROM Bovine b LEFT JOIN Field f ON b.field.idField = f.idField WHERE b.field.idField <> :idField and b.owner.idWallet = :idWallet and b.active = true")
     List<Bovine> getBovinesAvailableByUserWalletId(long idField, String idWallet);
 
     @Query(
