@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FieldHistoryDTO {
-    private long idFieldHistory;
+    private long id;
     private long idField;
     private long idBovine;
     private Date switchDate;

@@ -13,9 +13,9 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface FieldHistoryRepository extends JpaRepository<FieldHistory, Long> {
 
-    @Query("SELECT f FROM FieldHistory f WHERE  f.bovine.idBovine = :idBovine ORDER BY f.idFieldHistory DESC")
-    List<FieldHistory> getAllFieldsHistoryByIDBovine(long idBovine);
+    @Query("SELECT f FROM FieldHistory f WHERE f.id = :id ORDER BY f.switchDate DESC")
+    FieldHistory getFieldHistoryById(long id);
 
-    @Query("SELECT f FROM FieldHistory f WHERE f.idFieldHistory = :idFieldHistory")
-    FieldHistory getFieldHistory(long idFieldHistory);
+    @Query("SELECT f FROM FieldHistory f WHERE  f.bovine.id = :idBovine ORDER BY f.switchDate DESC")
+    List<FieldHistory> getFieldHistoryByBovineId(long idBovine);
 }
