@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "bovines")
-@CrossOrigin(maxAge = 3600)
 @Api("Management endpoints to handle bovines")
+@CrossOrigin(maxAge = 3600)
 @SuppressWarnings("unused")
 public class BovineController {
     @Autowired

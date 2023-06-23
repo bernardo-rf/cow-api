@@ -52,13 +52,14 @@ public enum ErrorCode {
     BID_DATE_INVALID(26, HttpStatus.BAD_REQUEST, "Error: Bid date invalid."),
     BID_DEPLOY_FAILED(27, HttpStatus.BAD_REQUEST, "Hedera Error: Bid deploy failed."),
     USER_NOT_FOUND(28, HttpStatus.NOT_FOUND, "Error: No user record found."),
-    FIELD_NOT_FOUND(28, HttpStatus.NOT_FOUND, "Error: No field record found."),
-    BOVINE_NOT_FOUND(29, HttpStatus.NOT_FOUND, "Error: No bovine record found."),
-    BOVINE_DEPLOY_FAILED(13, HttpStatus.BAD_REQUEST, "Hedera Error:  Bovine deploy failed."),
-    BOVINE_UPDATE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine update failed."),
-    BOVINE_DELETE_FAILED(14, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine delete failed."),
-    BOVINE_SERIAL_NUMBER_INVALID(14, HttpStatus.BAD_REQUEST, "Error: Bovine serial number invalid."),
-    HISTORY_FIELD_CREATE_FAILED(14, HttpStatus.BAD_REQUEST, "Error: History Field create failed.");
+    FIELD_NOT_FOUND(29, HttpStatus.NOT_FOUND, "Error: No field record found."),
+    FIELD_HISTORY_NOT_FOUND(30, HttpStatus.NOT_FOUND, "Error: No field history record found."),
+    BOVINE_NOT_FOUND(31, HttpStatus.NOT_FOUND, "Error: No bovine record found."),
+    BOVINE_DEPLOY_FAILED(32, HttpStatus.BAD_REQUEST, "Hedera Error:  Bovine deploy failed."),
+    BOVINE_UPDATE_FAILED(33, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine update failed."),
+    BOVINE_DELETE_FAILED(34, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine delete failed."),
+    BOVINE_SERIAL_NUMBER_INVALID(35, HttpStatus.BAD_REQUEST, "Error: Bovine serial number invalid."),
+    HISTORY_FIELD_CREATE_FAILED(36, HttpStatus.BAD_REQUEST, "Error: History Field create failed.");
 
     private final int code;
 

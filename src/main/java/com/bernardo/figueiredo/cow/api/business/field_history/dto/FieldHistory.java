@@ -26,7 +26,7 @@ import lombok.Setter;
 public class FieldHistory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idFieldHistory;
+    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_field")
