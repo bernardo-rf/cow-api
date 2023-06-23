@@ -51,9 +51,7 @@ public class BovineService extends BaseService {
     public Bovine getBovineById(long id) {
         Bovine bovine = bovineRepository.getBovineById(id);
 
-        if (bovine == null) {
-            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
-        }
+        validateBovineNull(bovine);
 
         return bovine;
     }
@@ -76,16 +74,8 @@ public class BovineService extends BaseService {
         return validateBovinesEmpty(bovines);
     }
 
-    @NotNull private static List<Bovine> validateBovinesEmpty(List<Bovine> bovines) {
-        if (bovines.isEmpty()) {
-            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
-        }
-
-        return bovines;
-    }
-
-    public List<Bovine> getBovinesAvailableByUserWalletId(long idField, String idWallet) {
-        List<Bovine> bovines = bovineRepository.getBovinesAvailableByUserWalletId(idField, idWallet);
+    public List<Bovine> getBovinesAvailableByUserWalletId(String idWallet, long idField) {
+        List<Bovine> bovines = bovineRepository.getBovinesAvailableByUserWalletId(idWallet, idField);
 
         return validateBovinesEmpty(bovines);
     }
@@ -97,7 +87,6 @@ public class BovineService extends BaseService {
     }
 
     public Bovine createBovine(BovineCreateDTO bovineCreateDTO) {
-
         Bovine bovine;
         HederaReceipt receipt;
         FileId fileId;
@@ -109,8 +98,12 @@ public class BovineService extends BaseService {
 
         User user = userService.getUserById(bovineCreateDTO.getIdOwner());
         Field field = fieldService.getFieldById(bovineCreateDTO.getIdField());
+
         Bovine bovineParent1 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent1());
+        validateBovineNull(bovineParent1);
+
         Bovine bovineParent2 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent2());
+        validateBovineNull(bovineParent2);
 
         try (Client client = getHederaClient()) {
 
@@ -126,21 +119,21 @@ public class BovineService extends BaseService {
 
             validateReceiptStatus(receipt);
 
-            Bovine newBovine = new Bovine();
-            newBovine.setOwner(user);
-            newBovine.setField(field);
-            newBovine.setBovineParent1(bovineParent1);
-            newBovine.setBovineParent2(bovineParent2);
-            newBovine.setGender(bovineCreateDTO.isGender());
-            newBovine.setSerialNumber(bovineCreateDTO.getSerialNumber());
-            newBovine.setBirthDate(bovineCreateDTO.getBirthDate());
-            newBovine.setWeight(bovineCreateDTO.getWeight());
-            newBovine.setHeight(bovineCreateDTO.getHeight());
-            newBovine.setBreed(bovineCreateDTO.getBreed());
-            newBovine.setColor(bovineCreateDTO.getColor());
-            newBovine.setActive(bovineCreateDTO.getActive());
-            newBovine.setObservation(bovineCreateDTO.getObservation());
-            newBovine.setImageCID(bovineCreateDTO.getImageCID());
+            Bovine newBovine = new Bovine(
+                    user,
+                    field,
+                    bovineParent1,
+                    bovineParent2,
+                    bovineCreateDTO.getSerialNumber(),
+                    bovineCreateDTO.getBirthDate(),
+                    bovineCreateDTO.getWeight(),
+                    bovineCreateDTO.getHeight(),
+                    bovineCreateDTO.getBreed(),
+                    bovineCreateDTO.getColor(),
+                    bovineCreateDTO.isGender(),
+                    bovineCreateDTO.getActive(),
+                    bovineCreateDTO.getObservation(),
+                    bovineCreateDTO.getImageCID());
 
             receipt = getBovineDeployReceipt(client, fileId, newBovine);
 
@@ -153,13 +146,7 @@ public class BovineService extends BaseService {
             newBovine.setIdContract(receipt.getContractId().toString());
             bovine = bovineRepository.save(newBovine);
 
-            FieldHistoryCreatedDTO historyCreatedDTO =
-                    new FieldHistoryCreatedDTO(field.getIdField(), bovine.getId(), new Date());
-            FieldHistory fieldHistory = fieldHistoryService.createFieldHistory(historyCreatedDTO);
-
-            if (fieldHistory == null) {
-                throw new ErrorCodeException(ErrorCode.HISTORY_FIELD_CREATE_FAILED);
-            }
+            addFieldHistory(bovine, field);
 
         } catch (ReceiptStatusException e) {
             validateGas(e);
@@ -171,6 +158,16 @@ public class BovineService extends BaseService {
         }
 
         return bovine;
+    }
+
+    private void addFieldHistory(Bovine bovine, Field field) {
+        FieldHistoryCreatedDTO historyCreatedDTO =
+                new FieldHistoryCreatedDTO(field.getIdField(), bovine.getId(), new Date());
+        FieldHistory fieldHistory = fieldHistoryService.createFieldHistory(historyCreatedDTO);
+
+        if (fieldHistory == null) {
+            throw new ErrorCodeException(ErrorCode.HISTORY_FIELD_CREATE_FAILED);
+        }
     }
 
     private HederaReceipt getBovineDeployReceipt(Client client, FileId fileId, Bovine bovine) throws TimeoutException {
@@ -209,9 +206,7 @@ public class BovineService extends BaseService {
 
     public Bovine updateBovine(long id, BovineDTO bovineDTO) {
         Bovine updateBovine = bovineRepository.getBovineById(id);
-        if (updateBovine == null) {
-            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
-        }
+        validateBovineNull(updateBovine);
 
         User user = userService.getUserById(bovineDTO.getIdOwner());
         if (user == null) {
@@ -219,14 +214,10 @@ public class BovineService extends BaseService {
         }
 
         Bovine bovineParent1 = bovineRepository.getBovineById(bovineDTO.getIdBovineParent1());
-        if (bovineParent1 == null) {
-            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
-        }
+        validateBovineNull(bovineParent1);
 
         Bovine bovineParent2 = bovineRepository.getBovineById(bovineDTO.getIdBovineParent2());
-        if (bovineParent2 == null) {
-            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
-        }
+        validateBovineNull(bovineParent1);
 
         Field field = fieldService.getFieldById(bovineDTO.getIdField());
         if (field == null) {
@@ -263,13 +254,7 @@ public class BovineService extends BaseService {
         updateBovine.setImageCID(bovineDTO.getImageCID());
         bovineRepository.save(updateBovine);
 
-        FieldHistoryCreatedDTO historyCreatedDTO =
-                new FieldHistoryCreatedDTO(field.getIdField(), updateBovine.getId(), new Date());
-        FieldHistory fieldHistory = fieldHistoryService.createFieldHistory(historyCreatedDTO);
-
-        if (fieldHistory == null) {
-            throw new ErrorCodeException(ErrorCode.HISTORY_FIELD_CREATE_FAILED);
-        }
+        addFieldHistory(updateBovine, field);
 
         return bovineRepository.save(updateBovine);
     }
@@ -306,48 +291,74 @@ public class BovineService extends BaseService {
         return execute(client, contractCreateTransaction);
     }
 
-    // TODO
-    //    public Set<BovineDTO> updateBovineLocation(Set<BovineDTO> bovineDTOS, long idField) {
-    //        for (BovineDTO bovineDTO : bovineDTOS) {
-    //            Bovine bovine = bovineRepository.getBovine(bovineDTO.getIdBovine());
-    //            if (bovine != null) {
-    //                bovine.setField(fieldRepository.getField(idField));
-    //                bovineRepository.save(bovine);
-    //
-    //                FieldHistoryCreatedDTO historyCreatedDTO =
-    //                        new FieldHistoryCreatedDTO(idField, bovineDTO.getIdBovine(), new Date());
-    //                FieldHistoryDTO fieldHistoryDTO = fieldHistoryService.createFieldHistory(historyCreatedDTO);
-    //            }
-    //        }
-    //        return bovineDTOS;
-    //    }
+    public Bovine updateBovineLocation(long id, long idField) {
+        Bovine updateBovine = bovineRepository.getBovineById(id);
+        validateBovineNull(updateBovine);
 
-    // TODO
-    //    public boolean deleteBovine(long idBovine) {
-    //        try {
-    //            PrivateKey operatorKey = EnvUtils.getOperatorKey();
-    //            client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
-    //
-    //            if (client.getOperatorAccountId() != null) {
-    //                Bovine bovineToDelete = bovineRepository.getBovine(idBovine);
-    //
-    //                if (bovineToDelete != null) {
-    //                    ContractDeleteTransaction transaction = new ContractDeleteTransaction()
-    //                            .setTransferAccountId(client.getOperatorAccountId())
-    //                            .setContractId(ContractId.fromString(bovineToDelete.getIdContract()));
-    //
-    //                    TransactionResponse txResponse =
-    //                            transaction.freezeWith(client).sign(operatorKey).execute(client);
-    //                    TransactionReceipt receipt = txResponse.getReceipt(client);
-    //                    Logger.getLogger("STATUS:" + receipt.status);
-    //
-    //                    bovineRepository.delete(bovineToDelete);
-    //                    return true;
-    //                }
-    //            }
-    //        } catch (Exception e) {
-    //            e.printStackTrace();
-    //        }
-    //        return false;
-    //    }
+        Field field = fieldService.getFieldById(idField);
+
+        updateBovine.setField(field);
+        Bovine bovine = bovineRepository.save(updateBovine);
+        validateBovineNull(updateBovine);
+
+        addFieldHistory(bovine, field);
+
+        return bovine;
+    }
+
+    public void deleteBovine(long id) {
+        Bovine deleteBovine = bovineRepository.getBovineById(id);
+        validateBovineNull(deleteBovine);
+
+        HederaReceipt receipt;
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getBovineDeleteReceipt(client, deleteBovine.getIdContract());
+
+            validateReceiptStatus(receipt);
+
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        bovineRepository.delete(deleteBovine);
+    }
+
+    private HederaReceipt getBovineDeleteReceipt(Client client, String bovineContractId) throws TimeoutException {
+        try {
+            return buildBovineDeleteReceipt(client, bovineContractId);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.BOVINE_DELETE_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.BOVINE_DELETE_FAILED));
+        }
+    }
+
+    private HederaReceipt buildBovineDeleteReceipt(Client client, String bovineContractId)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractDeleteTransaction contractDeleteTransaction = new ContractDeleteTransaction()
+                .setTransferAccountId(EnvUtils.getOperatorId())
+                .setContractId(ContractId.fromString(bovineContractId));
+
+        return freezeWithSignExecute(client, EnvUtils.getOperatorKey(), contractDeleteTransaction);
+    }
+
+    private static void validateBovineNull(Bovine bovine) {
+        if (bovine == null) {
+            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
+        }
+    }
+
+    @NotNull private static List<Bovine> validateBovinesEmpty(List<Bovine> bovines) {
+        if (bovines.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
+        }
+
+        return bovines;
+    }
 }

@@ -52,17 +52,25 @@ public class BovineController {
         return ResponseEntity.ok(bovineMapper.mapSourceListToTargetList(bovines));
     }
 
-    @GetMapping("/{userWalletId}")
+    @GetMapping("/user/{userWalletId}")
     @ApiOperation("Get bovines by user wallet id")
     public ResponseEntity<List<BovineDTO>> getBovinesByUserWalletId(@PathVariable String userWalletId) {
         List<Bovine> bovines = bovineService.getBovinesByUserWalletId(userWalletId);
         return ResponseEntity.ok(bovineMapper.mapSourceListToTargetList(bovines));
     }
 
-    @GetMapping("/{userWalletId}/auction")
+    @GetMapping("/user/{userWalletId}/auction")
     @ApiOperation("Get bovines to auction by user wallet id")
     public ResponseEntity<List<BovineDTO>> getBovinesToAuction(@PathVariable String userWalletId) {
         List<Bovine> bovines = bovineService.getBovineToAuctionByUserWalletId(userWalletId);
+        return ResponseEntity.ok(bovineMapper.mapSourceListToTargetList(bovines));
+    }
+
+    @GetMapping("/user/{userWalletId}/available")
+    @ApiOperation("Get bovines available by user wallet id")
+    public ResponseEntity<List<BovineDTO>> getBovinesToAuction(
+            @PathVariable String userWalletId, @RequestParam long fieldId) {
+        List<Bovine> bovines = bovineService.getBovinesAvailableByUserWalletId(userWalletId, fieldId);
         return ResponseEntity.ok(bovineMapper.mapSourceListToTargetList(bovines));
     }
 
@@ -73,19 +81,24 @@ public class BovineController {
         return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
     }
 
-    // TODO
-    //    @PutMapping("/{id}")
-    //    @ApiOperation("Update bovine")
-    //    public ResponseEntity<BovineDTO> updateBovine(@PathVariable long id, @RequestBody BovineDTO bovineDTO) {
-    //        Bovine bovine = bovineService.updateBovine(id, bovineDTO);
-    //        return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
-    //    }
+    @PutMapping("/{id}")
+    @ApiOperation("Update bovine")
+    public ResponseEntity<BovineDTO> updateBovine(@PathVariable long id, @RequestBody BovineDTO bovineDTO) {
+        Bovine bovine = bovineService.updateBovine(id, bovineDTO);
+        return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
+    }
 
-    // TODO
-    //    @DeleteMapping("/{id}")
-    //    @ApiOperation("Delete bovine")
-    //    public ResponseEntity<String> deleteBovine(@PathVariable long id) {
-    //        bovineService.deleteBovine(id);
-    //        return ResponseEntity.ok("Bovine deleted with success.");
-    //    }
+    @PutMapping("/{id}/location")
+    @ApiOperation("Update bovine location")
+    public ResponseEntity<BovineDTO> updateBovineLocation(@PathVariable long id, @RequestParam long fieldId) {
+        Bovine bovine = bovineService.updateBovineLocation(id, fieldId);
+        return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation("Delete bovine")
+    public ResponseEntity<String> deleteBovine(@PathVariable long id) {
+        bovineService.deleteBovine(id);
+        return ResponseEntity.ok("Bovine deleted with success.");
+    }
 }
