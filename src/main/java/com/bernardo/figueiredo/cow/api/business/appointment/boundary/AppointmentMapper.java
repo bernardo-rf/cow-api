@@ -18,7 +18,7 @@ public class AppointmentMapper {
                 appointment.getId(),
                 appointment.getIdContract(),
                 appointmentRequestId,
-                appointment.getBovine().getIdBovine(),
+                appointment.getBovine().getId(),
                 appointment.getVeterinary().getIdUser(),
                 appointment.getAppointmentDate().toString(),
                 appointment.getAppointmentType(),

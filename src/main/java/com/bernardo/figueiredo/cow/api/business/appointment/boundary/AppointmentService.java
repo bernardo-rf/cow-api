@@ -162,7 +162,7 @@ public class AppointmentService extends BaseService {
                 .setAdminKey(EnvUtils.getOperatorKey())
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addUint256(
-                                BigInteger.valueOf(newAppointment.getBovine().getIdBovine()))
+                                BigInteger.valueOf(newAppointment.getBovine().getId()))
                         .addUint256(BigInteger.valueOf(
                                 newAppointment.getVeterinary().getIdUser()))
                         .addUint256(BigInteger.valueOf(
@@ -299,9 +299,9 @@ public class AppointmentService extends BaseService {
             return buildAppointmentDeleteReceipt(client, appointmentContract);
         } catch (ReceiptStatusException e) {
             validateGas(e);
-            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DEPLOY_FAILED);
+            throw new ErrorCodeException(ErrorCode.APPOINTMENT_DELETE_FAILED);
         } catch (PrecheckStatusException e) {
-            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DEPLOY_FAILED));
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.APPOINTMENT_DELETE_FAILED));
         }
     }
 

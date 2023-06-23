@@ -17,7 +17,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     List<Bid> getBids();
 
     @Query("SELECT b FROM Bid b WHERE b.id = :id ORDER BY bidDate DESC")
-    Bid getBidByBidId(long id);
+    Bid getBidById(long id);
 
     @Query("SELECT b FROM Bid b WHERE b.auction.id = :id ORDER BY bidDate DESC")
     List<Bid> getBidByAuctionId(long id);

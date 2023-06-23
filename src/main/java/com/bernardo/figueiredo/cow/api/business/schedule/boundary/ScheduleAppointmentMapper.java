@@ -14,7 +14,7 @@ public class ScheduleAppointmentMapper {
                 scheduleAppointmentDTO.getId(),
                 scheduleAppointmentDTO.getVeterinary().getIdUser(),
                 scheduleAppointmentDTO.getOwner().getIdUser(),
-                scheduleAppointmentDTO.getBovine().getIdBovine(),
+                scheduleAppointmentDTO.getBovine().getId(),
                 scheduleAppointmentDTO.getMotive(),
                 scheduleAppointmentDTO.getScheduleDate(),
                 scheduleAppointmentDTO.getScheduleStatus());

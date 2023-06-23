@@ -47,6 +47,13 @@ public class BidController {
         return ResponseEntity.ok(bidMapper.mapEntityToDTO(bid));
     }
 
+    @GetMapping("/auction/{id}")
+    @ApiOperation("Get bid by auction id")
+    public ResponseEntity<List<BidDTO>> getBidByAuctionId(@PathVariable long id) {
+        List<Bid> bids = bidService.getBidByAuctionId(id);
+        return ResponseEntity.ok(bidMapper.mapSourceListToTargetList(bids));
+    }
+
     @PostMapping("/")
     @ApiOperation("Create bid")
     public ResponseEntity<BidDTO> createBid(@RequestBody BidCreateDTO bidCreateDTO) {

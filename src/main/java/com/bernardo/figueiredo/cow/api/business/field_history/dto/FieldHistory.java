@@ -26,7 +26,7 @@ import lombok.Setter;
 public class FieldHistory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idFieldHistory;
+    private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_field")
@@ -40,10 +40,4 @@ public class FieldHistory implements Serializable {
 
     @Column(nullable = false)
     private Date switchDate;
-
-    public FieldHistory(Field field, Bovine bovine, Date switchDate) {
-        this.field = field;
-        this.bovine = bovine;
-        this.switchDate = switchDate;
-    }
 }

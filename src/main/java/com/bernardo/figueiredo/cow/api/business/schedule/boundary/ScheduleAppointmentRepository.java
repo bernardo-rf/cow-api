@@ -17,7 +17,7 @@ public interface ScheduleAppointmentRepository extends JpaRepository<ScheduleApp
     ScheduleAppointment getScheduleAppointmentById(long id);
 
     @Query(
-            "SELECT a FROM ScheduleAppointment a WHERE a.bovine.idBovine = :id ORDER BY a.scheduleStatus ASC, a.scheduleDate ASC")
+            "SELECT a FROM ScheduleAppointment a WHERE a.bovine.id = :id ORDER BY a.scheduleStatus ASC, a.scheduleDate ASC")
     List<ScheduleAppointment> getScheduleAppointmentByBovineId(long id);
 
     @Query(

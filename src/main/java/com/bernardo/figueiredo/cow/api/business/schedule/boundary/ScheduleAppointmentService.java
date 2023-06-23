@@ -141,7 +141,7 @@ public class ScheduleAppointmentService extends BaseService {
             appointmentCreateDTO.setIdAppointmentRequest(scheduleAppointment.getId());
             appointmentCreateDTO.setIdVeterinary(
                     scheduleAppointment.getVeterinary().getIdUser());
-            appointmentCreateDTO.setIdBovine(scheduleAppointment.getBovine().getIdBovine());
+            appointmentCreateDTO.setIdBovine(scheduleAppointment.getBovine().getId());
             appointmentService.createAppointment(appointmentCreateDTO);
         }
 
