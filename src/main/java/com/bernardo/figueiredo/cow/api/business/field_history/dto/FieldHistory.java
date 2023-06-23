@@ -40,10 +40,4 @@ public class FieldHistory implements Serializable {
 
     @Column(nullable = false)
     private Date switchDate;
-
-    public FieldHistory(Field field, Bovine bovine, Date switchDate) {
-        this.field = field;
-        this.bovine = bovine;
-        this.switchDate = switchDate;
-    }
 }
