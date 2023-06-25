@@ -6,9 +6,9 @@
 
 package com.bernardo.figueiredo.cow.api.business.field.boundary;
 
+import com.bernardo.figueiredo.cow.api.business.field.dto.Field;
 import com.bernardo.figueiredo.cow.api.business.field.dto.FieldCreateDTO;
 import com.bernardo.figueiredo.cow.api.business.field.dto.FieldDTO;
-import com.bernardo.figueiredo.cow.api.business.field.dto.FieldFullInfoDTO;
 import io.swagger.annotations.*;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,120 +16,61 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(path = "fields")
+@Api("Management endpoints to handle fields")
 @CrossOrigin(maxAge = 3600)
-@Api("Handles management of COW Fields")
-@RequestMapping(path = "api/fields")
+@SuppressWarnings("unused")
 public class FieldController {
 
     @Autowired
     private FieldService fieldService;
 
+    @Autowired
+    private FieldMapper fieldMapper;
+
     public FieldController() {
         fieldService = new FieldService();
     }
 
-    @GetMapping("{userWallet}/full-info")
-    @ApiOperation("Get all fields full info")
-    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsByIDOwner(@PathVariable String userWallet) throws Exception {
-        try {
-            return ResponseEntity.ok(fieldService.getFieldsByIDOwner(userWallet));
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    @GetMapping("/{id}")
+    @ApiOperation("Get field by id")
+    public ResponseEntity<FieldDTO> getFieldById(@PathVariable long id) {
+        Field field = fieldService.getFieldById(id);
+        return ResponseEntity.ok(fieldMapper.mapEntityToDTO(field));
     }
 
-    @GetMapping("{userWallet}/not-occupied")
+    @GetMapping("/user/{userWalletId}")
+    @ApiOperation("Get fields by user wallet id")
+    public ResponseEntity<List<FieldDTO>> getFieldsByUserWalletId(@PathVariable String userWalletId) {
+        List<Field> fields = fieldService.getFieldsByUserWalletId(userWalletId);
+        return ResponseEntity.ok(fieldMapper.mapSourceListToTargetList(fields));
+    }
+
+    @GetMapping("/user/{userWalletId}/available")
     @ApiOperation("Get all fields owned by userWallet not occupied")
-    public ResponseEntity<List<FieldFullInfoDTO>> getFieldsNotOccupied(@PathVariable String userWallet)
-            throws Exception {
-        try {
-            return ResponseEntity.ok(fieldService.getFieldsNotOccupied(userWallet));
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    public ResponseEntity<List<FieldDTO>> getFieldsAvailableByUserWalletId(@PathVariable String userWalletId) {
+        List<Field> fields = fieldService.getFieldsAvailableByUserWalletId(userWalletId);
+        return ResponseEntity.ok(fieldMapper.mapSourceListToTargetList(fields));
     }
-
-    @GetMapping("/{fieldId}")
-    @ApiOperation("Get field by filed id")
-    public ResponseEntity<FieldFullInfoDTO> getField(@PathVariable long fieldId) throws Exception {
-        try {
-            FieldFullInfoDTO fullInfoDTO = fieldService.getField(fieldId);
-            if (fullInfoDTO.getIdField() != 0) {
-                return ResponseEntity.ok(fullInfoDTO);
-            }
-            return ResponseEntity.status(404).build();
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
-    }
-
-    // TODO
-    //    @GetMapping("/{fieldId}/bovines")
-    //    @ApiOperation("Get field bovines by field id")
-    //    public ResponseEntity<FieldDTO> getFieldBovine(@PathVariable long fieldId) throws Exception {
-    //        try {
-    //            return ResponseEntity.ok(fieldService.getFieldBovines(fieldId));
-    //        } catch (Exception e) {
-    //            throw new Exception("ERROR: ", e);
-    //        }
-    //    }
-
-    // TODO
-    //    @GetMapping("/{fieldId}/bovines/not-in")
-    //    @ApiOperation("Get field bovines not in by field id")
-    //    public ResponseEntity<List<BovineFullInfoDTO>> getAllBovineNotIn(@PathVariable long fieldId) throws Exception
-    // {
-    //        try {
-    //            return ResponseEntity.ok(fieldService.getFieldBovinesNotIn(fieldId));
-    //        } catch (Exception e) {
-    //            throw new Exception("ERROR: ", e);
-    //        }
-    //    }
 
     @PostMapping("/")
-    @ApiOperation("Create a field")
-    public ResponseEntity<FieldDTO> createField(@RequestBody FieldCreateDTO fieldCreateDTO) throws Exception {
-        try {
-            FieldDTO fieldDTO = fieldService.createField(fieldCreateDTO);
-            if (fieldDTO.getIdField() == 999999) {
-                return ResponseEntity.status(409).build();
-            } else if (fieldDTO.getIdField() != 0) {
-                return ResponseEntity.ok(fieldDTO);
-            }
-            return ResponseEntity.status(404).build();
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    @ApiOperation("Create field")
+    public ResponseEntity<FieldDTO> createField(@RequestBody FieldCreateDTO fieldCreateDTO) {
+        Field field = fieldService.createField(fieldCreateDTO);
+        return ResponseEntity.ok(fieldMapper.mapEntityToDTO(field));
     }
 
-    @PutMapping("/{fieldID}")
-    @ApiOperation("Update a field")
-    public ResponseEntity<FieldDTO> updateField(@PathVariable long fieldID, @RequestBody FieldDTO fieldDTO)
-            throws Exception {
-        try {
-            if (fieldID == fieldDTO.getIdField()) {
-                FieldDTO updatedFieldDTO = fieldService.updateField(fieldDTO);
-                if (updatedFieldDTO.getIdField() != 0) {
-                    return ResponseEntity.ok(updatedFieldDTO);
-                }
-                return ResponseEntity.status(404).build();
-            }
-            return ResponseEntity.status(409).build();
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    @PutMapping("/{id}")
+    @ApiOperation("Update field")
+    public ResponseEntity<FieldDTO> updateField(@PathVariable long id, @RequestBody FieldDTO fieldDTO) {
+        Field field = fieldService.updateField(id, fieldDTO);
+        return ResponseEntity.ok(fieldMapper.mapEntityToDTO(field));
     }
 
-    @DeleteMapping("/{fieldID}")
-    @ApiOperation("Delete a field")
-    public ResponseEntity<String> deleteField(@PathVariable long fieldID) throws Exception {
-        try {
-            if (fieldService.deleteField(fieldID)) {
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.status(404).build();
-        } catch (Exception e) {
-            throw new Exception("ERROR: ", e);
-        }
+    @DeleteMapping("/{id}")
+    @ApiOperation("Delete field")
+    public ResponseEntity<String> deleteField(@PathVariable long id) {
+        fieldService.deleteField(id);
+        return ResponseEntity.ok("Field deleted with success.");
     }
 }

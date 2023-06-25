@@ -74,8 +74,8 @@ public class BovineService extends BaseService {
         return validateBovinesEmpty(bovines);
     }
 
-    public List<Bovine> getBovinesAvailableByUserWalletId(String idWallet, long idField) {
-        List<Bovine> bovines = bovineRepository.getBovinesAvailableByUserWalletId(idWallet, idField);
+    public List<Bovine> getBovinesAvailableByUserWalletIdAndFieldId(String idWallet, long idField) {
+        List<Bovine> bovines = bovineRepository.getBovinesAvailableByUserWalletIdAndFieldId(idWallet, idField);
 
         return validateBovinesEmpty(bovines);
     }
@@ -162,7 +162,7 @@ public class BovineService extends BaseService {
 
     private void addFieldHistory(Bovine bovine, Field field) {
         FieldHistoryCreatedDTO historyCreatedDTO =
-                new FieldHistoryCreatedDTO(field.getIdField(), bovine.getId(), new Date());
+                new FieldHistoryCreatedDTO(field.getId(), bovine.getId(), new Date());
         FieldHistory fieldHistory = fieldHistoryService.createFieldHistory(historyCreatedDTO);
 
         if (fieldHistory == null) {
@@ -190,7 +190,7 @@ public class BovineService extends BaseService {
                 .setAdminKey(EnvUtils.getOperatorKey())
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addString(newBovine.getOwner().getIdContract())
-                        .addUint256(BigInteger.valueOf(newBovine.getField().getIdField()))
+                        .addUint256(BigInteger.valueOf(newBovine.getField().getId()))
                         .addUint256(BigInteger.valueOf(newBovine.getSerialNumber()))
                         .addUint256(BigInteger.valueOf(newBovine.getBirthDate().getTime()))
                         .addBool(newBovine.getActive())

@@ -31,7 +31,7 @@ public class Field implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idField;
+    private long id;
 
     @Column(nullable = false, unique = true)
     private String idContract;
@@ -39,7 +39,7 @@ public class Field implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
     @JsonBackReference
-    private User user;
+    private User owner;
 
     @Column(nullable = false, length = 100)
     @Nationalized
@@ -50,7 +50,7 @@ public class Field implements Serializable {
     private String address;
 
     @Column(nullable = false)
-    private int fieldLimit;
+    private int maxCapacityLimit;
 
     @Column(nullable = false)
     private Double latitude;
@@ -73,7 +73,6 @@ public class Field implements Serializable {
     private Set<FieldHistory> fieldHistorySet = new HashSet<>();
 
     public Field(
-            String idContract,
             User user,
             String fieldDescription,
             String address,
@@ -82,11 +81,10 @@ public class Field implements Serializable {
             Double longitude,
             Boolean active,
             String observation) {
-        this.idContract = idContract;
-        this.user = user;
+        this.owner = user;
         this.fieldDescription = fieldDescription;
         this.address = address;
-        this.fieldLimit = limit;
+        this.maxCapacityLimit = limit;
         this.latitude = latitude;
         this.longitude = longitude;
         this.active = active;

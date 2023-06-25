@@ -70,7 +70,7 @@ public class BovineController {
     @ApiOperation("Get bovines available by user wallet id")
     public ResponseEntity<List<BovineDTO>> getBovinesToAuction(
             @PathVariable String userWalletId, @RequestParam long fieldId) {
-        List<Bovine> bovines = bovineService.getBovinesAvailableByUserWalletId(userWalletId, fieldId);
+        List<Bovine> bovines = bovineService.getBovinesAvailableByUserWalletIdAndFieldId(userWalletId, fieldId);
         return ResponseEntity.ok(bovineMapper.mapSourceListToTargetList(bovines));
     }
 

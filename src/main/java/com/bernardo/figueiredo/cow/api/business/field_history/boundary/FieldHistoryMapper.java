@@ -11,7 +11,7 @@ public class FieldHistoryMapper {
     public FieldHistoryDTO mapEntityToDTO(FieldHistory fieldHistory) {
         return new FieldHistoryDTO(
                 fieldHistory.getId(),
-                fieldHistory.getField().getIdField(),
+                fieldHistory.getField().getId(),
                 fieldHistory.getBovine().getId(),
                 fieldHistory.getSwitchDate());
     }
