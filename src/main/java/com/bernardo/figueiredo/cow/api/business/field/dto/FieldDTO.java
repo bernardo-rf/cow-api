@@ -6,8 +6,6 @@
 
 package com.bernardo.figueiredo.cow.api.business.field.dto;
 
-import com.bernardo.figueiredo.cow.api.business.bovine.dto.BovineDTO;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,15 +16,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FieldDTO {
-    private long idField;
-    private String idOwner;
+    private long id;
+    private long idOwner;
     private String idContract;
     private String fieldDescription;
     private Double latitude;
     private Double longitude;
     private String address;
-    private int limit;
+    private int maxCapacityLimit;
     private Boolean active;
     private String observation;
-    private Set<BovineDTO> bovines;
 }

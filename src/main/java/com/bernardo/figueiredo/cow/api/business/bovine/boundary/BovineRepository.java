@@ -32,8 +32,8 @@ public interface BovineRepository extends JpaRepository<Bovine, Long> {
     List<Bovine> getBovineToAuctionByUserWalletId(String idWallet);
 
     @Query(
-            "SELECT b FROM Bovine b LEFT JOIN Field f ON b.field.idField = f.idField WHERE b.field.idField <> :idField and b.owner.idWallet = :idWallet and b.active = true")
-    List<Bovine> getBovinesAvailableByUserWalletId(String idWallet, long idField);
+            "SELECT b FROM Bovine b LEFT JOIN Field f ON b.field.id = f.id WHERE b.field.id <> :idField and b.owner.idWallet = :idWallet and b.active = true")
+    List<Bovine> getBovinesAvailableByUserWalletIdAndFieldId(String idWallet, long idField);
 
     @Query(
             value =

@@ -12,19 +12,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface FieldRepository extends JpaRepository<Field, Long> {
-    @Query("SELECT f FROM Field f WHERE f.active = true ORDER BY f.idField ASC")
-    List<Field> getFields();
 
-    @Query("SELECT f FROM Field f WHERE f.active = true and f.user.idWallet = :idOwner ORDER BY f.idField ASC")
-    List<Field> getFieldsByIDOwner(String idOwner);
-
-    @Query("SELECT f FROM Field f WHERE f.idField = :idField and f.active = true")
-    Field getField(long idField);
-
-    @Query("SELECT f FROM Field f WHERE f.idField = :id and f.active = true")
+    @Query("SELECT f FROM Field f WHERE f.id = :id and f.active = true")
     Field getFieldById(long id);
 
+    @Query("SELECT f FROM Field f WHERE f.active = true and f.owner.idWallet = :idWallet ORDER BY f.id ASC")
+    List<Field> getFieldsByUserWalletId(String idWallet);
+
     @Query(
-            "SELECT f.fieldDescription FROM Field f WHERE f.fieldDescription = :fieldDescription and f.user.idWallet = :idOwner")
-    Field checkFieldByAddressAndIDOwner(String fieldDescription, String idOwner);
+            "SELECT f.address FROM Field f WHERE f.fieldDescription = :fieldDescription and f.owner.idWallet = :idWallet")
+    Field getFieldAddressByDescriptionAndUserWalletId(String fieldDescription, String idWallet);
 }

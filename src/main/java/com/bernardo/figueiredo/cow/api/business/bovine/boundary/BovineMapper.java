@@ -13,7 +13,7 @@ public class BovineMapper {
                 bovine.getId(),
                 bovine.getIdContract(),
                 bovine.getOwner().getIdUser(),
-                bovine.getField().getIdField(),
+                bovine.getField().getId(),
                 bovine.getSerialNumber(),
                 bovine.getBirthDate(),
                 bovine.getWeight(),
