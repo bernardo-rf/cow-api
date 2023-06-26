@@ -72,25 +72,4 @@ public class Auction implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "auction")
     @JsonManagedReference
     private Set<Bid> bidSet = new HashSet<>();
-
-    public Auction(
-            String idContract,
-            Bovine bovine,
-            User auctioneer,
-            User highestBidder,
-            String auctionDescription,
-            Date startDate,
-            Date endDate,
-            int auctionStatus,
-            double initialPrice) {
-        this.idContract = idContract;
-        this.bovine = bovine;
-        this.auctioneer = auctioneer;
-        this.highestBidder = highestBidder;
-        this.auctionDescription = auctionDescription;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.auctionStatus = auctionStatus;
-        this.initialPrice = initialPrice;
-    }
 }

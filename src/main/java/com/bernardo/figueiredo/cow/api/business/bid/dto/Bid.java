@@ -46,12 +46,4 @@ public class Bid implements Serializable {
 
     @Column(nullable = false)
     private Date bidDate;
-
-    public Bid(String idContract, Auction auction, User user, Double bidValue, Date bidDate) {
-        this.idContract = idContract;
-        this.auction = auction;
-        this.bidder = user;
-        this.bidValue = bidValue;
-        this.bidDate = bidDate;
-    }
 }
