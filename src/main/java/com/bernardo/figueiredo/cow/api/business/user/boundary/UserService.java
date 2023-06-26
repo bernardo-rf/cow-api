@@ -8,6 +8,7 @@ package com.bernardo.figueiredo.cow.api.business.user.boundary;
 
 import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.*;
 import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.execute;
+import static com.bernardo.figueiredo.cow.api.utils.Constants.INITIAL_BALANCE;
 
 import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseByteCode;
 import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseService;
@@ -163,7 +164,7 @@ public class UserService extends BaseService {
                     userCreateDTO.getEmail(),
                     bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
                     true,
-                    10000.0,
+                    INITIAL_BALANCE,
                     "",
                     "");
 

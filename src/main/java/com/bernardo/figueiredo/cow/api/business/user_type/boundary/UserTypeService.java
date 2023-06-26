@@ -29,16 +29,6 @@ public class UserTypeService {
         return userType;
     }
 
-    public UserType getUserTypeByDescription(String userTypeDescription) {
-        UserType userType = userTypeRepository.getUserTypeByDescription(userTypeDescription);
-
-        if (userType == null) {
-            throw new ErrorCodeException(ErrorCode.USER_TYPE_NOT_FOUND);
-        }
-
-        return userType;
-    }
-
     public List<UserType> getUserTypes() {
         List<UserType> userTypes = userTypeRepository.getUserTypes();
 
@@ -47,16 +37,5 @@ public class UserTypeService {
         }
 
         return userTypes;
-    }
-
-    public UserType createUserType(String userTypeDescription) {
-
-        UserType userType = getUserTypeByDescription(userTypeDescription);
-        if (userType != null) {
-            throw new ErrorCodeException(ErrorCode.USER_TYPE_DESCRIPTION_INVALID);
-        }
-
-        UserType newUserType = new UserType(userTypeDescription, true);
-        return userTypeRepository.save(newUserType);
     }
 }
