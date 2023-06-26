@@ -13,7 +13,7 @@ public class BidMapper {
                 bid.getId(),
                 bid.getIdContract(),
                 bid.getAuction().getId(),
-                bid.getBidder().getIdUser(),
+                bid.getBidder().getId(),
                 bid.getBidValue(),
                 bid.getBidDate());
     }

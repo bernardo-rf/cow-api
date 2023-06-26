@@ -12,7 +12,7 @@ public class FieldMapper {
     public FieldDTO mapEntityToDTO(Field field) {
         return new FieldDTO(
                 field.getId(),
-                field.getOwner().getIdUser(),
+                field.getOwner().getId(),
                 field.getIdContract(),
                 field.getFieldDescription(),
                 field.getLatitude(),

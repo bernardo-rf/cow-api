@@ -6,7 +6,6 @@
 
 package com.bernardo.figueiredo.cow.api.business.user.dto;
 
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,17 +15,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
-    private long id;
-    private String idContract;
-    private String idWallet;
-    private long idUserType;
-    private String name;
-    private Date birthDate;
+public class UserCredentialDTO {
     private String email;
     private String password;
-    private Boolean active;
-    private Double balance;
-    private String fullName;
-    private String imageCID;
 }

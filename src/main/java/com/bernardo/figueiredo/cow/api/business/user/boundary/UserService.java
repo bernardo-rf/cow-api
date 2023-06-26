@@ -6,34 +6,36 @@
 
 package com.bernardo.figueiredo.cow.api.business.user.boundary;
 
+import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.*;
+import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.execute;
+
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseByteCode;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseService;
 import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCode;
 import com.bernardo.figueiredo.cow.api.apiconfiguration.exceptions.ErrorCodeException;
+import com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaReceipt;
 import com.bernardo.figueiredo.cow.api.business.user.dto.*;
-import com.bernardo.figueiredo.cow.api.business.user_type.boundary.UserTypeRepository;
+import com.bernardo.figueiredo.cow.api.business.user_type.boundary.UserTypeService;
 import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.bernardo.figueiredo.cow.api.utils.JwtToken;
 import com.hedera.hashgraph.sdk.*;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.Scanner;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
-
-    @Autowired
-    private UserTypeRepository userTypeRepository;
+public class UserService extends BaseService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserTypeService userTypeService;
 
     @Autowired
     private JwtToken jwtToken;
@@ -41,32 +43,16 @@ public class UserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private BaseByteCode baseByteCode;
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    public Client client = Client.forTestnet();
-
-    public UserFullInfoDTO convertToDTO(User user, String userType) {
-        return new UserFullInfoDTO(
-                user.getIdUser(),
-                user.getIdContract(),
-                user.getIdWallet(),
-                user.getUserType().getIdUserType(),
-                userType,
-                user.getName(),
-                user.getBirthDate(),
-                user.getEmail(),
-                user.getPassword(),
-                user.getActive(),
-                user.getBalance(),
-                user.getFullName(),
-                user.getImageCID());
-    }
-
     public User getUserById(long id) {
-        User user = userRepository.getUser(id);
+        User user = userRepository.getUserById(id);
 
         if (user == null) {
             throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
@@ -75,201 +61,254 @@ public class UserService {
         return user;
     }
 
-    public UserFullInfoDTO getUserFullInfo(long idUser) {
-        User user = userRepository.getUser(idUser);
+    public User getUserByEmail(String email) {
+        User user = userRepository.getUserByEmail(email);
+
+        if (user == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return user;
+    }
+
+    public User getUserByWalletId(String idWallet) {
+        User user = userRepository.getUserByWalletId(idWallet);
+
+        if (user == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return user;
+    }
+
+    public List<User> getUsersByUserTypeId(long idUserType) {
+        List<User> users = userRepository.getUsersByUserTypeId(idUserType);
+
+        if (users.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return users;
+    }
+
+    public UserAuth authenticateUser(UserCredentialDTO userDTO) {
+        User user = userRepository.getUserByEmail(userDTO.getEmail());
+        if (user == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
+            throw new ErrorCodeException(ErrorCode.AUTHENTICATION_FAILED);
+        }
+
+        String accessToken = jwtToken.generateToken(user);
+        if (accessToken.isEmpty()) {
+            throw new ErrorCodeException(ErrorCode.AUTHENTICATION_CREATE_FAILED);
+        }
+
+        return new UserAuth(accessToken, user);
+    }
+
+    public UserAuth createUser(UserCreateDTO userCreateDTO) {
+        User userSaved;
+        HederaReceipt receipt;
+        FileId fileId;
+        AccountId accountId;
+
+        User user = getUserByEmail(userCreateDTO.getEmail());
         if (user != null) {
-            UserType userType =
-                    userTypeRepository.getUserType(user.getUserType().getIdUserType());
-            if (userType != null) {
-                return convertToDTO(user, userType.getTypeDescription().toUpperCase());
-            }
+            throw new ErrorCodeException(ErrorCode.USER_EMAIL_INVALID);
         }
-        return new UserFullInfoDTO();
+
+        UserType checkUserType = userTypeService.getUserTypeById(userCreateDTO.getIdUserType());
+        if (checkUserType == null) {
+            throw new ErrorCodeException(ErrorCode.USER_TYPE_NOT_FOUND);
+        }
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            PrivateKey newPrivateKey = PrivateKey.generateED25519();
+            PublicKey newPublicKey = newPrivateKey.getPublicKey();
+
+            receipt = getUserAccountReceipt(client, newPublicKey);
+
+            validateReceiptStatus(receipt);
+
+            if (receipt.getAccountId() == null) {
+                throw new ErrorCodeException(ErrorCode.HEDERA_ACCOUNT_ID_NOT_FOUND);
+            }
+
+            accountId = receipt.getAccountId();
+
+            receipt = getHederaContractFile(client);
+
+            validateReceiptStatus(receipt);
+
+            if (receipt.getFileId() == null) {
+                throw new ErrorCodeException(ErrorCode.HEDERA_FIELD_ID_NOT_FOUND);
+            }
+            fileId = receipt.getFileId();
+
+            receipt = getHederaContractFileAppend(client, fileId, baseByteCode.getUserByteCode(), 10, 2);
+
+            validateReceiptStatus(receipt);
+
+            User newUser = new User(
+                    accountId.toString(),
+                    checkUserType,
+                    userCreateDTO.getName(),
+                    null,
+                    userCreateDTO.getEmail(),
+                    bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
+                    true,
+                    10000.0,
+                    "",
+                    "");
+
+            receipt = getUserDeployReceipt(client, fileId, newUser);
+
+            validateReceiptStatus(receipt);
+
+            if (receipt.getContractId() == null) {
+                throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
+            }
+
+            newUser.setIdContract(receipt.getContractId().toString());
+            userSaved = userRepository.save(newUser);
+
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.USER_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.USER_DEPLOY_FAILED));
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        String accessToken = jwtToken.generateToken(userSaved);
+        if (accessToken.isBlank()) {
+            throw new ErrorCodeException(ErrorCode.ACCESS_TOKEN_CREATE_FAILED);
+        }
+
+        return new UserAuth(accessToken, userSaved);
     }
 
-    public UserAuthResponseDTO authenticate(UserAuthDTO userDTO) {
-        UserAuthResponseDTO emptyUserAuthResponseDTO = new UserAuthResponseDTO();
-        User user = userRepository.getUserByEmail(userDTO.getEmail(), 0);
-        if (user != null && bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
-            if (!user.getActive()) {
-                emptyUserAuthResponseDTO.setToken("USER_DISABLE");
-                return emptyUserAuthResponseDTO;
-            }
-            UserAuthResponseDTO userAuthResponseDTO = new UserAuthResponseDTO();
-            UserFullInfoDTO userFullInfoDTO = getUserFullInfo(user.getIdUser());
-            if (userFullInfoDTO.getIdUser() != 0) {
-                userAuthResponseDTO.setToken(jwtToken.generateToken(user));
-                userAuthResponseDTO.setUser(userFullInfoDTO);
-                return userAuthResponseDTO;
-            }
-        }
-        return emptyUserAuthResponseDTO;
-    }
-
-    public UserAuthResponseDTO createUser(UserCreateDTO userCreateDTO) {
-        UserAuthResponseDTO emptyUserAuthResponseDTO = new UserAuthResponseDTO();
+    private HederaReceipt getUserDeployReceipt(Client client, FileId fileId, User user) throws TimeoutException {
         try {
-
-            User userAux = userRepository.getUserByEmail(userCreateDTO.getEmail(), 0);
-            if (userAux != null) {
-                emptyUserAuthResponseDTO.setToken("ERROR_EMAIL");
-                return emptyUserAuthResponseDTO;
-            }
-
-            UserType userType = userTypeRepository.getUserType(userCreateDTO.getIdUserType());
-            if (userType == null) {
-                emptyUserAuthResponseDTO.setToken("ERROR_USER_TYPE");
-                return emptyUserAuthResponseDTO;
-            }
-
-            File myObj = new File(EnvUtils.getProjectPath() + "user/User.bin");
-            Scanner myReader = new Scanner(myObj);
-
-            while (myReader.hasNextLine()) {
-                PrivateKey operatorKey = EnvUtils.getOperatorKey();
-                client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
-
-                AccountId newAccountId;
-                PrivateKey newAccountPrivateKey = PrivateKey.generateED25519();
-                PublicKey newAccountPublicKey = newAccountPrivateKey.getPublicKey();
-
-                TransactionResponse newAccount = new AccountCreateTransaction()
-                        .setKey(newAccountPublicKey)
-                        .setInitialBalance(Hbar.fromTinybars(1000))
-                        .execute(client);
-
-                newAccountId = newAccount.getReceipt(client).accountId;
-
-                AccountBalance tokenBalance = null;
-                if (newAccountId != null) {
-                    AccountBalanceQuery query = new AccountBalanceQuery().setAccountId(newAccountId);
-                    tokenBalance = query.execute(client);
-                }
-
-                if (tokenBalance != null) {
-                    String objectByteCode = myReader.nextLine();
-                    byte[] bytecode = objectByteCode.getBytes(StandardCharsets.UTF_8);
-
-                    TransactionResponse fileCreateTx = new FileCreateTransaction()
-                            .setKeys(operatorKey)
-                            .freezeWith(client)
-                            .execute(client);
-
-                    TransactionReceipt fileReceipt1 = fileCreateTx.getReceipt(client);
-                    FileId bytecodeFileId = fileReceipt1.fileId;
-
-                    if (bytecodeFileId != null) {
-                        TransactionResponse fileAppendTransaction = new FileAppendTransaction()
-                                .setFileId(bytecodeFileId)
-                                .setContents(bytecode)
-                                .setMaxChunks(10)
-                                .setMaxTransactionFee(new Hbar(2))
-                                .execute(client);
-                        TransactionReceipt fileReceipt2 = fileAppendTransaction.getReceipt(client);
-                        Logger.getLogger("Contract Created =" + fileReceipt2);
-
-                        String balanceAux = tokenBalance.hbars.toString();
-                        String balance = balanceAux.substring(0, balanceAux.length() - 3);
-
-                        TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
-                                .setBytecodeFileId(bytecodeFileId)
-                                .setGas(300000)
-                                .setAdminKey(operatorKey)
-                                .setConstructorParameters(new ContractFunctionParameters()
-                                        .addUint256(BigInteger.valueOf(userCreateDTO.getIdUserType()))
-                                        .addString(userCreateDTO.getName())
-                                        .addString("")
-                                        .addString(userCreateDTO.getEmail())
-                                        .addString(bCryptPasswordEncoder.encode(
-                                                userCreateDTO.getPassword().toUpperCase()))
-                                        .addBool(true)
-                                        .addUint256(BigInteger.valueOf(Long.parseLong(balance))))
-                                .execute(client);
-
-                        TransactionReceipt fileReceipt3 = contractCreateTransaction.getReceipt(client);
-                        Logger.getLogger("Contract Filled " + fileReceipt3.contractId);
-
-                        if (fileReceipt3.contractId != null) {
-                            String idContract = fileReceipt3.contractId.toString();
-                            String idAccount = newAccountId.toString();
-
-                            User user = new User(
-                                    idContract,
-                                    idAccount,
-                                    userType,
-                                    userCreateDTO.getName(),
-                                    null,
-                                    userCreateDTO.getEmail(),
-                                    bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
-                                    true,
-                                    Double.valueOf(balance),
-                                    "",
-                                    "");
-                            userRepository.save(user);
-
-                            return new UserAuthResponseDTO(
-                                    jwtToken.generateToken(user),
-                                    convertToDTO(
-                                            user, userType.getTypeDescription().toUpperCase()));
-                        }
-                    }
-                }
-            }
-        } catch (FileNotFoundException | TimeoutException | PrecheckStatusException | ReceiptStatusException e) {
-            e.printStackTrace();
+            return buildUserDeployReceipt(client, fileId, user);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.USER_DEPLOY_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.USER_DEPLOY_FAILED));
         }
-        return emptyUserAuthResponseDTO;
     }
 
-    public UserFullInfoDTO updateUser(UserDTO userDTO) {
-        UserFullInfoDTO emptyUser = new UserFullInfoDTO();
+    private HederaReceipt buildUserDeployReceipt(Client client, FileId byteCodeFileId, User newUser)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractCreateTransaction contractCreateTransaction = new ContractCreateTransaction()
+                .setBytecodeFileId(byteCodeFileId)
+                .setGas(400_000)
+                .setAdminKey(EnvUtils.getOperatorKey())
+                .setConstructorParameters(new ContractFunctionParameters()
+                        .addUint256(BigInteger.valueOf(newUser.getUserType().getId()))
+                        .addString(newUser.getName())
+                        .addUint256(BigInteger.valueOf(newUser.getBirthDate().getTime()))
+                        .addString(newUser.getEmail())
+                        .addString(bCryptPasswordEncoder.encode(
+                                newUser.getPassword().toUpperCase()))
+                        .addBool(newUser.getActive())
+                        .addUint256(BigInteger.valueOf((long) newUser.getBalance())));
+
+        return execute(client, contractCreateTransaction);
+    }
+
+    private HederaReceipt getUserAccountReceipt(Client client, PublicKey publicKey) throws TimeoutException {
         try {
-            User user = userRepository.getUserByIDWallet(userDTO.getIdWallet());
-            if (bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
-                emptyUser.setName("error_password_equals_to_previous");
-                return emptyUser;
-            }
-
-            User userAux = userRepository.getUserByEmail(userDTO.getEmail(), userDTO.getIdUser());
-            if (userAux != null) {
-                emptyUser.setName("error_email_already_taken");
-                return emptyUser;
-            }
-
-            client.setOperator(EnvUtils.getOperatorId(), EnvUtils.getOperatorKey());
-
-            TransactionResponse contractCreateTransaction = new ContractExecuteTransaction()
-                    .setContractId(ContractId.fromString(userDTO.getIdContract()))
-                    .setGas(300000)
-                    .setFunction(
-                            "setUpdate",
-                            new ContractFunctionParameters()
-                                    .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
-                                    .addUint256(BigInteger.valueOf(
-                                            userDTO.getBirthDate().getTime()))
-                                    .addBool(userDTO.getActive()))
-                    .execute(client);
-
-            TransactionReceipt fileReceipt = contractCreateTransaction.getReceipt(client);
-            Logger.getLogger("Status " + fileReceipt.status);
-
-            user.setName(userDTO.getName());
-            user.setEmail(userDTO.getEmail());
-            user.setBirthDate(userDTO.getBirthDate());
-            user.setFullName(userDTO.getFullName());
-            user.setImageCID(userDTO.getImageCID());
-
-            if (!userDTO.getPassword().isEmpty()) {
-                user.setPassword(
-                        bCryptPasswordEncoder.encode(userDTO.getPassword().toUpperCase()));
-            }
-            userRepository.save(user);
-
-            return getUserFullInfo(user.getIdUser());
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            return buildUserAccountReceipt(client, publicKey);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.USER_ACCOUNT_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.USER_ACCOUNT_FAILED));
         }
-        return emptyUser;
+    }
+
+    private HederaReceipt buildUserAccountReceipt(Client client, PublicKey publicKey)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        AccountCreateTransaction accountCreateTransaction =
+                new AccountCreateTransaction().setKey(publicKey).setInitialBalance(Hbar.fromTinybars(10_000));
+
+        return execute(client, accountCreateTransaction);
+    }
+
+    public User updateUser(long id, UserDTO userDTO) {
+        User updateUser = userRepository.getUserById(id);
+        if (updateUser == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        User checkUser = userRepository.getUserByEmail(userDTO.getEmail());
+        if (checkUser == null) {
+            throw new ErrorCodeException(ErrorCode.USER_EMAIL_INVALID);
+        }
+
+        if (bCryptPasswordEncoder.matches(userDTO.getPassword(), updateUser.getPassword())) {
+            throw new ErrorCodeException(ErrorCode.USER_PASSWORD_INVALID);
+        }
+
+        HederaReceipt receipt;
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getUserUpdateReceipt(client, userDTO);
+
+            validateReceiptStatus(receipt);
+
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        updateUser.setName(userDTO.getName());
+        updateUser.setEmail(userDTO.getEmail());
+        updateUser.setBirthDate(userDTO.getBirthDate());
+        updateUser.setFullName(userDTO.getFullName());
+        updateUser.setImageCID(userDTO.getImageCID());
+
+        return userRepository.save(updateUser);
+    }
+
+    private HederaReceipt getUserUpdateReceipt(Client client, UserDTO userDTO) throws TimeoutException {
+        try {
+            return buildFieldUpdateReceipt(client, userDTO);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.USER_UPDATE_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.USER_UPDATE_FAILED));
+        }
+    }
+
+    private HederaReceipt buildFieldUpdateReceipt(Client client, UserDTO userDTO)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractExecuteTransaction contractExecuteTransaction = new ContractExecuteTransaction()
+                .setContractId(ContractId.fromString(userDTO.getIdContract()))
+                .setGas(300_000)
+                .setFunction(
+                        "setUpdate",
+                        new ContractFunctionParameters()
+                                .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
+                                .addUint256(BigInteger.valueOf(
+                                        userDTO.getBirthDate().getTime()))
+                                .addBool(userDTO.getActive()));
+
+        return execute(client, contractExecuteTransaction);
     }
 }

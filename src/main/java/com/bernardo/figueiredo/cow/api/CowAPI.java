@@ -26,7 +26,7 @@ public class CowAPI {
     @Bean
     public CommandLineRunner onStart(UserTypeRepository userTypeRepository) {
         return args -> {
-            List<UserType> userTypes = userTypeRepository.getAllUserTypes();
+            List<UserType> userTypes = userTypeRepository.getUserTypes();
             if (userTypes.isEmpty()) {
                 userTypeRepository.save(new UserType(Constants.FARMER_USER_TYPE, true));
                 userTypeRepository.save(new UserType(Constants.VETERINARY_USER_TYPE, true));

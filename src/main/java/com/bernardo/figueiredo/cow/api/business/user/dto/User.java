@@ -34,7 +34,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idUser;
+    private long id;
 
     @Column(nullable = false, unique = true)
     @Nationalized
@@ -93,7 +93,6 @@ public class User implements Serializable {
     private Set<Field> fieldSet = new HashSet<>();
 
     public User(
-            String idContract,
             String idWallet,
             UserType userType,
             String name,
@@ -104,7 +103,6 @@ public class User implements Serializable {
             Double balance,
             String fullName,
             String imageCID) {
-        this.idContract = idContract;
         this.idWallet = idWallet;
         this.userType = userType;
         this.name = name;

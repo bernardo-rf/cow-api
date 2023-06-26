@@ -29,16 +29,16 @@ import org.springframework.stereotype.Service;
 public class FieldService extends BaseService {
 
     @Autowired
-    FieldRepository fieldRepository;
+    private FieldRepository fieldRepository;
 
     @Autowired
-    BaseByteCode baseByteCode;
+    private BaseByteCode baseByteCode;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    BovineService bovineService;
+    private BovineService bovineService;
 
     public Field getFieldById(long id) {
         Field field = fieldRepository.getFieldById(id);
@@ -184,6 +184,9 @@ public class FieldService extends BaseService {
         }
 
         User user = userService.getUserById(fieldDTO.getIdOwner());
+        if (user == null) {
+            throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
+        }
 
         HederaReceipt receipt;
 
