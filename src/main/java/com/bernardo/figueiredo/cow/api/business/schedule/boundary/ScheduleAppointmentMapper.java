@@ -12,8 +12,8 @@ public class ScheduleAppointmentMapper {
     public ScheduleAppointmentDTO mapEntityToDTO(ScheduleAppointment scheduleAppointmentDTO) {
         return new ScheduleAppointmentDTO(
                 scheduleAppointmentDTO.getId(),
-                scheduleAppointmentDTO.getVeterinary().getIdUser(),
-                scheduleAppointmentDTO.getOwner().getIdUser(),
+                scheduleAppointmentDTO.getVeterinary().getId(),
+                scheduleAppointmentDTO.getOwner().getId(),
                 scheduleAppointmentDTO.getBovine().getId(),
                 scheduleAppointmentDTO.getMotive(),
                 scheduleAppointmentDTO.getScheduleDate(),

@@ -1,9 +1,3 @@
-/*
- *
- * @Copyright 2023 Politécnico de Leiria, @bernardo-rf.
- *
- */
-
 package com.bernardo.figueiredo.cow.api.business.user.dto;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAuthResponseDTO {
+public class UserAuth {
     private String token;
-    private UserFullInfoDTO user;
+    private User user;
 }

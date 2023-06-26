@@ -164,7 +164,7 @@ public class AppointmentService extends BaseService {
                         .addUint256(
                                 BigInteger.valueOf(newAppointment.getBovine().getId()))
                         .addUint256(BigInteger.valueOf(
-                                newAppointment.getVeterinary().getIdUser()))
+                                newAppointment.getVeterinary().getId()))
                         .addUint256(BigInteger.valueOf(
                                 newAppointment.getAppointmentDate().getTime()))
                         .addString(newAppointment.getAppointmentType())

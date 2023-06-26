@@ -4,7 +4,7 @@
  *
  */
 
-package com.bernardo.figueiredo.cow.api.business.user.dto;
+package com.bernardo.figueiredo.cow.api.business.user_type.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +15,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAuthDTO {
-    private String token;
-    private UserDTO user;
+public class UserTypeDTO {
+    private long id;
+    private String typeDescription;
+    private Boolean active;
 }

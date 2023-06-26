@@ -12,7 +12,7 @@ public class BovineMapper {
         return new BovineDTO(
                 bovine.getId(),
                 bovine.getIdContract(),
-                bovine.getOwner().getIdUser(),
+                bovine.getOwner().getId(),
                 bovine.getField().getId(),
                 bovine.getSerialNumber(),
                 bovine.getBirthDate(),

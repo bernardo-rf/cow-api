@@ -13,6 +13,8 @@ import java.util.Objects;
 
 public class EnvUtils {
 
+    private EnvUtils() {}
+
     static Dotenv getEnv() {
         return Dotenv.load();
     }
@@ -23,9 +25,5 @@ public class EnvUtils {
 
     public static PrivateKey getOperatorKey() {
         return PrivateKey.fromString(Objects.requireNonNull(getEnv().get("OPERATOR_KEY")));
-    }
-
-    public static String getProjectPath() {
-        return Objects.requireNonNull(getEnv().get("PROJECT_PATH"));
     }
 }

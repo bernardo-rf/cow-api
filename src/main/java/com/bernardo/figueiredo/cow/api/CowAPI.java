@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
+@SuppressWarnings("unused")
 public class CowAPI {
 
     public static void main(String[] args) {
@@ -26,7 +27,7 @@ public class CowAPI {
     @Bean
     public CommandLineRunner onStart(UserTypeRepository userTypeRepository) {
         return args -> {
-            List<UserType> userTypes = userTypeRepository.getAllUserTypes();
+            List<UserType> userTypes = userTypeRepository.getUserTypes();
             if (userTypes.isEmpty()) {
                 userTypeRepository.save(new UserType(Constants.FARMER_USER_TYPE, true));
                 userTypeRepository.save(new UserType(Constants.VETERINARY_USER_TYPE, true));

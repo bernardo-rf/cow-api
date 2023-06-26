@@ -7,64 +7,31 @@
 package com.bernardo.figueiredo.cow.api.business.user_type.boundary;
 
 import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
+import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserTypeDTO;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(path = "user_types")
+@Api("Management endpoints to handle user types")
 @CrossOrigin(maxAge = 3600)
-@Api("Handles management of COW UserTypes")
-@RequestMapping(path = "api/userTypes")
+@SuppressWarnings("unused")
 public class UserTypeController {
 
     @Autowired
-    private UserTypeRepository userTypeRepository;
+    private UserTypeService userTypeService;
 
-    public UserTypeController() {}
+    @Autowired
+    private UserTypeMapper userTypeMapper;
 
     @GetMapping("/")
-    @ApiOperation("Get all user types")
-    public List<UserType> getUserTypes() {
-        return userTypeRepository.getAllUserTypes();
-    }
-
-    @GetMapping("/{userTypeId}")
-    @ApiOperation("Get user type by user type id")
-    @ApiImplicitParams({
-        @ApiImplicitParam(
-                name = "userTypeId",
-                required = true,
-                type = "long",
-                example = "1",
-                value = "user type identifier.")
-    })
-    public Optional<UserType> getUserType(@PathVariable long userTypeId) {
-        return userTypeRepository.findById(userTypeId);
-    }
-
-    @PostMapping("/")
-    @ApiOperation("Create a user type")
-    @ApiImplicitParams({
-        @ApiImplicitParam(
-                name = "userTypeDescription",
-                type = "string",
-                example = "Farmer",
-                value = "define the description of the user type."),
-        @ApiImplicitParam(
-                name = "active",
-                type = "boolean",
-                example = "1",
-                value = "define the active of the user type.")
-    })
-    public UserType createUserType(
-            @RequestParam(defaultValue = "Farmer") String userTypeDescription,
-            @RequestParam(defaultValue = "1") Boolean active) {
-        UserType newUserType = new UserType(userTypeDescription, active);
-        return userTypeRepository.save(newUserType);
+    @ApiOperation("Get user types")
+    public ResponseEntity<List<UserTypeDTO>> getUserTypes() {
+        List<UserType> userTypes = userTypeService.getUserTypes();
+        return ResponseEntity.ok(userTypeMapper.mapSourceListToTargetList(userTypes));
     }
 }
