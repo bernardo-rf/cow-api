@@ -166,12 +166,12 @@ public class FieldService extends BaseService {
                 .setGas(400_000)
                 .setAdminKey(EnvUtils.getOperatorKey())
                 .setConstructorParameters(new ContractFunctionParameters()
+                        .addString(String.valueOf(newField.getOwner().getId()))
                         .addString(newField.getFieldDescription())
                         .addString(newField.getLatitude().toString())
                         .addString(newField.getLongitude().toString())
                         .addBool(newField.getActive())
-                        .addString(newField.getObservation())
-                        .addString(newField.getOwner().getIdWallet()));
+                        .addString(newField.getObservation()));
 
         return execute(client, contractCreateTransaction);
     }
@@ -237,7 +237,15 @@ public class FieldService extends BaseService {
         ContractExecuteTransaction contractCreateTransaction = new ContractExecuteTransaction()
                 .setContractId(ContractId.fromString(fieldDTO.getIdContract()))
                 .setGas(300_000)
-                .setFunction("setUpdate", new ContractFunctionParameters().addBool(fieldDTO.getActive()));
+                .setFunction(
+                        "setUpdate",
+                        new ContractFunctionParameters()
+                                .addString(String.valueOf(fieldDTO.getIdOwner()))
+                                .addString(fieldDTO.getFieldDescription())
+                                .addString(fieldDTO.getLatitude().toString())
+                                .addString(fieldDTO.getLongitude().toString())
+                                .addBool(fieldDTO.getActive())
+                                .addString(fieldDTO.getObservation()));
 
         return execute(client, contractCreateTransaction);
     }
