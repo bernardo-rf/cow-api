@@ -22,13 +22,8 @@ import com.bernardo.figueiredo.cow.api.business.user.boundary.UserService;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.hedera.hashgraph.sdk.*;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -168,7 +163,6 @@ public class AppointmentService extends BaseService {
                         .addUint256(BigInteger.valueOf(
                                 newAppointment.getAppointmentDate().getTime()))
                         .addString(newAppointment.getAppointmentType())
-                        .addUint256(BigDecimal.valueOf(newAppointment.getCost()).toBigInteger())
                         .addString(newAppointment.getObservation()));
 
         return execute(client, contractCreateTransaction);
@@ -191,24 +185,13 @@ public class AppointmentService extends BaseService {
             throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
         }
 
-        Date appointmentDate;
-
-        try {
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-            appointmentDate = formatter.parse(updateAppointmentDTO.getAppointmentDate());
-
-        } catch (ParseException e) {
-            throw new ErrorCodeException(ErrorCode.APPOINTMENT_UPDATE_FAILED);
-        }
-
         HederaReceipt receipt;
 
         try (Client client = getHederaClient()) {
 
             validateClientInstance(client);
 
-            receipt = getAppointmentUpdateReceipt(
-                    client, updateAppointment.getIdContract(), updateAppointmentDTO, appointmentDate);
+            receipt = getAppointmentUpdateReceipt(client, updateAppointmentDTO);
 
             validateReceiptStatus(receipt);
 
@@ -218,7 +201,7 @@ public class AppointmentService extends BaseService {
 
         updateAppointment.setBovine(bovine);
         updateAppointment.setVeterinary(user);
-        updateAppointment.setAppointmentDate(appointmentDate);
+        updateAppointment.setAppointmentDate(updateAppointmentDTO.getAppointmentDate());
         updateAppointment.setAppointmentType(updateAppointmentDTO.getAppointmentType());
         updateAppointment.setCost(updateAppointmentDTO.getCost());
         updateAppointment.setObservation(updateAppointmentDTO.getObservation());
@@ -227,11 +210,10 @@ public class AppointmentService extends BaseService {
         return appointmentRepository.save(updateAppointment);
     }
 
-    private HederaReceipt getAppointmentUpdateReceipt(
-            Client client, String appointmentContract, AppointmentDTO appointmentDTO, Date appointmentDate)
+    private HederaReceipt getAppointmentUpdateReceipt(Client client, AppointmentDTO appointmentDTO)
             throws TimeoutException {
         try {
-            return buildAppointmentUpdateReceipt(client, appointmentContract, appointmentDTO, appointmentDate);
+            return buildAppointmentUpdateReceipt(client, appointmentDTO);
         } catch (ReceiptStatusException e) {
             validateGas(e);
             throw new ErrorCodeException(ErrorCode.APPOINTMENT_UPDATE_FAILED);
@@ -240,19 +222,21 @@ public class AppointmentService extends BaseService {
         }
     }
 
-    private HederaReceipt buildAppointmentUpdateReceipt(
-            Client client, String appointmentContractId, AppointmentDTO appointmentDTO, Date appointmentDate)
+    private HederaReceipt buildAppointmentUpdateReceipt(Client client, AppointmentDTO appointmentDTO)
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
         ContractExecuteTransaction contractCreateTransaction = new ContractExecuteTransaction()
-                .setContractId(ContractId.fromString(appointmentContractId))
+                .setContractId(ContractId.fromString(appointmentDTO.getIdContract()))
                 .setGas(300_000)
                 .setFunction(
                         "setUpdate",
                         new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(appointmentDTO.getIdBovine()))
                                 .addUint256(BigInteger.valueOf(appointmentDTO.getIdVeterinary()))
-                                .addUint256(BigInteger.valueOf(appointmentDate.getTime())));
+                                .addUint256(BigInteger.valueOf(
+                                        appointmentDTO.getAppointmentDate().getTime()))
+                                .addString(appointmentDTO.getAppointmentType())
+                                .addString(appointmentDTO.getObservation()));
 
         return execute(client, contractCreateTransaction);
     }

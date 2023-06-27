@@ -20,7 +20,7 @@ public class AppointmentMapper {
                 appointmentRequestId,
                 appointment.getBovine().getId(),
                 appointment.getVeterinary().getId(),
-                appointment.getAppointmentDate().toString(),
+                appointment.getAppointmentDate(),
                 appointment.getAppointmentType(),
                 appointment.getCost(),
                 appointment.getObservation(),
