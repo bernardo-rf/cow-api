@@ -14,4 +14,5 @@ public final class Constants {
     public static final String VETERINARY_USER_TYPE = "VETERINARY";
     public static final String BUYER_USER_TYPE = "BUYER";
     public static final double INITIAL_BALANCE = 10000.0;
+    public static final String MINT_FUNCTION = "mint";
 }

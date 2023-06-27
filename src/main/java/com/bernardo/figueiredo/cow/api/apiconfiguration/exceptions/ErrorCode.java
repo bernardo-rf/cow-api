@@ -59,7 +59,7 @@ public enum ErrorCode {
     USER_TYPE_NOT_FOUND(35, HttpStatus.NOT_FOUND, "Error: No user type record found."),
     USER_TYPE_DESCRIPTION_INVALID(36, HttpStatus.BAD_REQUEST, "Error: No user type description invalid."),
     USER_ACCOUNT_FAILED(37, HttpStatus.BAD_REQUEST, "Hedera Error: User account failed."),
-    USER_DEPLOY_FAILED(38, HttpStatus.BAD_REQUEST, "Hedera Error:User deploy failed."),
+    USER_DEPLOY_FAILED(38, HttpStatus.BAD_REQUEST, "Hedera Error: User deploy failed."),
     USER_UPDATE_FAILED(39, HttpStatus.BAD_REQUEST, "Hedera Error: User update failed."),
     USER_PASSWORD_INVALID(40, HttpStatus.BAD_REQUEST, "Error: User password invalid."),
     ACCESS_TOKEN_CREATE_FAILED(41, HttpStatus.BAD_REQUEST, "Error: User access token create failed."),
@@ -76,6 +76,7 @@ public enum ErrorCode {
     BOVINE_DELETE_FAILED(52, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine delete failed."),
     BOVINE_SERIAL_NUMBER_INVALID(53, HttpStatus.BAD_REQUEST, "Error: Bovine serial number invalid."),
     HISTORY_FIELD_CREATE_FAILED(54, HttpStatus.BAD_REQUEST, "Error: History Field create failed."),
+    BOVINE_MINT_FAILED(54, HttpStatus.BAD_REQUEST, "Hedera Error: Bovine mint failed."),
     HEDERA_ACCOUNT_ID_NOT_FOUND(55, HttpStatus.NOT_FOUND, "Hedera Error: Account id not found..");
 
     private final int code;

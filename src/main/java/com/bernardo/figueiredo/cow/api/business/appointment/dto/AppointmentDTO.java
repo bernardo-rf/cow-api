@@ -6,6 +6,7 @@
 
 package com.bernardo.figueiredo.cow.api.business.appointment.dto;
 
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ public class AppointmentDTO {
     private long idAppointmentRequest;
     private long idBovine;
     private long idVeterinary;
-    private String appointmentDate;
+    private Date appointmentDate;
     private String appointmentType;
     private Double cost;
     private String observation;

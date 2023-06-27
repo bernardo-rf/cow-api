@@ -81,6 +81,13 @@ public class BovineController {
         return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
     }
 
+    @PostMapping("/mint")
+    @ApiOperation("Create bovine")
+    public ResponseEntity<BovineDTO> mintBovine(@RequestBody BovineCreateDTO bovineCreateDTO) {
+        Bovine bovine = bovineService.mintBovine(bovineCreateDTO);
+        return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
+    }
+
     @PutMapping("/{id}")
     @ApiOperation("Update bovine")
     public ResponseEntity<BovineDTO> updateBovine(@PathVariable long id, @RequestBody BovineDTO bovineDTO) {

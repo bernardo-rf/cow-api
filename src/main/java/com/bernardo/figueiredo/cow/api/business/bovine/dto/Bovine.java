@@ -39,6 +39,9 @@ public class Bovine implements Serializable {
     @Nationalized
     private String idContract;
 
+    @Column(nullable = false)
+    private long idToken;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_user", referencedColumnName = "idWallet")
     @JsonBackReference
@@ -99,6 +102,7 @@ public class Bovine implements Serializable {
     private Set<Auction> auctionSet = new HashSet<>();
 
     public Bovine(
+            String idContract,
             User user,
             Field field,
             Bovine bovineParent1,
@@ -113,6 +117,7 @@ public class Bovine implements Serializable {
             Boolean active,
             String observation,
             String imageCID) {
+        this.idContract = idContract;
         this.owner = user;
         this.field = field;
         this.bovineParent1 = bovineParent1;

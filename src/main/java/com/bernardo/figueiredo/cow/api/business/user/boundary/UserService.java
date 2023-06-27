@@ -219,10 +219,7 @@ public class UserService extends BaseService {
                         .addString(newUser.getName())
                         .addUint256(BigInteger.valueOf(newUser.getBirthDate().getTime()))
                         .addString(newUser.getEmail())
-                        .addString(bCryptPasswordEncoder.encode(
-                                newUser.getPassword().toUpperCase()))
-                        .addBool(newUser.getActive())
-                        .addUint256(BigInteger.valueOf((long) newUser.getBalance())));
+                        .addBool(newUser.getActive()));
 
         return execute(client, contractCreateTransaction);
     }
@@ -306,8 +303,10 @@ public class UserService extends BaseService {
                         "setUpdate",
                         new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
+                                .addString(userDTO.getName())
                                 .addUint256(BigInteger.valueOf(
                                         userDTO.getBirthDate().getTime()))
+                                .addString(userDTO.getEmail())
                                 .addBool(userDTO.getActive()));
 
         return execute(client, contractExecuteTransaction);
