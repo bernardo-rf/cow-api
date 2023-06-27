@@ -68,7 +68,6 @@ public class AuctionService extends BaseService {
 
     public Auction createAuction(AuctionCreateDTO auctionCreateDTO) {
         Auction auction;
-
         HederaReceipt receipt;
         FileId fileId;
 
@@ -114,7 +113,6 @@ public class AuctionService extends BaseService {
             }
 
             newAuction.setIdContract(receipt.getContractId().toString());
-
             auction = auctionRepository.save(newAuction);
 
         } catch (ReceiptStatusException e) {
@@ -150,7 +148,7 @@ public class AuctionService extends BaseService {
                 .setAdminKey(EnvUtils.getOperatorKey())
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addUint256(BigInteger.valueOf((newAuction.getBovine().getId())))
-                        .addString(newAuction.getAuctioneer().getIdContract())
+                        .addUint256(BigInteger.valueOf((newAuction.getAuctioneer().getId())))
                         .addString(newAuction.getAuctionDescription())
                         .addUint256(BigInteger.valueOf(newAuction.getStartDate().getTime()))
                         .addUint256(BigInteger.valueOf(newAuction.getEndDate().getTime()))
@@ -234,11 +232,12 @@ public class AuctionService extends BaseService {
                 .setFunction(
                         "setUpdate",
                         new ContractFunctionParameters()
-                                .addUint256(BigInteger.valueOf(auctionDTO.getIdBovine()))
-                                .addUint256(BigInteger.valueOf(
-                                        auctionDTO.getStartDate().getTime()))
-                                .addUint256(BigInteger.valueOf(
-                                        auctionDTO.getEndDate().getTime())));
+                                .addUint256(BigInteger.valueOf((auctionDTO.getIdBovine())))
+                                .addUint256(BigInteger.valueOf((auctionDTO.getIdAuctioneer())))
+                                .addString(auctionDTO.getAuctionDescription())
+                                .addUint256(BigInteger.valueOf(auctionDTO.getStartDate().getTime()))
+                                .addUint256(BigInteger.valueOf(auctionDTO.getEndDate().getTime()))
+                                .addUint32(auctionDTO.getAuctionStatus()));
 
         return execute(client, contractCreateTransaction);
     }
