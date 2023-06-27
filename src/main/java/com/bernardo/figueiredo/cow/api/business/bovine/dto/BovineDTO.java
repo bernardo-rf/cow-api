@@ -19,6 +19,7 @@ import lombok.Setter;
 public class BovineDTO {
     private long idBovine;
     private String idContract;
+    private long idToken;
     private long idOwner;
     private long idField;
     private long serialNumber;
