@@ -7,6 +7,7 @@
 package com.bernardo.figueiredo.cow.api.business.bovine.boundary;
 
 import static com.bernardo.figueiredo.cow.api.apiconfiguration.utils.HederaExecutor.*;
+import static com.bernardo.figueiredo.cow.api.utils.Constants.MINT_FUNCTION;
 
 import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseByteCode;
 import com.bernardo.figueiredo.cow.api.apiconfiguration.boundary.BaseService;
@@ -87,7 +88,7 @@ public class BovineService extends BaseService {
     }
 
     public Bovine createBovine(BovineCreateDTO bovineCreateDTO) {
-        Bovine bovine;
+        Bovine mintedBovine;
         HederaReceipt receipt;
         FileId fileId;
 
@@ -95,15 +96,6 @@ public class BovineService extends BaseService {
         if (checkBovine != null) {
             throw new ErrorCodeException(ErrorCode.BOVINE_SERIAL_NUMBER_INVALID);
         }
-
-        User user = userService.getUserById(bovineCreateDTO.getIdOwner());
-        Field field = fieldService.getFieldById(bovineCreateDTO.getIdField());
-
-        Bovine bovineParent1 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent1());
-        validateBovineNull(bovineParent1);
-
-        Bovine bovineParent2 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent2());
-        validateBovineNull(bovineParent2);
 
         try (Client client = getHederaClient()) {
 
@@ -119,23 +111,7 @@ public class BovineService extends BaseService {
 
             validateReceiptStatus(receipt);
 
-            Bovine newBovine = new Bovine(
-                    user,
-                    field,
-                    bovineParent1,
-                    bovineParent2,
-                    bovineCreateDTO.getSerialNumber(),
-                    bovineCreateDTO.getBirthDate(),
-                    bovineCreateDTO.getWeight(),
-                    bovineCreateDTO.getHeight(),
-                    bovineCreateDTO.getBreed(),
-                    bovineCreateDTO.getColor(),
-                    bovineCreateDTO.isGender(),
-                    bovineCreateDTO.getActive(),
-                    bovineCreateDTO.getObservation(),
-                    bovineCreateDTO.getImageCID());
-
-            receipt = getBovineDeployReceipt(client, fileId, newBovine);
+            receipt = getBovineDeployReceipt(client, fileId);
 
             validateReceiptStatus(receipt);
 
@@ -143,10 +119,8 @@ public class BovineService extends BaseService {
                 throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
             }
 
-            newBovine.setIdContract(receipt.getContractId().toString());
-            bovine = bovineRepository.save(newBovine);
-
-            addFieldHistory(bovine, field);
+            bovineCreateDTO.setIdContract(receipt.getContractId().toString());
+            mintedBovine = mintBovine(bovineCreateDTO);
 
         } catch (ReceiptStatusException e) {
             validateGas(e);
@@ -157,7 +131,7 @@ public class BovineService extends BaseService {
             throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
         }
 
-        return bovine;
+        return mintedBovine;
     }
 
     private void addFieldHistory(Bovine bovine, Field field) {
@@ -170,9 +144,67 @@ public class BovineService extends BaseService {
         }
     }
 
-    private HederaReceipt getBovineDeployReceipt(Client client, FileId fileId, Bovine bovine) throws TimeoutException {
+    public Bovine mintBovine(BovineCreateDTO bovineCreateDTO) {
+        Bovine mintBovine;
+        HederaReceipt receipt;
+
+        Bovine checkBovine = bovineRepository.getBovineBySerialNumber(bovineCreateDTO.getSerialNumber());
+        if (checkBovine != null) {
+            throw new ErrorCodeException(ErrorCode.BOVINE_SERIAL_NUMBER_INVALID);
+        }
+
+        User user = userService.getUserById(bovineCreateDTO.getIdOwner());
+        Field field = fieldService.getFieldById(bovineCreateDTO.getIdField());
+
+        Bovine bovineParent1 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent1());
+        validateBovineNull(bovineParent1);
+
+        Bovine bovineParent2 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent2());
+        validateBovineNull(bovineParent2);
+
+        Bovine newBovine = new Bovine(
+                bovineCreateDTO.getIdContract(),
+                user,
+                field,
+                bovineParent1,
+                bovineParent2,
+                bovineCreateDTO.getSerialNumber(),
+                bovineCreateDTO.getBirthDate(),
+                bovineCreateDTO.getWeight(),
+                bovineCreateDTO.getHeight(),
+                bovineCreateDTO.getBreed(),
+                bovineCreateDTO.getColor(),
+                bovineCreateDTO.isGender(),
+                bovineCreateDTO.getActive(),
+                bovineCreateDTO.getObservation(),
+                bovineCreateDTO.getImageCID());
+
+        try (Client client = getHederaClient()) {
+
+            validateClientInstance(client);
+
+            receipt = getBovineMintReceipt(client, newBovine);
+
+            validateReceiptStatus(receipt);
+
+            if (receipt.getContractId() == null) {
+                throw new ErrorCodeException(ErrorCode.HEDERA_CONTRACT_ID_NOT_FOUND);
+            }
+
+            mintBovine = bovineRepository.save(newBovine);
+
+            addFieldHistory(mintBovine, field);
+
+        } catch (TimeoutException e) {
+            throw new ErrorCodeException(ErrorCode.HEDERA_NETWORK_TIMEOUT);
+        }
+
+        return mintBovine;
+    }
+
+    private HederaReceipt getBovineDeployReceipt(Client client, FileId fileId) throws TimeoutException {
         try {
-            return buildBovineDeployReceipt(client, fileId, bovine);
+            return buildBovineDeployReceipt(client, fileId);
         } catch (ReceiptStatusException e) {
             validateGas(e);
             throw new ErrorCodeException(ErrorCode.BOVINE_DEPLOY_FAILED);
@@ -181,27 +213,53 @@ public class BovineService extends BaseService {
         }
     }
 
-    private HederaReceipt buildBovineDeployReceipt(Client client, FileId byteCodeFileId, Bovine newBovine)
+    private HederaReceipt buildBovineDeployReceipt(Client client, FileId byteCodeFileId)
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
         ContractCreateTransaction contractCreateTransaction = new ContractCreateTransaction()
                 .setBytecodeFileId(byteCodeFileId)
                 .setGas(400_000)
-                .setAdminKey(EnvUtils.getOperatorKey())
-                .setConstructorParameters(new ContractFunctionParameters()
-                        .addString(newBovine.getOwner().getIdContract())
-                        .addUint256(BigInteger.valueOf(newBovine.getField().getId()))
-                        .addUint256(BigInteger.valueOf(newBovine.getSerialNumber()))
-                        .addUint256(BigInteger.valueOf(newBovine.getBirthDate().getTime()))
-                        .addBool(newBovine.getActive())
-                        .addString(newBovine.getObservation())
-                        .addUint256(
-                                BigInteger.valueOf(newBovine.getBovineParent1().getId()))
-                        .addUint256(
-                                BigInteger.valueOf(newBovine.getBovineParent2().getId()))
-                        .addBool(newBovine.isGender()));
+                .setAdminKey(EnvUtils.getOperatorKey());
 
         return execute(client, contractCreateTransaction);
+    }
+
+    private HederaReceipt getBovineMintReceipt(Client client, Bovine bovine) throws TimeoutException {
+        try {
+            return buildBovineMintReceipt(client, bovine);
+        } catch (ReceiptStatusException e) {
+            validateGas(e);
+            throw new ErrorCodeException(ErrorCode.BOVINE_MINT_FAILED);
+        } catch (PrecheckStatusException e) {
+            throw new ErrorCodeException(validateErrorCode(e, ErrorCode.BOVINE_MINT_FAILED));
+        }
+    }
+
+    private HederaReceipt buildBovineMintReceipt(Client client, Bovine newBovine)
+            throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+
+        ContractExecuteTransaction contractExecuteTransaction = new ContractExecuteTransaction()
+                .setContractId(ContractId.fromString(newBovine.getIdContract()))
+                .setGas(400_000)
+                .setFunction(
+                        MINT_FUNCTION,
+                        new ContractFunctionParameters()
+                                .addUint256(
+                                        (BigInteger.valueOf(newBovine.getOwner().getId())))
+                                .addUint256(
+                                        BigInteger.valueOf(newBovine.getField().getId()))
+                                .addUint256(BigInteger.valueOf(newBovine.getSerialNumber()))
+                                .addUint256(BigInteger.valueOf(
+                                        newBovine.getBirthDate().getTime()))
+                                .addBool(newBovine.getActive())
+                                .addString(newBovine.getObservation())
+                                .addUint256(BigInteger.valueOf(
+                                        newBovine.getBovineParent1().getId()))
+                                .addUint256(BigInteger.valueOf(
+                                        newBovine.getBovineParent2().getId()))
+                                .addBool(newBovine.isGender()));
+
+        return execute(client, contractExecuteTransaction);
     }
 
     public Bovine updateBovine(long id, BovineDTO bovineDTO) {
@@ -279,11 +337,13 @@ public class BovineService extends BaseService {
                 .setFunction(
                         "setUpdate",
                         new ContractFunctionParameters()
+                                .addUint256((BigInteger.valueOf(bovineDTO.getIdOwner())))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdField()))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getSerialNumber()))
                                 .addUint256(BigInteger.valueOf(
                                         bovineDTO.getBirthDate().getTime()))
                                 .addBool(bovineDTO.getActive())
+                                .addString(bovineDTO.getObservation())
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent1()))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent2()))
                                 .addBool(bovineDTO.isGender()));

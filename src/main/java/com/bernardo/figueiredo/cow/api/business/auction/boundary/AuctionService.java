@@ -148,7 +148,8 @@ public class AuctionService extends BaseService {
                 .setAdminKey(EnvUtils.getOperatorKey())
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addUint256(BigInteger.valueOf((newAuction.getBovine().getId())))
-                        .addUint256(BigInteger.valueOf((newAuction.getAuctioneer().getId())))
+                        .addUint256(
+                                BigInteger.valueOf((newAuction.getAuctioneer().getId())))
                         .addString(newAuction.getAuctionDescription())
                         .addUint256(BigInteger.valueOf(newAuction.getStartDate().getTime()))
                         .addUint256(BigInteger.valueOf(newAuction.getEndDate().getTime()))
@@ -235,8 +236,10 @@ public class AuctionService extends BaseService {
                                 .addUint256(BigInteger.valueOf((auctionDTO.getIdBovine())))
                                 .addUint256(BigInteger.valueOf((auctionDTO.getIdAuctioneer())))
                                 .addString(auctionDTO.getAuctionDescription())
-                                .addUint256(BigInteger.valueOf(auctionDTO.getStartDate().getTime()))
-                                .addUint256(BigInteger.valueOf(auctionDTO.getEndDate().getTime()))
+                                .addUint256(BigInteger.valueOf(
+                                        auctionDTO.getStartDate().getTime()))
+                                .addUint256(BigInteger.valueOf(
+                                        auctionDTO.getEndDate().getTime()))
                                 .addUint32(auctionDTO.getAuctionStatus()));
 
         return execute(client, contractCreateTransaction);
