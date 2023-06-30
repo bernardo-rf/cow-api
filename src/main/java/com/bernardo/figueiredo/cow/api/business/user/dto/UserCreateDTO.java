@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,4 +22,5 @@ public class UserCreateDTO {
     private String name;
     private String email;
     private String password;
+    private Instant birthDate;
 }

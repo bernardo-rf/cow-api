@@ -6,8 +6,7 @@
 
 package com.bernardo.figueiredo.cow.api.business.field.dto;
 
-import com.bernardo.figueiredo.cow.api.business.bovine.dto.Bovine;
-import java.util.Set;
+import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,5 +25,5 @@ public class FieldCreateDTO {
     private int maxCapacityLimit;
     private Boolean active;
     private String observation;
-    private Set<Bovine> bovines;
+    private ArrayList<Integer> bovines;
 }

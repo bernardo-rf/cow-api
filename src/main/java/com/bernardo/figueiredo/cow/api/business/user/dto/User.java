@@ -14,7 +14,7 @@ import com.bernardo.figueiredo.cow.api.business.user_type.dto.UserType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -57,7 +57,7 @@ public class User implements Serializable {
     @Nationalized
     private String fullName;
 
-    private Date birthDate;
+    private Instant birthDate;
 
     @Column(nullable = false, unique = true, length = 50)
     @Nationalized
@@ -96,7 +96,7 @@ public class User implements Serializable {
             String idWallet,
             UserType userType,
             String name,
-            Date birthDate,
+            Instant birthDate,
             String email,
             String password,
             Boolean active,

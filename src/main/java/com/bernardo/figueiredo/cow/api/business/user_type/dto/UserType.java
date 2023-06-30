@@ -6,11 +6,7 @@
 
 package com.bernardo.figueiredo.cow.api.business.user_type.dto;
 
-import com.bernardo.figueiredo.cow.api.business.user.dto.User;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,10 +32,6 @@ public class UserType implements Serializable {
 
     @Column(nullable = false)
     private Boolean active;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userType")
-    @JsonManagedReference
-    private Set<User> users = new HashSet<>();
 
     public UserType(String description, Boolean active) {
         this.typeDescription = description;

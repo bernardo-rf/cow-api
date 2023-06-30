@@ -22,6 +22,7 @@ import com.bernardo.figueiredo.cow.api.utils.EnvUtils;
 import com.bernardo.figueiredo.cow.api.utils.JwtToken;
 import com.hedera.hashgraph.sdk.*;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,12 @@ public class UserService extends BaseService {
         return user;
     }
 
+    public boolean checkUserExistsByEmail(String email) {
+        User user = userRepository.getUserByEmail(email);
+
+        return user != null;
+    }
+
     public User getUserByWalletId(String idWallet) {
         User user = userRepository.getUserByWalletId(idWallet);
 
@@ -116,8 +123,7 @@ public class UserService extends BaseService {
         FileId fileId;
         AccountId accountId;
 
-        User user = getUserByEmail(userCreateDTO.getEmail());
-        if (user != null) {
+        if (checkUserExistsByEmail(userCreateDTO.getEmail())) {
             throw new ErrorCodeException(ErrorCode.USER_EMAIL_INVALID);
         }
 
@@ -160,7 +166,7 @@ public class UserService extends BaseService {
                     accountId.toString(),
                     checkUserType,
                     userCreateDTO.getName(),
-                    null,
+                    userCreateDTO.getBirthDate(),
                     userCreateDTO.getEmail(),
                     bCryptPasswordEncoder.encode(userCreateDTO.getPassword()),
                     true,
@@ -217,7 +223,7 @@ public class UserService extends BaseService {
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addUint256(BigInteger.valueOf(newUser.getUserType().getId()))
                         .addString(newUser.getName())
-                        .addUint256(BigInteger.valueOf(newUser.getBirthDate().getTime()))
+                        .addUint256(BigInteger.valueOf(Date.from(newUser.getBirthDate()).getTime()))
                         .addString(newUser.getEmail())
                         .addBool(newUser.getActive()));
 
@@ -239,7 +245,7 @@ public class UserService extends BaseService {
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
         AccountCreateTransaction accountCreateTransaction =
-                new AccountCreateTransaction().setKey(publicKey).setInitialBalance(Hbar.fromTinybars(10_000));
+                new AccountCreateTransaction().setKey(publicKey).setInitialBalance(Hbar.from(10_000));
 
         return execute(client, accountCreateTransaction);
     }
@@ -296,6 +302,8 @@ public class UserService extends BaseService {
     private HederaReceipt buildFieldUpdateReceipt(Client client, UserDTO userDTO)
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
+        BigInteger birthDateTime = new BigInteger(userDTO.getBirthDate().toString());
+
         ContractExecuteTransaction contractExecuteTransaction = new ContractExecuteTransaction()
                 .setContractId(ContractId.fromString(userDTO.getIdContract()))
                 .setGas(300_000)
@@ -304,8 +312,7 @@ public class UserService extends BaseService {
                         new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
                                 .addString(userDTO.getName())
-                                .addUint256(BigInteger.valueOf(
-                                        userDTO.getBirthDate().getTime()))
+                                .addUint256(birthDateTime)
                                 .addString(userDTO.getEmail())
                                 .addBool(userDTO.getActive()));
 

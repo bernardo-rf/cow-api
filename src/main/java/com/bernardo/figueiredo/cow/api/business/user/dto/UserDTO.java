@@ -6,7 +6,7 @@
 
 package com.bernardo.figueiredo.cow.api.business.user.dto;
 
-import java.util.Date;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +22,7 @@ public class UserDTO {
     private String idWallet;
     private long idUserType;
     private String name;
-    private Date birthDate;
+    private Instant birthDate;
     private String email;
     private String password;
     private Boolean active;

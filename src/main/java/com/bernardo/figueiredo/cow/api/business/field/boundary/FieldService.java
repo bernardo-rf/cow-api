@@ -131,10 +131,14 @@ public class FieldService extends BaseService {
             newField.setIdContract(receipt.getContractId().toString());
             field = fieldRepository.save(newField);
 
-            for (Bovine bovine : fieldCreateDTO.getBovines()) {
+            for (long bovineId : fieldCreateDTO.getBovines()) {
+                Bovine bovine = bovineService.getBovineById(bovineId);
+                if (bovine == null) {
+                    throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
+                }
+
                 bovineService.updateBovineLocation(bovine.getId(), newField.getId());
             }
-
         } catch (ReceiptStatusException e) {
             validateGas(e);
             throw new ErrorCodeException(ErrorCode.FIELD_DEPLOY_FAILED);
