@@ -20,6 +20,6 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
     List<Field> getFieldsByUserWalletId(String idWallet);
 
     @Query(
-            "SELECT f.address FROM Field f WHERE f.fieldDescription = :fieldDescription and f.owner.idWallet = :idWallet")
-    Field getFieldAddressByDescriptionAndUserWalletId(String fieldDescription, String idWallet);
+            "SELECT f FROM Field f WHERE f.address = :address and  f.fieldDescription = :fieldDescription and f.owner.idWallet = :idWallet")
+    Field getFieldAddressByDescriptionAndUserWalletId(String address, String fieldDescription, String idWallet);
 }

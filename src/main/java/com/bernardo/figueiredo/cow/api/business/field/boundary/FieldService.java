@@ -91,7 +91,7 @@ public class FieldService extends BaseService {
         User user = userService.getUserById(fieldCreateDTO.getIdOwner());
 
         Field checkField = fieldRepository.getFieldAddressByDescriptionAndUserWalletId(
-                fieldCreateDTO.getAddress(), user.getIdWallet());
+                fieldCreateDTO.getAddress(), fieldCreateDTO.getFieldDescription(), user.getIdWallet());
         if (checkField != null) {
             throw new ErrorCodeException(ErrorCode.FIELD_ADDRESS_INVALID);
         }
@@ -131,13 +131,15 @@ public class FieldService extends BaseService {
             newField.setIdContract(receipt.getContractId().toString());
             field = fieldRepository.save(newField);
 
-            for (long bovineId : fieldCreateDTO.getBovines()) {
-                Bovine bovine = bovineService.getBovineById(bovineId);
-                if (bovine == null) {
-                    throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
-                }
+            if(fieldCreateDTO.getBovines() != null){
+                for (long bovineId : fieldCreateDTO.getBovines()) {
+                    Bovine bovine = bovineService.getBovineById(bovineId);
+                    if (bovine == null) {
+                        throw new ErrorCodeException(ErrorCode.BOVINE_NOT_FOUND);
+                    }
 
-                bovineService.updateBovineLocation(bovine.getId(), newField.getId());
+                    bovineService.updateBovineLocation(bovine.getId(), newField.getId());
+                }
             }
         } catch (ReceiptStatusException e) {
             validateGas(e);
@@ -215,12 +217,13 @@ public class FieldService extends BaseService {
         updateField.setActive(fieldDTO.getActive());
         updateField.setObservation(fieldDTO.getObservation());
 
-        List<Bovine> bovines =
-                bovineService.getBovinesAvailableByUserWalletIdAndFieldId(user.getIdWallet(), updateField.getId());
-        for (Bovine bovine : bovines) {
-            bovineService.updateBovineLocation(bovine.getId(), updateField.getId());
+        if(!updateField.getBovineSet().isEmpty()){
+            List<Bovine> bovines =
+                    bovineService.getBovinesAvailableByUserWalletIdAndFieldId(user.getIdWallet(), updateField.getId());
+            for (Bovine bovine : bovines) {
+                bovineService.updateBovineLocation(bovine.getId(), updateField.getId());
+            }
         }
-
         return fieldRepository.save(updateField);
     }
 
