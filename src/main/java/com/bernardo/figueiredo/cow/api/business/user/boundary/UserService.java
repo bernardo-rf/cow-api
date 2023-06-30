@@ -105,7 +105,7 @@ public class UserService extends BaseService {
             throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
         }
 
-        if (bCryptPasswordEncoder.matches(userDTO.getPassword(), user.getPassword())) {
+        if (bCryptPasswordEncoder.matches(user.getPassword(), userDTO.getPassword())) {
             throw new ErrorCodeException(ErrorCode.AUTHENTICATION_FAILED);
         }
 
@@ -245,7 +245,7 @@ public class UserService extends BaseService {
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
         AccountCreateTransaction accountCreateTransaction =
-                new AccountCreateTransaction().setKey(publicKey).setInitialBalance(Hbar.from(10_000));
+                new AccountCreateTransaction().setKey(publicKey).setInitialBalance(Hbar.from(1_000));
 
         return execute(client, accountCreateTransaction);
     }
@@ -257,11 +257,11 @@ public class UserService extends BaseService {
         }
 
         User checkUser = userRepository.getUserByEmail(userDTO.getEmail());
-        if (checkUser == null) {
+        if (checkUser != null) {
             throw new ErrorCodeException(ErrorCode.USER_EMAIL_INVALID);
         }
 
-        if (bCryptPasswordEncoder.matches(userDTO.getPassword(), updateUser.getPassword())) {
+        if (bCryptPasswordEncoder.matches(updateUser.getPassword(), userDTO.getPassword())) {
             throw new ErrorCodeException(ErrorCode.USER_PASSWORD_INVALID);
         }
 
@@ -302,8 +302,6 @@ public class UserService extends BaseService {
     private HederaReceipt buildFieldUpdateReceipt(Client client, UserDTO userDTO)
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
-        BigInteger birthDateTime = new BigInteger(userDTO.getBirthDate().toString());
-
         ContractExecuteTransaction contractExecuteTransaction = new ContractExecuteTransaction()
                 .setContractId(ContractId.fromString(userDTO.getIdContract()))
                 .setGas(300_000)
@@ -312,7 +310,7 @@ public class UserService extends BaseService {
                         new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
                                 .addString(userDTO.getName())
-                                .addUint256(birthDateTime)
+                                .addUint256(BigInteger.valueOf(Date.from(userDTO.getBirthDate()).getTime()))
                                 .addString(userDTO.getEmail())
                                 .addBool(userDTO.getActive()));
 

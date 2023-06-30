@@ -38,9 +38,9 @@ public class UserController {
         return ResponseEntity.ok(userMapper.mapEntityToDTO(user));
     }
 
-    @GetMapping("userType/{userTypeId}")
+    @GetMapping("/userType")
     @ApiOperation("Get users by user type id")
-    public ResponseEntity<List<UserDTO>> getUsersByUserTypeID(long userTypeId) {
+    public ResponseEntity<List<UserDTO>> getUsersByUserTypeID(@RequestParam long userTypeId) {
         List<User> users = userService.getUsersByUserTypeId(userTypeId);
         return ResponseEntity.ok(userMapper.mapSourceListToTargetList(users));
     }
