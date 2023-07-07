@@ -13,7 +13,7 @@ import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
@@ -56,7 +56,7 @@ public class Bovine implements Serializable {
     private long serialNumber;
 
     @Column(nullable = false)
-    private Date birthDate;
+    private Instant birthDate;
 
     @Column(nullable = false)
     private Double weight;
@@ -105,10 +105,8 @@ public class Bovine implements Serializable {
             String idContract,
             User user,
             Field field,
-            Bovine bovineParent1,
-            Bovine bovineParent2,
             long serialNumber,
-            Date birthDate,
+            Instant birthDate,
             Double weight,
             Double height,
             String breed,
@@ -120,8 +118,6 @@ public class Bovine implements Serializable {
         this.idContract = idContract;
         this.owner = user;
         this.field = field;
-        this.bovineParent1 = bovineParent1;
-        this.bovineParent2 = bovineParent2;
         this.serialNumber = serialNumber;
         this.birthDate = birthDate;
         this.weight = weight;

@@ -6,7 +6,7 @@
 
 package com.bernardo.figueiredo.cow.api.business.bovine.dto;
 
-import java.util.Date;
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class BovineCreateDTO {
     private long idOwner;
     private long idField;
     private long serialNumber;
-    private Date birthDate;
+    private Instant birthDate;
     private Double weight;
     private Double height;
     private String breed;

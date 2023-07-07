@@ -92,11 +92,6 @@ public class BovineService extends BaseService {
         HederaReceipt receipt;
         FileId fileId;
 
-        Bovine checkBovine = bovineRepository.getBovineBySerialNumber(bovineCreateDTO.getSerialNumber());
-        if (checkBovine != null) {
-            throw new ErrorCodeException(ErrorCode.BOVINE_SERIAL_NUMBER_INVALID);
-        }
-
         try (Client client = getHederaClient()) {
 
             validateClientInstance(client);
@@ -107,7 +102,7 @@ public class BovineService extends BaseService {
 
             fileId = receipt.getFileId();
 
-            receipt = getHederaContractFileAppend(client, fileId, baseByteCode.getFieldByteCode(), 10, 2);
+            receipt = getHederaContractFileAppend(client, fileId, baseByteCode.getBovineByteCode(), 10, 2);
 
             validateReceiptStatus(receipt);
 
@@ -156,18 +151,10 @@ public class BovineService extends BaseService {
         User user = userService.getUserById(bovineCreateDTO.getIdOwner());
         Field field = fieldService.getFieldById(bovineCreateDTO.getIdField());
 
-        Bovine bovineParent1 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent1());
-        validateBovineNull(bovineParent1);
-
-        Bovine bovineParent2 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent2());
-        validateBovineNull(bovineParent2);
-
         Bovine newBovine = new Bovine(
                 bovineCreateDTO.getIdContract(),
                 user,
                 field,
-                bovineParent1,
-                bovineParent2,
                 bovineCreateDTO.getSerialNumber(),
                 bovineCreateDTO.getBirthDate(),
                 bovineCreateDTO.getWeight(),
@@ -178,6 +165,18 @@ public class BovineService extends BaseService {
                 bovineCreateDTO.getActive(),
                 bovineCreateDTO.getObservation(),
                 bovineCreateDTO.getImageCID());
+
+        if(bovineCreateDTO.getIdBovineParent1() != 0){
+            Bovine bovineParent1 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent1());
+            validateBovineNull(bovineParent1);
+            newBovine.setBovineParent1(bovineParent1);
+        }
+
+        if(bovineCreateDTO.getIdBovineParent2() != 0){
+            Bovine bovineParent2 = bovineRepository.getBovineById(bovineCreateDTO.getIdBovineParent2());
+            validateBovineNull(bovineParent2);
+            newBovine.setBovineParent1(bovineParent2);
+        }
 
         try (Client client = getHederaClient()) {
 
@@ -238,6 +237,16 @@ public class BovineService extends BaseService {
     private HederaReceipt buildBovineMintReceipt(Client client, Bovine newBovine)
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
+        long idBovineParent1 = 0;
+        if(newBovine.getBovineParent1() != null) {
+            idBovineParent1 = newBovine.getBovineParent1().getId();
+        }
+
+        long idBovineParent2 = 0;
+        if(newBovine.getBovineParent2() != null) {
+            idBovineParent2 = newBovine.getBovineParent2().getId();
+        }
+
         ContractExecuteTransaction contractExecuteTransaction = new ContractExecuteTransaction()
                 .setContractId(ContractId.fromString(newBovine.getIdContract()))
                 .setGas(400_000)
@@ -250,13 +259,11 @@ public class BovineService extends BaseService {
                                         BigInteger.valueOf(newBovine.getField().getId()))
                                 .addUint256(BigInteger.valueOf(newBovine.getSerialNumber()))
                                 .addUint256(BigInteger.valueOf(
-                                        newBovine.getBirthDate().getTime()))
+                                        Date.from(newBovine.getBirthDate()).getTime()))
                                 .addBool(newBovine.getActive())
                                 .addString(newBovine.getObservation())
-                                .addUint256(BigInteger.valueOf(
-                                        newBovine.getBovineParent1().getId()))
-                                .addUint256(BigInteger.valueOf(
-                                        newBovine.getBovineParent2().getId()))
+                                .addUint256(BigInteger.valueOf(idBovineParent1))
+                                .addUint256(BigInteger.valueOf(idBovineParent2))
                                 .addBool(newBovine.isGender()));
 
         return execute(client, contractExecuteTransaction);
@@ -271,11 +278,17 @@ public class BovineService extends BaseService {
             throw new ErrorCodeException(ErrorCode.USER_NOT_FOUND);
         }
 
-        Bovine bovineParent1 = bovineRepository.getBovineById(bovineDTO.getIdBovineParent1());
-        validateBovineNull(bovineParent1);
+        if(bovineDTO.getIdBovineParent1() != 0){
+            Bovine bovineParent1 = bovineRepository.getBovineById(bovineDTO.getIdBovineParent1());
+            validateBovineNull(bovineParent1);
+            updateBovine.setBovineParent1(bovineParent1);
+        }
 
-        Bovine bovineParent2 = bovineRepository.getBovineById(bovineDTO.getIdBovineParent2());
-        validateBovineNull(bovineParent1);
+        if(bovineDTO.getIdBovineParent2() != 0){
+            Bovine bovineParent2 = bovineRepository.getBovineById(bovineDTO.getIdBovineParent2());
+            validateBovineNull(bovineParent2);
+            updateBovine.setBovineParent2(bovineParent2);
+        }
 
         Field field = fieldService.getFieldById(bovineDTO.getIdField());
         if (field == null) {
@@ -298,8 +311,6 @@ public class BovineService extends BaseService {
 
         updateBovine.setOwner(user);
         updateBovine.setField(field);
-        updateBovine.setBovineParent1(bovineParent1);
-        updateBovine.setBovineParent2(bovineParent2);
         updateBovine.setGender(bovineDTO.isGender());
         updateBovine.setSerialNumber(bovineDTO.getSerialNumber());
         updateBovine.setBirthDate(bovineDTO.getBirthDate());
@@ -331,21 +342,32 @@ public class BovineService extends BaseService {
     private HederaReceipt buildBovineUpdateReceipt(Client client, BovineDTO bovineDTO)
             throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
 
+        long idBovineParent1 = 0;
+        if(bovineDTO.getIdBovineParent1() != 0) {
+            idBovineParent1 = bovineDTO.getIdBovineParent1();
+        }
+
+        long idBovineParent2 = 0;
+        if(bovineDTO.getIdBovineParent2() != 0) {
+            idBovineParent2 = bovineDTO.getIdBovineParent2();
+        }
+
         ContractExecuteTransaction contractCreateTransaction = new ContractExecuteTransaction()
                 .setContractId(ContractId.fromString(bovineDTO.getIdContract()))
-                .setGas(300_000)
+                .setGas(250_000)
                 .setFunction(
                         "setUpdate",
                         new ContractFunctionParameters()
+                                .addUint256((BigInteger.valueOf(bovineDTO.getIdToken())))
                                 .addUint256((BigInteger.valueOf(bovineDTO.getIdOwner())))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getIdField()))
                                 .addUint256(BigInteger.valueOf(bovineDTO.getSerialNumber()))
                                 .addUint256(BigInteger.valueOf(
-                                        bovineDTO.getBirthDate().getTime()))
+                                        Date.from(bovineDTO.getBirthDate()).getTime()))
                                 .addBool(bovineDTO.getActive())
                                 .addString(bovineDTO.getObservation())
-                                .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent1()))
-                                .addUint256(BigInteger.valueOf(bovineDTO.getIdBovineParent2()))
+                                .addUint256(BigInteger.valueOf(idBovineParent1))
+                                .addUint256(BigInteger.valueOf(idBovineParent2))
                                 .addBool(bovineDTO.isGender()));
 
         return execute(client, contractCreateTransaction);

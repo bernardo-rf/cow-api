@@ -223,7 +223,8 @@ public class UserService extends BaseService {
                 .setConstructorParameters(new ContractFunctionParameters()
                         .addUint256(BigInteger.valueOf(newUser.getUserType().getId()))
                         .addString(newUser.getName())
-                        .addUint256(BigInteger.valueOf(Date.from(newUser.getBirthDate()).getTime()))
+                        .addUint256(BigInteger.valueOf(
+                                Date.from(newUser.getBirthDate()).getTime()))
                         .addString(newUser.getEmail())
                         .addBool(newUser.getActive()));
 
@@ -310,7 +311,8 @@ public class UserService extends BaseService {
                         new ContractFunctionParameters()
                                 .addUint256(BigInteger.valueOf(userDTO.getIdUserType()))
                                 .addString(userDTO.getName())
-                                .addUint256(BigInteger.valueOf(Date.from(userDTO.getBirthDate()).getTime()))
+                                .addUint256(BigInteger.valueOf(
+                                        Date.from(userDTO.getBirthDate()).getTime()))
                                 .addString(userDTO.getEmail())
                                 .addBool(userDTO.getActive()));
 

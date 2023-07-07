@@ -9,12 +9,11 @@ package com.bernardo.figueiredo.cow.api.utils;
 import com.bernardo.figueiredo.cow.api.business.user.dto.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import java.io.Serializable;
 import java.security.Key;
 import java.util.Date;
-
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

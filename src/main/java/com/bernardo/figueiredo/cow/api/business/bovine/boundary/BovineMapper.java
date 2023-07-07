@@ -9,6 +9,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class BovineMapper {
     public BovineDTO mapEntityToDTO(Bovine bovine) {
+
+        long idBovineParent1 = 0;
+        if(bovine.getBovineParent1() != null) {
+            idBovineParent1 = bovine.getBovineParent1().getId();
+        }
+
+        long idBovineParent2 = 0;
+        if(bovine.getBovineParent2() != null) {
+            idBovineParent2 = bovine.getBovineParent2().getId();
+        }
+
         return new BovineDTO(
                 bovine.getId(),
                 bovine.getIdContract(),
@@ -23,8 +34,8 @@ public class BovineMapper {
                 bovine.getColor(),
                 bovine.getActive(),
                 bovine.getObservation(),
-                bovine.getBovineParent1().getId(),
-                bovine.getBovineParent2().getId(),
+                idBovineParent1,
+                idBovineParent2,
                 bovine.isGender(),
                 bovine.getImageCID());
     }

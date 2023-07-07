@@ -33,7 +33,7 @@ public class BovineController {
 
     @GetMapping("/{id}")
     @ApiOperation("Get bovine by id")
-    public ResponseEntity<BovineDTO> getBovine(@PathVariable long id) {
+    public ResponseEntity<BovineDTO> getBovineById(@PathVariable long id) {
         Bovine bovine = bovineService.getBovineById(id);
         return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));
     }
@@ -68,7 +68,7 @@ public class BovineController {
 
     @GetMapping("/user/{userWalletId}/available")
     @ApiOperation("Get bovines available by user wallet id")
-    public ResponseEntity<List<BovineDTO>> getBovinesToAuction(
+    public ResponseEntity<List<BovineDTO>> getBovinesAvailableByUserWalletIdAndFieldId(
             @PathVariable String userWalletId, @RequestParam long fieldId) {
         List<Bovine> bovines = bovineService.getBovinesAvailableByUserWalletIdAndFieldId(userWalletId, fieldId);
         return ResponseEntity.ok(bovineMapper.mapSourceListToTargetList(bovines));
@@ -82,7 +82,7 @@ public class BovineController {
     }
 
     @PostMapping("/mint")
-    @ApiOperation("Create bovine")
+    @ApiOperation("Mint bovine")
     public ResponseEntity<BovineDTO> mintBovine(@RequestBody BovineCreateDTO bovineCreateDTO) {
         Bovine bovine = bovineService.mintBovine(bovineCreateDTO);
         return ResponseEntity.ok(bovineMapper.mapEntityToDTO(bovine));

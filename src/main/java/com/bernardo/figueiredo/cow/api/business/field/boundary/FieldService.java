@@ -131,7 +131,7 @@ public class FieldService extends BaseService {
             newField.setIdContract(receipt.getContractId().toString());
             field = fieldRepository.save(newField);
 
-            if(fieldCreateDTO.getBovines() != null){
+            if (fieldCreateDTO.getBovines() != null) {
                 for (long bovineId : fieldCreateDTO.getBovines()) {
                     Bovine bovine = bovineService.getBovineById(bovineId);
                     if (bovine == null) {
@@ -217,7 +217,7 @@ public class FieldService extends BaseService {
         updateField.setActive(fieldDTO.getActive());
         updateField.setObservation(fieldDTO.getObservation());
 
-        if(!updateField.getBovineSet().isEmpty()){
+        if (!updateField.getBovineSet().isEmpty()) {
             List<Bovine> bovines =
                     bovineService.getBovinesAvailableByUserWalletIdAndFieldId(user.getIdWallet(), updateField.getId());
             for (Bovine bovine : bovines) {
